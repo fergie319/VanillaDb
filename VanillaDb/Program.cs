@@ -1,9 +1,9 @@
-﻿using Serilog;
-using Serilog.Sinks.SystemConsole.Themes;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Serilog;
+using Serilog.Sinks.SystemConsole.Themes;
 using VanillaDb.Models;
 
 namespace VanillaDb
@@ -85,16 +85,11 @@ namespace VanillaDb
                     var newField = new FieldModel()
                     {
                         FieldName = splitFieldTokens[0],
-                        SqlType = splitFieldTokens[1],
+                        FieldType = ParseFieldType(splitFieldTokens[1]),
                         IsIdentity = splitFieldTokens.Any(s => string.Equals(s, "identity", StringComparison.InvariantCultureIgnoreCase)),
                         IsPrimaryKey = splitFieldTokens.Any(s => string.Equals(s, "primary", StringComparison.InvariantCultureIgnoreCase)),
                         IsNullable = fieldDef.IndexOf(" NOT NULL ", StringComparison.InvariantCultureIgnoreCase) == -1,
                     };
-
-                    // TODO: Parse the type and convert it to a c# type
-                    newField.FieldType = typeof(string);
-                    newField.MaxLength = 10;
-
                     table.Fields.Add(newField);
 
                     // Break out of the loop if we've reached the end of the stream before encountering a )
@@ -158,6 +153,54 @@ namespace VanillaDb
             Console.ReadKey();
 
             return result;
+        }
+
+        /// <summary>Parses the type of the field from the given SQL Type markup.</summary>
+        /// <param name="sqlTypeMarkup">The SQL type markup.</param>
+        /// <returns>Field Type Model</returns>
+        private static FieldTypeModel ParseFieldType(string sqlTypeMarkup)
+        {
+            // Initialize the return object
+            var fieldType = new FieldTypeModel()
+            {
+                SqlType = sqlTypeMarkup,
+                MaxLength = -1,
+            };
+
+            // Split the type into type+size for the char types that include size
+            var splitFieldType = sqlTypeMarkup.Split(new[] { "(", ")", ",", "\t", " " }, StringSplitOptions.RemoveEmptyEntries);
+            switch (splitFieldType[0].ToUpperInvariant())
+            {
+                case "VARCHAR":
+                case "NVARCHAR":
+                case "NCHAR":
+                case "CHAR":
+                    fieldType.FieldType = typeof(string);
+                    if (splitFieldType.Length < 2)
+                    {
+                        throw new InvalidOperationException($"SQL Type is missing a length designation: {sqlTypeMarkup}");
+                    }
+
+                    if (int.TryParse(splitFieldType[1], out var maxLength))
+                    {
+                        fieldType.MaxLength = maxLength;
+                    }
+                    else if (string.Equals(splitFieldType[1], "MAX", StringComparison.InvariantCultureIgnoreCase))
+                    {
+                        fieldType.MaxLength = int.MaxValue;
+                    }
+                    else
+                    {
+                        throw new InvalidOperationException($"{splitFieldType[1]} is not a valid length value for a SQL character type.");
+                    }
+
+                    break;
+                case "INT":
+                    fieldType.FieldType = typeof(int);
+                    break;
+            }
+
+            return fieldType;
         }
     }
 }
