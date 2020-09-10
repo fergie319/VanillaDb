@@ -25,9 +25,5 @@ namespace VanillaDb.Models
 
         /// <summary>Gets or sets whether this field is an identity field.</summary>
         public bool IsIdentity { get; set; }
-
-        // TODO: Keep track of multiple fields in an index so that multi-param queries are easy
-        /// <summary>Gets or sets a whether this field is part of an index.</summary>
-        public bool IsIndexed { get; set; }
     }
 }

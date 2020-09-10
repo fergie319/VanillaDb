@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Serilog;
+using Serilog.Sinks.SystemConsole.Themes;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -9,12 +11,22 @@ namespace VanillaDb
     /// <summary>Main Program Class</summary>
     public class Program
     {
+        private static ILogger Log { get; set; }
+
         /// <summary>
         /// Defines the entry point of the application.
         /// </summary>
         /// <param name="args">The arguments.</param>
         public static int Main(string[] args)
         {
+            // Set up and configure Serilog here
+            Log = new LoggerConfiguration()
+                .Enrich.FromLogContext()
+                .MinimumLevel.Debug()
+                .WriteTo.Console(theme: AnsiConsoleTheme.Code)
+                .CreateLogger();
+            Serilog.Log.Logger = Log;
+
             var result = 0;
             if (args.Length == 0)
             {
@@ -30,28 +42,29 @@ namespace VanillaDb
             }
 
             // Open the file and start parsing
+            var table = new TableModel()
+            {
+                Fields = new List<FieldModel>(),
+            };
+            var indexes = new List<IndexModel>();
             using (var stream = sqlFileInfo.OpenRead())
             using (var reader = new StreamReader(stream))
             {
                 // TODO: Use Microsoft.SqlServer.Management.SqlParser.Parser - for now it is too complicated
-                // TODO: Example Usage: https://stackoverflow.com/questions/30452864/parsing-t-sql-statements-to-tokens
+                //       Example Usage: https://stackoverflow.com/questions/30452864/parsing-t-sql-statements-to-tokens
 
                 // NOTE: Parsing is inflexible, any deviation from expectations results in error
 
                 // First line should be table creation - extract table name (last parameter)
                 var createTable = reader.ReadLine();
-                var splitTableTokens = createTable.Split(new[] { "[", "]", ".", " " }, StringSplitOptions.RemoveEmptyEntries);
+                var splitTableTokens = createTable.Split(new[] { "[", "]", ".", " ", "\t" }, StringSplitOptions.RemoveEmptyEntries);
                 if (splitTableTokens.Length < 3)
                 {
                     throw new InvalidOperationException("Create Table line should at least split into 3 parts: Create Table [name].");
                 }
 
                 // Start building the table model - starting with the name
-                var table = new TableModel()
-                {
-                    TableName = splitTableTokens.Last(),
-                    Fields = new List<FieldModel>(),
-                };
+                table.TableName = splitTableTokens.Last();
 
                 // Second line should be just the parenthesis start
                 if (reader.ReadLine() != "(")
@@ -63,7 +76,7 @@ namespace VanillaDb
                 var fieldDef = reader.ReadLine();
                 while (fieldDef != ")")
                 {
-                    var splitFieldTokens = fieldDef.Split(new[] { " ", "[", "]" }, StringSplitOptions.RemoveEmptyEntries);
+                    var splitFieldTokens = fieldDef.Split(new[] { " ", "[", "]", "\t" }, StringSplitOptions.RemoveEmptyEntries);
                     if (splitFieldTokens.Length < 2)
                     {
                         throw new InvalidOperationException("Field definition line in Create Table statement should split into at least [FieldName] Type.");
@@ -73,8 +86,8 @@ namespace VanillaDb
                     {
                         FieldName = splitFieldTokens[0],
                         SqlType = splitFieldTokens[1],
-                        IsIdentity = splitFieldTokens.Any(s => string.Equals(splitFieldTokens[1], "identity", StringComparison.InvariantCultureIgnoreCase)),
-                        IsPrimaryKey = splitFieldTokens.Any(s => string.Equals(splitFieldTokens[1], "primary", StringComparison.InvariantCultureIgnoreCase)),
+                        IsIdentity = splitFieldTokens.Any(s => string.Equals(s, "identity", StringComparison.InvariantCultureIgnoreCase)),
+                        IsPrimaryKey = splitFieldTokens.Any(s => string.Equals(s, "primary", StringComparison.InvariantCultureIgnoreCase)),
                         IsNullable = fieldDef.IndexOf(" NOT NULL ", StringComparison.InvariantCultureIgnoreCase) == -1,
                     };
 
@@ -88,6 +101,10 @@ namespace VanillaDb
                     if (reader.EndOfStream)
                     {
                         break;
+                    }
+                    else
+                    {
+                        fieldDef = reader.ReadLine();
                     }
                 }
 
@@ -105,17 +122,40 @@ namespace VanillaDb
                             var fieldClause = splitIndexTokens.Last();
 
                             // Now split out the field names - removing whitespace characters
-                            var splitFields = fieldClause.Split(new[] { ",", " ", "[", "]" }, StringSplitOptions.RemoveEmptyEntries));
+                            var splitFields = fieldClause.Split(new[] { ",", " ", "[", "]", "\t" }, StringSplitOptions.RemoveEmptyEntries);
 
                             // For each named field, find it add it to an index model
+                            var index = new IndexModel()
+                            {
+                                Fields = new List<FieldModel>()
+                            };
+                            foreach (var fieldName in splitFields)
+                            {
+                                var field = table.Fields.FirstOrDefault(f => f.FieldName.Equals(fieldName));
+                                if (field == null)
+                                {
+                                    throw new InvalidOperationException($"A field in an index was encountered that does not match a field in the table: {fieldName}");
+                                }
+
+                                index.Fields.Add(field);
+                            }
+
+                            indexes.Add(index);
                         }
                     }
                 }
             }
 
+            // TODO: First verify we're getting the models filled out.
+            Log.Debug("Table: {@Table}", table);
+            Log.Debug("Indexes: {@Indexes}", indexes);
+
             // Generate the stored procedures using our parsed table information
 
             // Generate the C# classes and interfaces for working with the table and stored procedures
+
+            // TODO: This is temporary for VS debugging - remove
+            Console.ReadKey();
 
             return result;
         }
