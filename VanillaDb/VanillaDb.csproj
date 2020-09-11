@@ -80,6 +80,7 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>TypeTable.tt</DependentUpon>
     </Compile>
+    <Compile Include="TypeTables\TypeTableCode.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
