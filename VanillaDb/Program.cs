@@ -158,8 +158,14 @@ namespace VanillaDb
             Log.Debug("Table: {@Table}", table);
             Log.Debug("Indexes: {@Indexes}", indexes);
 
+            // Generate output in subdirectories of the table file directory's parent
+            // In other words, we're assuming the table is in a Tables folder and want our output next to that folder
+            var outputDir = sqlFileInfo.Directory.Parent.FullName;
+
             // Generate the stored procedures using our parsed table information
             // First generate type tables for all fields participating in indexes
+            var typeTableDir = Path.Combine(outputDir, "Types");
+            Directory.CreateDirectory(typeTableDir);
             foreach (var index in indexes)
             {
                 var typeTable = new TypeTable(index);
@@ -167,7 +173,7 @@ namespace VanillaDb
                 var fieldNames = string.Join("_", index.Fields.Select(f => f.FieldName));
                 Log.Debug($"Output to: Types\\Type_{fieldNames}_Table.sql");
                 Log.Debug($"Content: {sqlContent}");
-                ////File.WriteAllText($"Types\\Type_{fieldNames}_Table.sql", sqlContent);
+                File.WriteAllText($"{typeTableDir}\\Type_{fieldNames}_Table.sql", sqlContent);
             }
 
             // Generate the C# classes and interfaces for working with the table and stored procedures
