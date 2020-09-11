@@ -5,6 +5,7 @@ using System.Linq;
 using Serilog;
 using Serilog.Sinks.SystemConsole.Themes;
 using VanillaDb.Models;
+using VanillaDb.TypeTables;
 
 namespace VanillaDb
 {
@@ -55,6 +56,8 @@ namespace VanillaDb
 
                 // NOTE: Parsing is inflexible, any deviation from expectations results in error
 
+                // TODO: Add more detailed logging along the way.
+
                 // First line should be table creation - extract table name (last parameter)
                 var createTable = reader.ReadLine();
                 var splitTableTokens = createTable.Split(new[] { "[", "]", ".", " ", "\t" }, StringSplitOptions.RemoveEmptyEntries);
@@ -91,6 +94,16 @@ namespace VanillaDb
                         IsNullable = fieldDef.IndexOf(" NOT NULL ", StringComparison.InvariantCultureIgnoreCase) == -1,
                     };
                     table.Fields.Add(newField);
+
+                    // If this field is the primary key, then add an index for it
+                    if (newField.IsPrimaryKey)
+                    {
+                        var index = new IndexModel()
+                        {
+                            Fields = new[] { newField }
+                        };
+                        indexes.Add(index);
+                    }
 
                     // Break out of the loop if we've reached the end of the stream before encountering a )
                     if (reader.EndOfStream)
@@ -145,7 +158,23 @@ namespace VanillaDb
             Log.Debug("Table: {@Table}", table);
             Log.Debug("Indexes: {@Indexes}", indexes);
 
+            // Generate output in subdirectories of the table file directory's parent
+            // In other words, we're assuming the table is in a Tables folder and want our output next to that folder
+            var outputDir = sqlFileInfo.Directory.Parent.FullName;
+
             // Generate the stored procedures using our parsed table information
+            // First generate type tables for all fields participating in indexes
+            var typeTableDir = Path.Combine(outputDir, "Types");
+            Directory.CreateDirectory(typeTableDir);
+            foreach (var index in indexes)
+            {
+                var typeTable = new TypeTable(index);
+                var sqlContent = typeTable.TransformText();
+                var fieldNames = string.Join("_", index.Fields.Select(f => f.FieldName));
+                Log.Debug($"Output to: Types\\Type_{fieldNames}_Table.sql");
+                Log.Debug($"Content: {sqlContent}");
+                File.WriteAllText($"{typeTableDir}\\Type_{fieldNames}_Table.sql", sqlContent);
+            }
 
             // Generate the C# classes and interfaces for working with the table and stored procedures
 
