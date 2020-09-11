@@ -69,6 +69,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="InsertProcs\InsertStoredProc.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>InsertStoredProc.tt</DependentUpon>
+    </Compile>
+    <Compile Include="InsertProcs\InsertStoredProcCode.cs" />
     <Compile Include="Models\FieldModel.cs" />
     <Compile Include="Models\FieldTypeModel.cs" />
     <Compile Include="Models\IndexModel.cs" />
@@ -100,6 +106,10 @@
   <ItemGroup>
     <None Include="packages.config" />
     <None Include="TestInput\Book.sql" />
+    <Content Include="InsertProcs\InsertStoredProc.tt">
+      <Generator>TextTemplatingFilePreprocessor</Generator>
+      <LastGenOutput>InsertStoredProc.cs</LastGenOutput>
+    </Content>
     <Content Include="TypeTables\TypeTable.tt">
       <Generator>TextTemplatingFilePreprocessor</Generator>
       <LastGenOutput>TypeTable.cs</LastGenOutput>
