@@ -1,0 +1,17 @@
+﻿<#@ template language="C#" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="System.Collections.Generic" #>
+CREATE PROCEDURE [dbo].[USP_<#= Table.TableName #>_GetBy<#= GenerateProcNameFields() #>]
+<#= GenerateProcParameters() #>
+AS
+Begin
+    SET NOCOUNT ON
+
+    SELECT <#= GenerateSelectFields() #>
+    FROM [<#= Table.TableName #>]
+    WHERE <#= GenerateWhereClause() #>
+
+    SET NOCOUNT OFF
+End

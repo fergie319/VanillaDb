@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using Serilog;
 using Serilog.Sinks.SystemConsole.Themes;
+using VanillaDb.GetProcs;
 using VanillaDb.InsertProcs;
 using VanillaDb.Models;
 using VanillaDb.TypeTables;
@@ -163,10 +164,14 @@ namespace VanillaDb
             // In other words, we're assuming the table is in a Tables folder and want our output next to that folder
             var outputDir = sqlFileInfo.Directory.Parent.FullName;
 
-            // Generate the stored procedures using our parsed table information
-            // First generate type tables for all fields participating in indexes
+            // Create the output directories for all of the different files
             var typeTableDir = Path.Combine(outputDir, "Types");
             Directory.CreateDirectory(typeTableDir);
+            var storedProcDir = Path.Combine(outputDir, "Stored Procedures");
+            Directory.CreateDirectory(storedProcDir);
+
+            // Generate the stored procedures using our parsed table information
+            // First generate type tables for all fields participating in indexes
             foreach (var index in indexes)
             {
                 var typeTable = new TypeTable(index);
@@ -174,11 +179,13 @@ namespace VanillaDb
                 var fieldNames = string.Join("_", index.Fields.Select(f => f.FieldName));
                 Log.Debug($"Content: {sqlContent}");
                 File.WriteAllText($"{typeTableDir}\\Type_{fieldNames}_Table.sql", sqlContent);
-            }
 
-            // Create the output directory for stored procedures
-            var storedProcDir = Path.Combine(outputDir, "Stored Procedures");
-            Directory.CreateDirectory(storedProcDir);
+                // Generate the single- and multi-select stored procedures
+                var getBySingle = new GetBySingleStoredProc(table, index);
+                sqlContent = getBySingle.TransformText();
+                Log.Debug($"Content: {sqlContent}");
+                File.WriteAllText($"{storedProcDir}\\USP_{table.TableName}_GetBy{fieldNames}", sqlContent);
+            }
 
             // Generate the Insert stored procedure
             var insertStoredProc = new InsertStoredProc(table);

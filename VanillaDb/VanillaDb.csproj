@@ -69,6 +69,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="GetProcs\GetBySingleStoredProc.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>GetBySingleStoredProc.tt</DependentUpon>
+    </Compile>
+    <Compile Include="GetProcs\GetBySingleStoredProcCode.cs" />
     <Compile Include="InsertProcs\InsertStoredProc.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -107,6 +113,10 @@
   <ItemGroup>
     <None Include="packages.config" />
     <None Include="TestInput\Book.sql" />
+    <Content Include="GetProcs\GetBySingleStoredProc.tt">
+      <Generator>TextTemplatingFilePreprocessor</Generator>
+      <LastGenOutput>GetBySingleStoredProc.cs</LastGenOutput>
+    </Content>
     <Content Include="InsertProcs\InsertStoredProc.tt">
       <Generator>TextTemplatingFilePreprocessor</Generator>
       <LastGenOutput>InsertStoredProc.cs</LastGenOutput>
