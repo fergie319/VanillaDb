@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using Serilog;
 using Serilog.Sinks.SystemConsole.Themes;
+using VanillaDb.InsertProcs;
 using VanillaDb.Models;
 using VanillaDb.TypeTables;
 
@@ -79,7 +80,7 @@ namespace VanillaDb
                 var fieldDef = reader.ReadLine();
                 while (fieldDef != ")")
                 {
-                    var splitFieldTokens = fieldDef.Split(new[] { " ", "[", "]", "\t" }, StringSplitOptions.RemoveEmptyEntries);
+                    var splitFieldTokens = fieldDef.Split(new[] { " ", "[", "]", ",", "\t" }, StringSplitOptions.RemoveEmptyEntries);
                     if (splitFieldTokens.Length < 2)
                     {
                         throw new InvalidOperationException("Field definition line in Create Table statement should split into at least [FieldName] Type.");
@@ -171,12 +172,19 @@ namespace VanillaDb
                 var typeTable = new TypeTable(index);
                 var sqlContent = typeTable.TransformText();
                 var fieldNames = string.Join("_", index.Fields.Select(f => f.FieldName));
-                Log.Debug($"Output to: Types\\Type_{fieldNames}_Table.sql");
                 Log.Debug($"Content: {sqlContent}");
                 File.WriteAllText($"{typeTableDir}\\Type_{fieldNames}_Table.sql", sqlContent);
             }
 
-            // Generate the C# classes and interfaces for working with the table and stored procedures
+            // Create the output directory for stored procedures
+            var storedProcDir = Path.Combine(outputDir, "Stored Procedures");
+            Directory.CreateDirectory(storedProcDir);
+
+            // Generate the Insert stored procedure
+            var insertStoredProc = new InsertStoredProc(table);
+            var insertContent = insertStoredProc.TransformText();
+            Log.Debug($"Content: {insertContent}");
+            File.WriteAllText($"{storedProcDir}\\USP_{table.TableName}_Insert", insertContent);
 
             // TODO: This is temporary for VS debugging - remove
             Console.ReadKey();

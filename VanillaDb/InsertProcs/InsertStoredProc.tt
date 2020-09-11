@@ -4,4 +4,21 @@
 <#@ import namespace="System.Text" #>
 <#@ import namespace="System.Collections.Generic" #>
 <#@ import namespace="VanillaDb.Models" #>
+<#
+    TableModel table = Table;
+#>
 
+CREATE PROCEDURE [dbo].[USP_<#= table.TableName #>_Insert]
+<#= GenerateProcParameters() #>
+AS
+BEGIN
+    SET NOCOUNT ON
+
+    INSERT INTO Book (<#= GenerateInsertParameters() #>)
+    OUTPUT <#= GenerateOutputFields() #>
+    VALUES (<#= GenerateValuesFields() #>)
+
+    SET NOCOUNT OFF
+END
+
+GO

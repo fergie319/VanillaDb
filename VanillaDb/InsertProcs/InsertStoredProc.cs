@@ -29,7 +29,50 @@ namespace VanillaDb.InsertProcs
         /// </summary>
         public virtual string TransformText()
         {
-            this.Write("\r\n");
+            
+            #line 7 "C:\git-scratch\vanilladb\VanillaDb\InsertProcs\InsertStoredProc.tt"
+
+    TableModel table = Table;
+
+            
+            #line default
+            #line hidden
+            this.Write("\r\nCREATE PROCEDURE [dbo].[USP_");
+            
+            #line 11 "C:\git-scratch\vanilladb\VanillaDb\InsertProcs\InsertStoredProc.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(table.TableName));
+            
+            #line default
+            #line hidden
+            this.Write("_Insert]\r\n");
+            
+            #line 12 "C:\git-scratch\vanilladb\VanillaDb\InsertProcs\InsertStoredProc.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(GenerateProcParameters()));
+            
+            #line default
+            #line hidden
+            this.Write("\r\nAS\r\nBEGIN\r\n    SET NOCOUNT ON\r\n\r\n    INSERT INTO Book (");
+            
+            #line 17 "C:\git-scratch\vanilladb\VanillaDb\InsertProcs\InsertStoredProc.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(GenerateInsertParameters()));
+            
+            #line default
+            #line hidden
+            this.Write(")\r\n    OUTPUT ");
+            
+            #line 18 "C:\git-scratch\vanilladb\VanillaDb\InsertProcs\InsertStoredProc.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(GenerateOutputFields()));
+            
+            #line default
+            #line hidden
+            this.Write("\r\n    VALUES (");
+            
+            #line 19 "C:\git-scratch\vanilladb\VanillaDb\InsertProcs\InsertStoredProc.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(GenerateValuesFields()));
+            
+            #line default
+            #line hidden
+            this.Write(")\r\n\r\n    SET NOCOUNT OFF\r\nEND\r\n\r\nGO\r\n");
             return this.GenerationEnvironment.ToString();
         }
     }

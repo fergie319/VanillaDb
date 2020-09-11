@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using VanillaDb.Models;
 
 namespace VanillaDb.InsertProcs
@@ -17,6 +14,44 @@ namespace VanillaDb.InsertProcs
         public InsertStoredProc(TableModel table)
         {
             Table = table;
+        }
+
+        /// <summary>Generates the stored procedure's parameter list.</summary>
+        /// <returns></returns>
+        public string GenerateProcParameters()
+        {
+            var insertParams = Table.Fields
+                //.Where(f => !f.IsIdentity)
+                .Select(f => $"    @{f.FieldName.ToCamelCase()} {f.FieldType.SqlType}");
+            return string.Join("," + Environment.NewLine, insertParams);
+        }
+
+        /// <summary>Generates the insert parameters for the stored procedure.</summary>
+        /// <returns>Comma-separated list of non-identity fields.</returns>
+        public string GenerateInsertParameters()
+        {
+            var insertParams = Table.Fields
+                .Where(f => !f.IsIdentity)
+                .Select(f => f.FieldName);
+            return string.Join(", ", insertParams);
+        }
+
+        /// <summary>Generates the fields for the OUTPUT clause of the Insert statement.</summary>
+        /// <returns></returns>
+        public string GenerateOutputFields()
+        {
+            var insertParams = Table.Fields.Select(f => "INSERTED." + f.FieldName);
+            return string.Join(", ", insertParams);
+        }
+
+        /// <summary>Generates the fields for the VALUES (...) clause of the Insert statement.</summary>
+        /// <returns></returns>
+        public string GenerateValuesFields()
+        {
+            var insertParams = Table.Fields
+                .Where(f => !f.IsIdentity)
+                .Select(f => "@" + f.FieldName.ToCamelCase());
+            return string.Join(", ", insertParams);
         }
     }
 }
