@@ -102,7 +102,8 @@ namespace VanillaDb
                     {
                         var index = new IndexModel()
                         {
-                            Fields = new[] { newField }
+                            Fields = new[] { newField },
+                            IsUnique = true
                         };
                         indexes.Add(index);
                     }
@@ -124,33 +125,44 @@ namespace VanillaDb
                     while (!reader.EndOfStream)
                     {
                         // First make sure this is an 'ON' clause (so part of Index definition)
-                        var indexOnClause = reader.ReadLine().Trim();
-                        if (indexOnClause.StartsWith("ON", StringComparison.InvariantCultureIgnoreCase))
+                        var nextLine = reader.ReadLine().Trim();
+                        if (nextLine.StartsWith("CREATE", StringComparison.InvariantCultureIgnoreCase) &&
+                            nextLine.IndexOf(" INDEX ", StringComparison.InvariantCultureIgnoreCase) > -1)
                         {
-                            // The fields exist within the parenthesis, which are at the end of the line
-                            var splitIndexTokens = indexOnClause.Trim().Split(new[] { "(", ")" }, StringSplitOptions.RemoveEmptyEntries);
-                            var fieldClause = splitIndexTokens.Last();
-
-                            // Now split out the field names - removing whitespace characters
-                            var splitFields = fieldClause.Split(new[] { ",", " ", "[", "]", "\t" }, StringSplitOptions.RemoveEmptyEntries);
-
-                            // For each named field, find it add it to an index model
-                            var index = new IndexModel()
+                            var isUnique = nextLine.IndexOf(" UNIQUE ", StringComparison.InvariantCultureIgnoreCase) > -1;
+                            var indexOnClause = reader.ReadLine().Trim();
+                            if (indexOnClause.StartsWith("ON", StringComparison.InvariantCultureIgnoreCase))
                             {
-                                Fields = new List<FieldModel>()
-                            };
-                            foreach (var fieldName in splitFields)
-                            {
-                                var field = table.Fields.FirstOrDefault(f => f.FieldName.Equals(fieldName));
-                                if (field == null)
+                                // The fields exist within the parenthesis, which are at the end of the line
+                                var splitIndexTokens = indexOnClause.Trim().Split(new[] { "(", ")" }, StringSplitOptions.RemoveEmptyEntries);
+                                var fieldClause = splitIndexTokens.Last();
+
+                                // Now split out the field names - removing whitespace characters
+                                var splitFields = fieldClause.Split(new[] { ",", " ", "[", "]", "\t" }, StringSplitOptions.RemoveEmptyEntries);
+
+                                // For each named field, find it add it to an index model
+                                var index = new IndexModel()
                                 {
-                                    throw new InvalidOperationException($"A field in an index was encountered that does not match a field in the table: {fieldName}");
+                                    Fields = new List<FieldModel>(),
+                                    IsUnique = isUnique
+                                };
+                                foreach (var fieldName in splitFields)
+                                {
+                                    var field = table.Fields.FirstOrDefault(f => f.FieldName.Equals(fieldName));
+                                    if (field == null)
+                                    {
+                                        throw new InvalidOperationException($"A field in an index was encountered that does not match a field in the table: {fieldName}");
+                                    }
+
+                                    index.Fields.Add(field);
                                 }
 
-                                index.Fields.Add(field);
+                                indexes.Add(index);
                             }
-
-                            indexes.Add(index);
+                            else
+                            {
+                                throw new InvalidOperationException("The CREATE INDEX statement must have the ON clause on the next line.")
+                            }
                         }
                     }
                 }
