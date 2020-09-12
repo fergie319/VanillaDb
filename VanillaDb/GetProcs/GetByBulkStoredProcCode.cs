@@ -1,4 +1,6 @@
-﻿using VanillaDb.Models;
+﻿using System.Linq;
+using VanillaDb.Models;
+using VanillaDb.TypeTables;
 
 namespace VanillaDb.GetProcs
 {
@@ -21,5 +23,13 @@ namespace VanillaDb.GetProcs
 
         // TODO: Implement the transform.
         // TODO: Add method to all transform classes for getting proc/file name.
+
+        /// <summary>Gets the name of the stored procedure.</summary>
+        /// <returns>Type Table name and file name (without .sql).</returns>
+        public string GenerateName()
+        {
+            var fieldNames = Index.Fields.Select(f => f.FieldName);
+            return $"USP_{Table.TableName}_GetBy{string.Join("_", fieldNames)}_BULK";
+        }
     }
 }

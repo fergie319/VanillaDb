@@ -18,7 +18,7 @@ namespace VanillaDb.TypeTables
 
         /// <summary>Gets the name of the file.</summary>
         /// <returns>Type Table name and file name (without .sql).</returns>
-        public string GenerateFileName()
+        public string GenerateName()
         {
             var fieldNames = Index.Fields.Select(f => f.FieldName);
             return $"Type_{string.Join("_", fieldNames)}_Table";

@@ -190,19 +190,19 @@ namespace VanillaDb
                 var sqlContent = typeTable.TransformText();
                 var fieldNames = string.Join("_", index.Fields.Select(f => f.FieldName));
                 Log.Debug($"Content: {sqlContent}");
-                File.WriteAllText($"{typeTableDir}\\Type_{fieldNames}_Table.sql", sqlContent);
+                File.WriteAllText($"{typeTableDir}\\{typeTable.GenerateName()}.sql", sqlContent);
 
                 // Generate the single-select stored procedures
                 var getBy = new GetBySingleStoredProc(table, index);
                 sqlContent = getBy.TransformText();
                 Log.Debug($"Content: {sqlContent}");
-                File.WriteAllText($"{storedProcDir}\\USP_{table.TableName}_GetBy{fieldNames}", sqlContent);
+                File.WriteAllText($"{storedProcDir}\\{getBy.GenerateName()}", sqlContent);
 
                 // Generate the bulk-select stored procedures
-                var getByBulk = new GetBySingleStoredProc(table, index);
+                var getByBulk = new GetByBulkStoredProc(table, index);
                 sqlContent = getByBulk.TransformText();
                 Log.Debug($"Content: {sqlContent}");
-                File.WriteAllText($"{storedProcDir}\\USP_{table.TableName}_GetBy{fieldNames}_Bulk", sqlContent);
+                File.WriteAllText($"{storedProcDir}\\{getByBulk.GenerateName()}", sqlContent);
             }
 
             // Generate the Insert stored procedure

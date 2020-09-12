@@ -28,17 +28,10 @@ namespace VanillaDb.GetProcs
         /// </summary>
         public virtual string TransformText()
         {
-            this.Write("CREATE PROCEDURE [dbo].[USP_");
+            this.Write("CREATE PROCEDURE [dbo].[");
             
             #line 6 "C:\git-scratch\vanilladb\VanillaDb\GetProcs\GetBySingleStoredProc.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(Table.TableName));
-            
-            #line default
-            #line hidden
-            this.Write("_GetBy");
-            
-            #line 6 "C:\git-scratch\vanilladb\VanillaDb\GetProcs\GetBySingleStoredProc.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(GenerateProcNameFields()));
+            this.Write(this.ToStringHelper.ToStringWithCulture(GenerateName()));
             
             #line default
             #line hidden

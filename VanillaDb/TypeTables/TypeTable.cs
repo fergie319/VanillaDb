@@ -32,7 +32,7 @@ namespace VanillaDb.TypeTables
             this.Write("CREATE TYPE [dbo].[");
             
             #line 7 "C:\git-scratch\vanilladb\VanillaDb\TypeTables\TypeTable.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(GenerateFileName()));
+            this.Write(this.ToStringHelper.ToStringWithCulture(GenerateName()));
             
             #line default
             #line hidden

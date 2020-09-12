@@ -22,10 +22,10 @@ namespace VanillaDb.GetProcs
 
         /// <summary>Generates the portion of the procedure name that is composed of the indexed fields.</summary>
         /// <returns>Underscore-separated field names</returns>
-        public string GenerateProcNameFields()
+        public string GenerateName()
         {
             var procNameFields = Index.Fields.Select(f => f.FieldName);
-            return string.Join("_", procNameFields);
+            return $"USP_{Table.TableName}_GetBy{string.Join("_", procNameFields)}";
         }
 
         /// <summary>Generates the stored procedure's parameter list.</summary>
