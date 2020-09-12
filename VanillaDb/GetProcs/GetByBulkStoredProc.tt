@@ -3,3 +3,16 @@
 <#@ import namespace="System.Linq" #>
 <#@ import namespace="System.Text" #>
 <#@ import namespace="System.Collections.Generic" #>
+CREATE PROCEDURE [dbo].[<#= GenerateName() #>]
+<#= GenerateProcParameters() #>
+AS
+Begin
+	SET NOCOUNT ON
+
+	SELECT <#= GenerateSelectFields() #>
+	FROM [<#= Table.TableName #>]
+	AS <#= GetTableAlias() #>
+	WHERE <#= GenerateWhereClause() #>
+
+	SET NOCOUNT OFF
+End

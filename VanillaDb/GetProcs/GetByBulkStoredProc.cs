@@ -28,6 +28,49 @@ namespace VanillaDb.GetProcs
         /// </summary>
         public virtual string TransformText()
         {
+            this.Write("CREATE PROCEDURE [dbo].[");
+            
+            #line 6 "C:\git-scratch\vanilladb\VanillaDb\GetProcs\GetByBulkStoredProc.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(GenerateName()));
+            
+            #line default
+            #line hidden
+            this.Write("]\r\n");
+            
+            #line 7 "C:\git-scratch\vanilladb\VanillaDb\GetProcs\GetByBulkStoredProc.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(GenerateProcParameters()));
+            
+            #line default
+            #line hidden
+            this.Write("\r\nAS\r\nBegin\r\n\tSET NOCOUNT ON\r\n\r\n\tSELECT ");
+            
+            #line 12 "C:\git-scratch\vanilladb\VanillaDb\GetProcs\GetByBulkStoredProc.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(GenerateSelectFields()));
+            
+            #line default
+            #line hidden
+            this.Write("\r\n\tFROM [");
+            
+            #line 13 "C:\git-scratch\vanilladb\VanillaDb\GetProcs\GetByBulkStoredProc.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(Table.TableName));
+            
+            #line default
+            #line hidden
+            this.Write("]\r\n\tAS ");
+            
+            #line 14 "C:\git-scratch\vanilladb\VanillaDb\GetProcs\GetByBulkStoredProc.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(GetTableAlias()));
+            
+            #line default
+            #line hidden
+            this.Write("\r\n\tWHERE ");
+            
+            #line 15 "C:\git-scratch\vanilladb\VanillaDb\GetProcs\GetByBulkStoredProc.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(GenerateWhereClause()));
+            
+            #line default
+            #line hidden
+            this.Write("\r\n\r\n\tSET NOCOUNT OFF\r\nEnd");
             return this.GenerationEnvironment.ToString();
         }
     }
