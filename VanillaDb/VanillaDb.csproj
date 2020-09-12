@@ -69,6 +69,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="GetProcs\GetByBulkStoredProc.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>GetByBulkStoredProc.tt</DependentUpon>
+    </Compile>
+    <Compile Include="GetProcs\GetByBulkStoredProcCode.cs" />
     <Compile Include="GetProcs\GetBySingleStoredProc.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -113,6 +119,10 @@
   <ItemGroup>
     <None Include="packages.config" />
     <None Include="TestInput\Book.sql" />
+    <Content Include="GetProcs\GetByBulkStoredProc.tt">
+      <Generator>TextTemplatingFilePreprocessor</Generator>
+      <LastGenOutput>GetByBulkStoredProc.cs</LastGenOutput>
+    </Content>
     <Content Include="GetProcs\GetBySingleStoredProc.tt">
       <Generator>TextTemplatingFilePreprocessor</Generator>
       <LastGenOutput>GetBySingleStoredProc.cs</LastGenOutput>

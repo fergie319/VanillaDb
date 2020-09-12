@@ -161,7 +161,7 @@ namespace VanillaDb
                             }
                             else
                             {
-                                throw new InvalidOperationException("The CREATE INDEX statement must have the ON clause on the next line.")
+                                throw new InvalidOperationException("The CREATE INDEX statement must have the ON clause on the next line.");
                             }
                         }
                     }
