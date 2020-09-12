@@ -4,21 +4,10 @@
 <#@ import namespace="System.Text" #>
 <#@ import namespace="System.Collections.Generic" #>
 <#@ import namespace="VanillaDb.Models" #>
-<#
-    IndexModel index = Index;
-	var fieldNames = index.Fields.Select(f => f.FieldName);
-#>
-CREATE TYPE [dbo].[Type_<#= string.Join("_", fieldNames) #>_Table]
+CREATE TYPE [dbo].[<#= GenerateName() #>]
 AS TABLE
 (
-<#
-	foreach (FieldModel field in Index.Fields)
-	{
-#>
-    <#= field.FieldName #> <#= field.FieldType.SqlType #>
-<#
-	}
-#>
+<#= GenerateFields() #>
 );
 
 GO;

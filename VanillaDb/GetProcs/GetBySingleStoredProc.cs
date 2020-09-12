@@ -7,21 +7,20 @@
 //     the code is regenerated.
 // </auto-generated>
 // ------------------------------------------------------------------------------
-namespace VanillaDb.TypeTables
+namespace VanillaDb.GetProcs
 {
     using System.Linq;
     using System.Text;
     using System.Collections.Generic;
-    using VanillaDb.Models;
     using System;
     
     /// <summary>
     /// Class to produce the template output
     /// </summary>
     
-    #line 1 "C:\git-scratch\vanilladb\VanillaDb\TypeTables\TypeTable.tt"
+    #line 1 "C:\git-scratch\vanilladb\VanillaDb\GetProcs\GetBySingleStoredProc.tt"
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.TextTemplating", "16.0.0.0")]
-    public partial class TypeTable : TypeTableBase
+    public partial class GetBySingleStoredProc : GetBySingleStoredProcBase
     {
 #line hidden
         /// <summary>
@@ -29,21 +28,42 @@ namespace VanillaDb.TypeTables
         /// </summary>
         public virtual string TransformText()
         {
-            this.Write("CREATE TYPE [dbo].[");
+            this.Write("CREATE PROCEDURE [dbo].[");
             
-            #line 7 "C:\git-scratch\vanilladb\VanillaDb\TypeTables\TypeTable.tt"
+            #line 6 "C:\git-scratch\vanilladb\VanillaDb\GetProcs\GetBySingleStoredProc.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(GenerateName()));
             
             #line default
             #line hidden
-            this.Write("]\r\nAS TABLE\r\n(\r\n");
+            this.Write("]\r\n");
             
-            #line 10 "C:\git-scratch\vanilladb\VanillaDb\TypeTables\TypeTable.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(GenerateFields()));
+            #line 7 "C:\git-scratch\vanilladb\VanillaDb\GetProcs\GetBySingleStoredProc.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(GenerateProcParameters()));
             
             #line default
             #line hidden
-            this.Write("\r\n);\r\n\r\nGO;");
+            this.Write("\r\nAS\r\nBegin\r\n    SET NOCOUNT ON\r\n\r\n    SELECT ");
+            
+            #line 12 "C:\git-scratch\vanilladb\VanillaDb\GetProcs\GetBySingleStoredProc.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(GenerateSelectFields()));
+            
+            #line default
+            #line hidden
+            this.Write("\r\n    FROM [");
+            
+            #line 13 "C:\git-scratch\vanilladb\VanillaDb\GetProcs\GetBySingleStoredProc.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(Table.TableName));
+            
+            #line default
+            #line hidden
+            this.Write("]\r\n    WHERE ");
+            
+            #line 14 "C:\git-scratch\vanilladb\VanillaDb\GetProcs\GetBySingleStoredProc.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(GenerateWhereClause()));
+            
+            #line default
+            #line hidden
+            this.Write("\r\n\r\n    SET NOCOUNT OFF\r\nEnd\r\n");
             return this.GenerationEnvironment.ToString();
         }
     }
@@ -55,7 +75,7 @@ namespace VanillaDb.TypeTables
     /// Base class for this transformation
     /// </summary>
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.TextTemplating", "16.0.0.0")]
-    public class TypeTableBase
+    public class GetBySingleStoredProcBase
     {
         #region Fields
         private global::System.Text.StringBuilder generationEnvironmentField;

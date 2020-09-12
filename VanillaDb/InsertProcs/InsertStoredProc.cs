@@ -29,45 +29,44 @@ namespace VanillaDb.InsertProcs
         /// </summary>
         public virtual string TransformText()
         {
+            this.Write("CREATE PROCEDURE [dbo].[USP_");
             
             #line 7 "C:\git-scratch\vanilladb\VanillaDb\InsertProcs\InsertStoredProc.tt"
-
-    TableModel table = Table;
-
-            
-            #line default
-            #line hidden
-            this.Write("\r\nCREATE PROCEDURE [dbo].[USP_");
-            
-            #line 11 "C:\git-scratch\vanilladb\VanillaDb\InsertProcs\InsertStoredProc.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(table.TableName));
+            this.Write(this.ToStringHelper.ToStringWithCulture(Table.TableName));
             
             #line default
             #line hidden
             this.Write("_Insert]\r\n");
             
-            #line 12 "C:\git-scratch\vanilladb\VanillaDb\InsertProcs\InsertStoredProc.tt"
+            #line 8 "C:\git-scratch\vanilladb\VanillaDb\InsertProcs\InsertStoredProc.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(GenerateProcParameters()));
             
             #line default
             #line hidden
-            this.Write("\r\nAS\r\nBEGIN\r\n    SET NOCOUNT ON\r\n\r\n    INSERT INTO Book (");
+            this.Write("\r\nAS\r\nBEGIN\r\n    SET NOCOUNT ON\r\n\r\n    INSERT INTO [");
             
-            #line 17 "C:\git-scratch\vanilladb\VanillaDb\InsertProcs\InsertStoredProc.tt"
+            #line 13 "C:\git-scratch\vanilladb\VanillaDb\InsertProcs\InsertStoredProc.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(Table.TableName));
+            
+            #line default
+            #line hidden
+            this.Write("] (");
+            
+            #line 13 "C:\git-scratch\vanilladb\VanillaDb\InsertProcs\InsertStoredProc.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(GenerateInsertParameters()));
             
             #line default
             #line hidden
             this.Write(")\r\n    OUTPUT ");
             
-            #line 18 "C:\git-scratch\vanilladb\VanillaDb\InsertProcs\InsertStoredProc.tt"
+            #line 14 "C:\git-scratch\vanilladb\VanillaDb\InsertProcs\InsertStoredProc.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(GenerateOutputFields()));
             
             #line default
             #line hidden
             this.Write("\r\n    VALUES (");
             
-            #line 19 "C:\git-scratch\vanilladb\VanillaDb\InsertProcs\InsertStoredProc.tt"
+            #line 15 "C:\git-scratch\vanilladb\VanillaDb\InsertProcs\InsertStoredProc.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(GenerateValuesFields()));
             
             #line default

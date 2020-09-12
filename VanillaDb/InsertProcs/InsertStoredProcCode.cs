@@ -21,7 +21,7 @@ namespace VanillaDb.InsertProcs
         public string GenerateProcParameters()
         {
             var insertParams = Table.Fields
-                //.Where(f => !f.IsIdentity)
+                .Where(f => !f.IsIdentity)
                 .Select(f => $"    @{f.FieldName.ToCamelCase()} {f.FieldType.SqlType}");
             return string.Join("," + Environment.NewLine, insertParams);
         }
