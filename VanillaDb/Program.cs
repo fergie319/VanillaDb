@@ -192,11 +192,17 @@ namespace VanillaDb
                 Log.Debug($"Content: {sqlContent}");
                 File.WriteAllText($"{typeTableDir}\\Type_{fieldNames}_Table.sql", sqlContent);
 
-                // Generate the single- and multi-select stored procedures
-                var getBySingle = new GetBySingleStoredProc(table, index);
-                sqlContent = getBySingle.TransformText();
+                // Generate the single-select stored procedures
+                var getBy = new GetBySingleStoredProc(table, index);
+                sqlContent = getBy.TransformText();
                 Log.Debug($"Content: {sqlContent}");
                 File.WriteAllText($"{storedProcDir}\\USP_{table.TableName}_GetBy{fieldNames}", sqlContent);
+
+                // Generate the bulk-select stored procedures
+                var getByBulk = new GetBySingleStoredProc(table, index);
+                sqlContent = getByBulk.TransformText();
+                Log.Debug($"Content: {sqlContent}");
+                File.WriteAllText($"{storedProcDir}\\USP_{table.TableName}_GetBy{fieldNames}_Bulk", sqlContent);
             }
 
             // Generate the Insert stored procedure
