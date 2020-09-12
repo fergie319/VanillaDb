@@ -29,56 +29,21 @@ namespace VanillaDb.TypeTables
         /// </summary>
         public virtual string TransformText()
         {
+            this.Write("CREATE TYPE [dbo].[");
             
             #line 7 "C:\git-scratch\vanilladb\VanillaDb\TypeTables\TypeTable.tt"
-
-    IndexModel index = Index;
-	var fieldNames = index.Fields.Select(f => f.FieldName);
-
+            this.Write(this.ToStringHelper.ToStringWithCulture(GenerateFileName()));
             
             #line default
             #line hidden
-            this.Write("CREATE TYPE [dbo].[Type_");
+            this.Write("]\r\nAS TABLE\r\n(\r\n");
             
-            #line 11 "C:\git-scratch\vanilladb\VanillaDb\TypeTables\TypeTable.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(string.Join("_", fieldNames)));
-            
-            #line default
-            #line hidden
-            this.Write("_Table]\r\nAS TABLE\r\n(\r\n");
-            
-            #line 14 "C:\git-scratch\vanilladb\VanillaDb\TypeTables\TypeTable.tt"
-
-	foreach (FieldModel field in Index.Fields)
-	{
-
+            #line 10 "C:\git-scratch\vanilladb\VanillaDb\TypeTables\TypeTable.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(GenerateFields()));
             
             #line default
             #line hidden
-            this.Write("    ");
-            
-            #line 18 "C:\git-scratch\vanilladb\VanillaDb\TypeTables\TypeTable.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(field.FieldName));
-            
-            #line default
-            #line hidden
-            this.Write(" ");
-            
-            #line 18 "C:\git-scratch\vanilladb\VanillaDb\TypeTables\TypeTable.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(field.FieldType.SqlType));
-            
-            #line default
-            #line hidden
-            this.Write("\r\n");
-            
-            #line 19 "C:\git-scratch\vanilladb\VanillaDb\TypeTables\TypeTable.tt"
-
-	}
-
-            
-            #line default
-            #line hidden
-            this.Write(");\r\n\r\nGO;");
+            this.Write("\r\n);\r\n\r\nGO;");
             return this.GenerationEnvironment.ToString();
         }
     }
