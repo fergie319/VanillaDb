@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using Serilog;
 using Serilog.Sinks.SystemConsole.Themes;
+using VanillaDb.DataProviders;
 using VanillaDb.GetProcs;
 using VanillaDb.InsertProcs;
 using VanillaDb.Models;
@@ -209,7 +210,21 @@ namespace VanillaDb
             var insertStoredProc = new InsertStoredProc(table);
             var insertContent = insertStoredProc.TransformText();
             Log.Debug($"Content: {insertContent}");
-            File.WriteAllText($"{storedProcDir}\\USP_{table.TableName}_Insert", insertContent);
+            File.WriteAllText($"{storedProcDir}\\{insertStoredProc.GenerateName()}", insertContent);
+
+            // Create Data Provider directory
+            var dataProviderDir = Path.Combine(outputDir, "DataProviders");
+            Directory.CreateDirectory(dataProviderDir);
+
+            // Generate the DataModel class
+            var dataModelGen = new DataModel(table);
+            var content = dataModelGen.TransformText();
+            Log.Debug($"Content: {content}");
+            File.WriteAllText($"{dataProviderDir}\\{dataModelGen.GenerateName()}", content);
+
+            // Generate the DataProvider interface
+
+            // Generate the SqlDataProvider class
 
             // TODO: This is temporary for VS debugging - remove
             Console.ReadKey();
