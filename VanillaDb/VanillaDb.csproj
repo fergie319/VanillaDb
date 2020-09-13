@@ -75,6 +75,18 @@
       <DependentUpon>DataModel.tt</DependentUpon>
     </Compile>
     <Compile Include="DataProviders\DataModelCode.cs" />
+    <Compile Include="DataProviders\DataProviderInterface.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>DataProviderInterface.tt</DependentUpon>
+    </Compile>
+    <Compile Include="DataProviders\DataProviderInterfaceCode.cs" />
+    <Compile Include="DataProviders\SqlDataProvider.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>SqlDataProvider.tt</DependentUpon>
+    </Compile>
+    <Compile Include="DataProviders\SqlDataProviderCode.cs" />
     <Compile Include="GetProcs\GetByBulkStoredProc.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -129,6 +141,14 @@
     <Content Include="DataProviders\DataModel.tt">
       <Generator>TextTemplatingFilePreprocessor</Generator>
       <LastGenOutput>DataModel.cs</LastGenOutput>
+    </Content>
+    <Content Include="DataProviders\DataProviderInterface.tt">
+      <Generator>TextTemplatingFilePreprocessor</Generator>
+      <LastGenOutput>DataProviderInterface.cs</LastGenOutput>
+    </Content>
+    <Content Include="DataProviders\SqlDataProvider.tt">
+      <Generator>TextTemplatingFilePreprocessor</Generator>
+      <LastGenOutput>SqlDataProvider.cs</LastGenOutput>
     </Content>
     <Content Include="GetProcs\GetByBulkStoredProc.tt">
       <Generator>TextTemplatingFilePreprocessor</Generator>
