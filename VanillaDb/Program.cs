@@ -61,6 +61,10 @@ namespace VanillaDb
 
                 // TODO: Add more detailed logging along the way.
 
+                // TODO: Add output directory arguments (one for sql file output, the other for C# output)
+
+                // TODO: Add C# namespace input argument
+
                 // First line should be table creation - extract table name (last parameter)
                 var createTable = reader.ReadLine();
                 var splitTableTokens = createTable.Split(new[] { "[", "]", ".", " ", "\t" }, StringSplitOptions.RemoveEmptyEntries);

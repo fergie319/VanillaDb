@@ -30,5 +30,16 @@ namespace VanillaDb.DataProviders
         {
             return $"I{Table.TableName}DataProvider";
         }
+
+        /// <summary>Generates the insert method for the data provider.</summary>
+        /// <returns>Insert method definition.</returns>
+        public string GenerateInsertMethod()
+        {
+            /////// <summary>Inserts the given <#= Table.TableName #> data model into the <#= Table.TableName #> table.</summary>
+            /////// <param name="<#= Table.TableName.ToLower() #> Data">The <#= Table.TableName.ToLower() #> data to insert.</param>
+            /////// <returns>The ID of the inserted <#= Table.TableName #> record.</returns>
+            ////int Insert(<#= Table.TableName #>DataModel <#= Table.TableName.ToCamelCase() #>Data);
+            return string.Empty;
+        }
     }
 }

@@ -28,6 +28,111 @@ namespace VanillaDb.DataProviders
         /// </summary>
         public virtual string TransformText()
         {
+            this.Write("// <copyright file=\"");
+            
+            #line 6 "C:\git-scratch\vanilladb\VanillaDb\DataProviders\DataProviderInterface.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(GenerateName()));
+            
+            #line default
+            #line hidden
+            this.Write(".cs\" company=\"MMF Software Developers Inc.\">\r\n// Copyright (c) MMF Software Devel" +
+                    "opers Inc.. All rights reserved.\r\n// </copyright>\r\n\r\nnamespace [");
+            
+            #line 10 "C:\git-scratch\vanilladb\VanillaDb\DataProviders\DataProviderInterface.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(Table.TableName));
+            
+            #line default
+            #line hidden
+            this.Write("]Service.DataProviders\r\n{\r\n    using System;\r\n    using System.Collections.Generi" +
+                    "c;\r\n\r\n    /// <summary>Interface for ");
+            
+            #line 15 "C:\git-scratch\vanilladb\VanillaDb\DataProviders\DataProviderInterface.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(Table.TableName));
+            
+            #line default
+            #line hidden
+            this.Write(" Data Providers.</summary>\r\n    public interface ");
+            
+            #line 16 "C:\git-scratch\vanilladb\VanillaDb\DataProviders\DataProviderInterface.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(GenerateName()));
+            
+            #line default
+            #line hidden
+            this.Write("\r\n    {\r\n        /// <summary>Inserts the given ");
+            
+            #line 18 "C:\git-scratch\vanilladb\VanillaDb\DataProviders\DataProviderInterface.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(Table.TableName));
+            
+            #line default
+            #line hidden
+            this.Write(" data model into the ");
+            
+            #line 18 "C:\git-scratch\vanilladb\VanillaDb\DataProviders\DataProviderInterface.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(Table.TableName));
+            
+            #line default
+            #line hidden
+            this.Write(" table.</summary>\r\n        /// <param name=\"");
+            
+            #line 19 "C:\git-scratch\vanilladb\VanillaDb\DataProviders\DataProviderInterface.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(Table.TableName.ToLower()));
+            
+            #line default
+            #line hidden
+            this.Write(" Data\">The ");
+            
+            #line 19 "C:\git-scratch\vanilladb\VanillaDb\DataProviders\DataProviderInterface.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(Table.TableName.ToLower()));
+            
+            #line default
+            #line hidden
+            this.Write(" data to insert.</param>\r\n        /// <returns>The ID of the inserted ");
+            
+            #line 20 "C:\git-scratch\vanilladb\VanillaDb\DataProviders\DataProviderInterface.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(Table.TableName));
+            
+            #line default
+            #line hidden
+            this.Write(" record.</returns>\r\n        int Insert(");
+            
+            #line 21 "C:\git-scratch\vanilladb\VanillaDb\DataProviders\DataProviderInterface.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(Table.TableName));
+            
+            #line default
+            #line hidden
+            this.Write("DataModel ");
+            
+            #line 21 "C:\git-scratch\vanilladb\VanillaDb\DataProviders\DataProviderInterface.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(Table.TableName.ToCamelCase()));
+            
+            #line default
+            #line hidden
+            this.Write("Data);\r\n\r\n        /// <summary>Gets the data for the book with the given BookId.<" +
+                    "/summary>\r\n        /// <param name=\"bookId\">The book Id.</param>\r\n        /// <r" +
+                    "eturns>Book Data Model or null if not found.</returns>\r\n        /// <exception c" +
+                    "ref=\"InvalidOperationException\">${bookId} is not a valid BookId.</exception>\r\n  " +
+                    "      BookDataModel GetByBookId(int bookId);\r\n\r\n        /// <summary>Gets the da" +
+                    "ta for the book with the given BookId.</summary>\r\n        /// <param name=\"bookI" +
+                    "ds\">The book Ids.</param>\r\n        /// <returns>Book Data Model or null if not f" +
+                    "ound.</returns>\r\n        /// <exception cref=\"System.ArgumentNullException\">book" +
+                    "Ids</exception>\r\n        IEnumerable<BookDataModel> GetByBookId(IEnumerable<int>" +
+                    " bookIds);\r\n\r\n        /// <summary>Gets the data for the book with the given ISB" +
+                    "N13.</summary>\r\n        /// <param name=\"isbn13\">The isbn13 value.</param>\r\n    " +
+                    "    /// <returns>Book Data Model or null if not found</returns>\r\n        BookDat" +
+                    "aModel GetByISBN13(string isbn13);\r\n\r\n        /// <summary>Gets the data for the" +
+                    " book with the given ISBN13.</summary>\r\n        /// <param name=\"isbn13s\">The is" +
+                    "bn13 values.</param>\r\n        /// <returns>Book Data Model or null if not found." +
+                    "</returns>\r\n        /// <exception cref=\"System.ArgumentNullException\">isbn13s</" +
+                    "exception>\r\n        IEnumerable<BookDataModel> GetByISBN13(IEnumerable<string> i" +
+                    "sbn13s);\r\n\r\n        /// <summary>Gets the data for the book with the given ASIN1" +
+                    "0.</summary>\r\n        /// <param name=\"asin10\">The asin10 value.</param>\r\n      " +
+                    "  /// <returns>Book Data Model or null if not found</returns>\r\n        BookDataM" +
+                    "odel GetByASIN10(string asin10);\r\n\r\n        /// <summary>Gets the data for the b" +
+                    "ook with the given ASIN10.</summary>\r\n        /// <param name=\"asin10s\">The asin" +
+                    "10 values.</param>\r\n        /// <returns>Book Data Model or null if not found.</" +
+                    "returns>\r\n        /// <exception cref=\"System.ArgumentNullException\">asin</excep" +
+                    "tion>\r\n        IEnumerable<BookDataModel> GetByASIN10(IEnumerable<string> asin10" +
+                    "s);\r\n    }\r\n}");
             return this.GenerationEnvironment.ToString();
         }
     }
