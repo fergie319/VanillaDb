@@ -1,4 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.CodeDom;
+using System.Collections.Generic;
+using System.Linq;
 using VanillaDb.Models;
 
 namespace VanillaDb.DataProviders
@@ -38,11 +41,47 @@ namespace VanillaDb.DataProviders
             get { return Table.TableName.ToLower(); }
         }
 
+        /// <summary>Gets the name of the primary key field.</summary>
+        public string PrimaryKey
+        {
+            get { return Table.Fields.First(f => f.IsPrimaryKey).FieldName; }
+        }
+
         /// <summary>Gets the name of the stored procedure.</summary>
         /// <returns>Class name and file name (without .sql).</returns>
         public string GenerateName()
         {
             return $"{Table.TableName}SqlDataProvider";
+        }
+
+        /// <summary>Generates the name of the insert stored proc.</summary>
+        /// <returns>Insert Stored proce name</returns>
+        public string GenerateInsertProcName()
+        {
+            return $"USP_{Table.TableName}_Insert";
+        }
+
+
+        /// <summary>Generates the insert proc parameters.</summary>
+        /// <returns>Code to add parameters for invoking insert stored proc.</returns>
+        public string GenerateInsertProcParams()
+        {
+            var indent = "                    ";
+            var recordParam = $"{Table.TableName.ToCamelCase()}Data";
+            var parameters = Table.Fields
+                .Where(f => !f.IsIdentity)
+                .Select(f =>
+                {
+                    var param = string.Empty;
+                    param = (f.IsNullable)
+                                ? $"\"@{f.FieldName.ToCamelCase()}\", {recordParam}.{f.FieldName} ?? (object)DBNull.Value"
+                                : $"\"@{f.FieldName.ToCamelCase()}\", {recordParam}.{f.FieldName}";
+                    return param;
+                });
+
+            var addParameters = parameters.Select(p => $"command.Parameters.AddWithValue({p});");
+
+            return string.Join($"{Environment.NewLine}{indent}", addParameters);
         }
     }
 }

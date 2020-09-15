@@ -1,8 +1,10 @@
 ﻿<#@ template language="C#" #>
 <#@ assembly name="System.Core" #>
+<#@ import namespace="System" #>
 <#@ import namespace="System.Linq" #>
 <#@ import namespace="System.Text" #>
 <#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="VanillaDb" #>
 // <copyright file="<#= GenerateName() #>.cs" company="MMF Software Developers Inc.">
 // Copyright (c) MMF Software Developers Inc.. All rights reserved.
 // </copyright>
@@ -292,22 +294,20 @@ namespace <#= Record #>Service.DataProviders
             {
                 throw new InvalidOperationException("Connection String is null.  Insert operation cannot be performed.");
             }
-// TODO: Matt, you need to add better names, like 'RecordData' and 'RecordDataModel' so this is all more readable
-            if (<#= RecordCamel #>Data.<#= Record #>Id > 0)
+
+            if (<#= RecordCamel #>Data.<#= PrimaryKey #> > 0)
             {
-                throw new InvalidOperationException("Unable to insert Book Data that already has a BookId.");
+                throw new InvalidOperationException("Unable to insert <#= Record #> Data that already has a <#= PrimaryKey #>.");
             }
 
-            var bookId = -1;
+            var <#= PrimaryKey.ToCamelCase() #> = -1;
             using (var connection = new SqlConnection(this.ConnectionString))
             {
-                using (var command = new SqlCommand("USP_Book_Insert"))
+                using (var command = new SqlCommand("<#= GenerateInsertProcName() #>"))
                 {
                     command.CommandType = CommandType.StoredProcedure;
                     command.Connection = connection;
-                    command.Parameters.AddWithValue("@isbn10", bookData.ISBN10 ?? (object)DBNull.Value);
-                    command.Parameters.AddWithValue("@isbn13", bookData.ISBN13 ?? (object)DBNull.Value);
-                    command.Parameters.AddWithValue("@asin10", bookData.ASIN10 ?? (object)DBNull.Value);
+                    <#= GenerateInsertProcParams() #>
 
                     connection.Open();
                     var reader = command.ExecuteReader();
@@ -315,13 +315,13 @@ namespace <#= Record #>Service.DataProviders
                     {
                         while (reader.Read())
                         {
-                            bookId = (int)reader["BookId"];
+                            <#= PrimaryKey.ToCamelCase() #> = (int)reader["<#= PrimaryKey #>"];
                         }
                     }
                 }
             }
 
-            return bookId;
+            return <#= PrimaryKey.ToCamelCase() #>;
         }
 
         /// <summary>Parses the book data model out of the reader.</summary>

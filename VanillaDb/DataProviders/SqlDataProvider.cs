@@ -9,10 +9,11 @@
 // ------------------------------------------------------------------------------
 namespace VanillaDb.DataProviders
 {
+    using System;
     using System.Linq;
     using System.Text;
     using System.Collections.Generic;
-    using System;
+    using VanillaDb;
     
     /// <summary>
     /// Class to produce the template output
@@ -30,7 +31,7 @@ namespace VanillaDb.DataProviders
         {
             this.Write("// <copyright file=\"");
             
-            #line 6 "C:\git-scratch\vanilladb\VanillaDb\DataProviders\SqlDataProvider.tt"
+            #line 8 "C:\git-scratch\vanilladb\VanillaDb\DataProviders\SqlDataProvider.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(GenerateName()));
             
             #line default
@@ -38,7 +39,7 @@ namespace VanillaDb.DataProviders
             this.Write(".cs\" company=\"MMF Software Developers Inc.\">\r\n// Copyright (c) MMF Software Devel" +
                     "opers Inc.. All rights reserved.\r\n// </copyright>\r\n\r\nnamespace ");
             
-            #line 10 "C:\git-scratch\vanilladb\VanillaDb\DataProviders\SqlDataProvider.tt"
+            #line 12 "C:\git-scratch\vanilladb\VanillaDb\DataProviders\SqlDataProvider.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(Record));
             
             #line default
@@ -47,35 +48,35 @@ namespace VanillaDb.DataProviders
                     ";\r\n    using System.Data;\r\n    using System.Data.SqlClient;\r\n    using System.Li" +
                     "nq;\r\n\r\n    /// <summary>SQL implementation of data provider interface for ");
             
-            #line 18 "C:\git-scratch\vanilladb\VanillaDb\DataProviders\SqlDataProvider.tt"
+            #line 20 "C:\git-scratch\vanilladb\VanillaDb\DataProviders\SqlDataProvider.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(Record));
             
             #line default
             #line hidden
             this.Write(" data.</summary>\r\n    /// <seealso cref=\"");
             
-            #line 19 "C:\git-scratch\vanilladb\VanillaDb\DataProviders\SqlDataProvider.tt"
+            #line 21 "C:\git-scratch\vanilladb\VanillaDb\DataProviders\SqlDataProvider.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(Record));
             
             #line default
             #line hidden
             this.Write("Service.DataProviders.I");
             
-            #line 19 "C:\git-scratch\vanilladb\VanillaDb\DataProviders\SqlDataProvider.tt"
+            #line 21 "C:\git-scratch\vanilladb\VanillaDb\DataProviders\SqlDataProvider.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(Record));
             
             #line default
             #line hidden
             this.Write("DataProvider\" />\r\n    public partial class ");
             
-            #line 20 "C:\git-scratch\vanilladb\VanillaDb\DataProviders\SqlDataProvider.tt"
+            #line 22 "C:\git-scratch\vanilladb\VanillaDb\DataProviders\SqlDataProvider.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(GenerateName()));
             
             #line default
             #line hidden
             this.Write(" : I");
             
-            #line 20 "C:\git-scratch\vanilladb\VanillaDb\DataProviders\SqlDataProvider.tt"
+            #line 22 "C:\git-scratch\vanilladb\VanillaDb\DataProviders\SqlDataProvider.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(Record));
             
             #line default
@@ -83,7 +84,7 @@ namespace VanillaDb.DataProviders
             this.Write("DataProvider\r\n    {\r\n        /// <summary>Initializes a new instance of the <see " +
                     "cref=\"");
             
-            #line 22 "C:\git-scratch\vanilladb\VanillaDb\DataProviders\SqlDataProvider.tt"
+            #line 24 "C:\git-scratch\vanilladb\VanillaDb\DataProviders\SqlDataProvider.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(GenerateName()));
             
             #line default
@@ -91,7 +92,7 @@ namespace VanillaDb.DataProviders
             this.Write("\"/> class.</summary>\r\n        /// <param name=\"connectionString\">The connection s" +
                     "tring.</param>\r\n        public ");
             
-            #line 24 "C:\git-scratch\vanilladb\VanillaDb\DataProviders\SqlDataProvider.tt"
+            #line 26 "C:\git-scratch\vanilladb\VanillaDb\DataProviders\SqlDataProvider.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(GenerateName()));
             
             #line default
@@ -229,56 +230,56 @@ namespace VanillaDb.DataProviders
                     "                 }\r\n                }\r\n            }\r\n\r\n            return bookD" +
                     "ata;\r\n        }\r\n\r\n        /// <summary>Inserts the given ");
             
-            #line 281 "C:\git-scratch\vanilladb\VanillaDb\DataProviders\SqlDataProvider.tt"
+            #line 283 "C:\git-scratch\vanilladb\VanillaDb\DataProviders\SqlDataProvider.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(Record));
             
             #line default
             #line hidden
             this.Write(" data model into the ");
             
-            #line 281 "C:\git-scratch\vanilladb\VanillaDb\DataProviders\SqlDataProvider.tt"
+            #line 283 "C:\git-scratch\vanilladb\VanillaDb\DataProviders\SqlDataProvider.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(Record));
             
             #line default
             #line hidden
             this.Write(" table.</summary>\r\n        /// <param name=\"");
             
-            #line 282 "C:\git-scratch\vanilladb\VanillaDb\DataProviders\SqlDataProvider.tt"
+            #line 284 "C:\git-scratch\vanilladb\VanillaDb\DataProviders\SqlDataProvider.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(RecordCamel));
             
             #line default
             #line hidden
             this.Write("Data\">The ");
             
-            #line 282 "C:\git-scratch\vanilladb\VanillaDb\DataProviders\SqlDataProvider.tt"
+            #line 284 "C:\git-scratch\vanilladb\VanillaDb\DataProviders\SqlDataProvider.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(RecordLower));
             
             #line default
             #line hidden
             this.Write(" data to insert.</param>\r\n        /// <returns>The ID of the inserted ");
             
-            #line 283 "C:\git-scratch\vanilladb\VanillaDb\DataProviders\SqlDataProvider.tt"
+            #line 285 "C:\git-scratch\vanilladb\VanillaDb\DataProviders\SqlDataProvider.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(Record));
             
             #line default
             #line hidden
             this.Write(" record.</returns>\r\n        public int Insert(");
             
-            #line 284 "C:\git-scratch\vanilladb\VanillaDb\DataProviders\SqlDataProvider.tt"
+            #line 286 "C:\git-scratch\vanilladb\VanillaDb\DataProviders\SqlDataProvider.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(Record));
             
             #line default
             #line hidden
             this.Write("DataModel ");
             
-            #line 284 "C:\git-scratch\vanilladb\VanillaDb\DataProviders\SqlDataProvider.tt"
+            #line 286 "C:\git-scratch\vanilladb\VanillaDb\DataProviders\SqlDataProvider.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(RecordCamel));
             
             #line default
             #line hidden
             this.Write("Data)\r\n        {\r\n            if (");
             
-            #line 286 "C:\git-scratch\vanilladb\VanillaDb\DataProviders\SqlDataProvider.tt"
+            #line 288 "C:\git-scratch\vanilladb\VanillaDb\DataProviders\SqlDataProvider.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(RecordCamel));
             
             #line default
@@ -286,7 +287,7 @@ namespace VanillaDb.DataProviders
             this.Write("Data == null)\r\n            {\r\n                throw new ArgumentNullException(nam" +
                     "eof(");
             
-            #line 288 "C:\git-scratch\vanilladb\VanillaDb\DataProviders\SqlDataProvider.tt"
+            #line 290 "C:\git-scratch\vanilladb\VanillaDb\DataProviders\SqlDataProvider.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(RecordCamel));
             
             #line default
@@ -298,46 +299,108 @@ namespace VanillaDb.DataProviders
             {
                 throw new InvalidOperationException(""Connection String is null.  Insert operation cannot be performed."");
             }
-// TODO: Matt, you need to add better names, like 'RecordData' and 'RecordDataModel' so this is all more readable
+
             if (");
             
-            #line 296 "C:\git-scratch\vanilladb\VanillaDb\DataProviders\SqlDataProvider.tt"
+            #line 298 "C:\git-scratch\vanilladb\VanillaDb\DataProviders\SqlDataProvider.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(RecordCamel));
             
             #line default
             #line hidden
             this.Write("Data.");
             
-            #line 296 "C:\git-scratch\vanilladb\VanillaDb\DataProviders\SqlDataProvider.tt"
+            #line 298 "C:\git-scratch\vanilladb\VanillaDb\DataProviders\SqlDataProvider.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(PrimaryKey));
+            
+            #line default
+            #line hidden
+            this.Write(" > 0)\r\n            {\r\n                throw new InvalidOperationException(\"Unable" +
+                    " to insert ");
+            
+            #line 300 "C:\git-scratch\vanilladb\VanillaDb\DataProviders\SqlDataProvider.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(Record));
             
             #line default
             #line hidden
-            this.Write("Id > 0)\r\n            {\r\n                throw new InvalidOperationException(\"Unab" +
-                    "le to insert Book Data that already has a BookId.\");\r\n            }\r\n\r\n         " +
-                    "   var bookId = -1;\r\n            using (var connection = new SqlConnection(this." +
-                    "ConnectionString))\r\n            {\r\n                using (var command = new SqlC" +
-                    "ommand(\"USP_Book_Insert\"))\r\n                {\r\n                    command.Comma" +
-                    "ndType = CommandType.StoredProcedure;\r\n                    command.Connection = " +
-                    "connection;\r\n                    command.Parameters.AddWithValue(\"@isbn10\", book" +
-                    "Data.ISBN10 ?? (object)DBNull.Value);\r\n                    command.Parameters.Ad" +
-                    "dWithValue(\"@isbn13\", bookData.ISBN13 ?? (object)DBNull.Value);\r\n               " +
-                    "     command.Parameters.AddWithValue(\"@asin10\", bookData.ASIN10 ?? (object)DBNul" +
-                    "l.Value);\r\n\r\n                    connection.Open();\r\n                    var rea" +
-                    "der = command.ExecuteReader();\r\n                    if (reader.HasRows)\r\n       " +
-                    "             {\r\n                        while (reader.Read())\r\n                 " +
-                    "       {\r\n                            bookId = (int)reader[\"BookId\"];\r\n         " +
-                    "               }\r\n                    }\r\n                }\r\n            }\r\n\r\n   " +
-                    "         return bookId;\r\n        }\r\n\r\n        /// <summary>Parses the book data " +
-                    "model out of the reader.</summary>\r\n        /// <param name=\"reader\">The reader." +
-                    "</param>\r\n        /// <returns>Populated Book Data Model</returns>\r\n        priv" +
-                    "ate BookDataModel ParseBookDataModel(IDataReader reader)\r\n        {\r\n           " +
-                    " var data = new BookDataModel();\r\n            data.BookId = (int)reader[\"BookId\"" +
-                    "];\r\n            data.ISBN10 = reader[\"ISBN10\"] != DBNull.Value ? (string)reader[" +
-                    "\"ISBN10\"] : string.Empty;\r\n            data.ISBN13 = reader[\"ISBN13\"] != DBNull." +
-                    "Value ? (string)reader[\"ISBN13\"] : string.Empty;\r\n            data.ASIN10 = read" +
-                    "er[\"ASIN10\"] != DBNull.Value ? (string)reader[\"ASIN10\"] : string.Empty;\r\n       " +
-                    "     return data;\r\n        }\r\n    }\r\n}\r\n");
+            this.Write(" Data that already has a ");
+            
+            #line 300 "C:\git-scratch\vanilladb\VanillaDb\DataProviders\SqlDataProvider.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(PrimaryKey));
+            
+            #line default
+            #line hidden
+            this.Write(".\");\r\n            }\r\n\r\n            var ");
+            
+            #line 303 "C:\git-scratch\vanilladb\VanillaDb\DataProviders\SqlDataProvider.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(PrimaryKey.ToCamelCase()));
+            
+            #line default
+            #line hidden
+            this.Write(" = -1;\r\n            using (var connection = new SqlConnection(this.ConnectionStri" +
+                    "ng))\r\n            {\r\n                using (var command = new SqlCommand(\"");
+            
+            #line 306 "C:\git-scratch\vanilladb\VanillaDb\DataProviders\SqlDataProvider.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(GenerateInsertProcName()));
+            
+            #line default
+            #line hidden
+            this.Write("\"))\r\n                {\r\n                    command.CommandType = CommandType.Sto" +
+                    "redProcedure;\r\n                    command.Connection = connection;\r\n           " +
+                    "         ");
+            
+            #line 310 "C:\git-scratch\vanilladb\VanillaDb\DataProviders\SqlDataProvider.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(GenerateInsertProcParams()));
+            
+            #line default
+            #line hidden
+            this.Write(@"
+
+                    connection.Open();
+                    var reader = command.ExecuteReader();
+                    if (reader.HasRows)
+                    {
+                        while (reader.Read())
+                        {
+                            ");
+            
+            #line 318 "C:\git-scratch\vanilladb\VanillaDb\DataProviders\SqlDataProvider.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(PrimaryKey.ToCamelCase()));
+            
+            #line default
+            #line hidden
+            this.Write(" = (int)reader[\"");
+            
+            #line 318 "C:\git-scratch\vanilladb\VanillaDb\DataProviders\SqlDataProvider.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(PrimaryKey));
+            
+            #line default
+            #line hidden
+            this.Write("\"];\r\n                        }\r\n                    }\r\n                }\r\n       " +
+                    "     }\r\n\r\n            return ");
+            
+            #line 324 "C:\git-scratch\vanilladb\VanillaDb\DataProviders\SqlDataProvider.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(PrimaryKey.ToCamelCase()));
+            
+            #line default
+            #line hidden
+            this.Write(@";
+        }
+
+        /// <summary>Parses the book data model out of the reader.</summary>
+        /// <param name=""reader"">The reader.</param>
+        /// <returns>Populated Book Data Model</returns>
+        private BookDataModel ParseBookDataModel(IDataReader reader)
+        {
+            var data = new BookDataModel();
+            data.BookId = (int)reader[""BookId""];
+            data.ISBN10 = reader[""ISBN10""] != DBNull.Value ? (string)reader[""ISBN10""] : string.Empty;
+            data.ISBN13 = reader[""ISBN13""] != DBNull.Value ? (string)reader[""ISBN13""] : string.Empty;
+            data.ASIN10 = reader[""ASIN10""] != DBNull.Value ? (string)reader[""ASIN10""] : string.Empty;
+            return data;
+        }
+    }
+}
+");
             return this.GenerationEnvironment.ToString();
         }
     }
