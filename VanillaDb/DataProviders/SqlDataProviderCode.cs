@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 using VanillaDb.Models;
 
 namespace VanillaDb.DataProviders
@@ -22,6 +18,24 @@ namespace VanillaDb.DataProviders
         {
             Table = table;
             Indexes = indexes;
+        }
+
+        /// <summary>Gets the name of the record type being worked with (the table name).</summary>
+        public string Record
+        {
+            get { return Table.TableName; }
+        }
+
+        /// <summary>Gets the lowercase name of the record type being worked with (the table name).</summary>
+        public string RecordLower
+        {
+            get { return Table.TableName.ToLower(); }
+        }
+
+        /// <summary>Gets the camelCase name of the record type being worked with (the table name).</summary>
+        public string RecordCamel
+        {
+            get { return Table.TableName.ToLower(); }
         }
 
         /// <summary>Gets the name of the stored procedure.</summary>

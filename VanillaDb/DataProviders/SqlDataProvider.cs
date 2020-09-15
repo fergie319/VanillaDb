@@ -28,180 +28,316 @@ namespace VanillaDb.DataProviders
         /// </summary>
         public virtual string TransformText()
         {
-            this.Write("// <copyright file=\"BookSqlDataProvider.cs\" company=\"MMF Software Developers Inc." +
-                    "\">\r\n// Copyright (c) MMF Software Developers Inc.. All rights reserved.\r\n// </co" +
-                    "pyright>\r\n\r\nnamespace BookService.DataProviders\r\n{\r\n    using System;\r\n    using" +
-                    " System.Collections.Generic;\r\n    using System.Data;\r\n    using System.Data.SqlC" +
-                    "lient;\r\n    using System.Linq;\r\n\r\n    /// <summary>Database interface implementa" +
-                    "tion for Book data</summary>\r\n    /// <seealso cref=\"BookService.DataProviders.I" +
-                    "BookDataProvider\" />\r\n    public partial class BookSqlDataProvider : IBookDataPr" +
-                    "ovider\r\n    {\r\n        /// <summary>Initializes a new instance of the <see cref=" +
-                    "\"BookSqlDataProvider\"/> class.</summary>\r\n        /// <param name=\"connectionStr" +
-                    "ing\">The connection string.</param>\r\n        public BookSqlDataProvider(string c" +
-                    "onnectionString)\r\n        {\r\n            this.ConnectionString = connectionStrin" +
-                    "g;\r\n        }\r\n\r\n        /// <summary>Gets or sets the connection string.</summa" +
-                    "ry>\r\n        /// <value>The connection string.</value>\r\n        private string C" +
-                    "onnectionString { get; set; }\r\n\r\n        /// <summary>Gets the data for the book" +
-                    " with the given BookId.</summary>\r\n        /// <param name=\"bookId\">The book Id." +
-                    "</param>\r\n        /// <returns>Book Data Model or null if not found.</returns>\r\n" +
-                    "        /// <exception cref=\"InvalidOperationException\">${bookId} is not a valid" +
-                    " BookId.</exception>\r\n        public BookDataModel GetByBookId(int bookId)\r\n    " +
-                    "    {\r\n            if (bookId < 1)\r\n            {\r\n                throw new Inv" +
-                    "alidOperationException($\"${bookId} is not a valid BookId.\");\r\n            }\r\n\r\n " +
-                    "           BookDataModel bookData = null;\r\n            using (var connection = n" +
-                    "ew SqlConnection(this.ConnectionString))\r\n            {\r\n                using (" +
-                    "var command = new SqlCommand(\"USP_Book_GetByBookId\"))\r\n                {\r\n      " +
-                    "              command.CommandType = CommandType.StoredProcedure;\r\n              " +
-                    "      command.Connection = connection;\r\n                    command.Parameters.A" +
-                    "ddWithValue(\"@bookId\", bookId);\r\n\r\n                    connection.Open();\r\n     " +
-                    "               var reader = command.ExecuteReader();\r\n                    if (re" +
-                    "ader.HasRows)\r\n                    {\r\n                        while (reader.Read" +
-                    "())\r\n                        {\r\n                            bookData = ParseBook" +
-                    "DataModel(reader);\r\n                        }\r\n                    }\r\n          " +
-                    "      }\r\n            }\r\n\r\n            return bookData;\r\n        }\r\n\r\n        ///" +
-                    " <summary>Gets the data for the book with the given BookId.</summary>\r\n        /" +
-                    "// <param name=\"bookIds\">The book Ids.</param>\r\n        /// <returns>Book Data M" +
-                    "odel or null if not found.</returns>\r\n        /// <exception cref=\"System.Argume" +
-                    "ntNullException\">bookIds</exception>\r\n        public IEnumerable<BookDataModel> " +
-                    "GetByBookId(IEnumerable<int> bookIds)\r\n        {\r\n            if (bookIds == nul" +
-                    "l || !bookIds.Any())\r\n            {\r\n                throw new ArgumentNullExcep" +
-                    "tion(nameof(bookIds));\r\n            }\r\n\r\n            // Create an in-memory data" +
-                    "table with all of the BookIds\r\n            var idDataTable = new DataTable();\r\n " +
-                    "           idDataTable.Columns.Add(new DataColumn(\"BookId\", typeof(int)));\r\n    " +
-                    "        foreach (var bookId in bookIds)\r\n            {\r\n                idDataTa" +
-                    "ble.Rows.Add(bookId);\r\n            }\r\n\r\n            var bookData = new List<Book" +
-                    "DataModel>();\r\n            using (var connection = new SqlConnection(this.Connec" +
-                    "tionString))\r\n            {\r\n                using (var command = new SqlCommand" +
-                    "(\"USP_Book_GetByBookId_Multiple\"))\r\n                {\r\n                    comma" +
-                    "nd.CommandType = CommandType.StoredProcedure;\r\n                    command.Conne" +
-                    "ction = connection;\r\n\r\n                    // Create the Stored Procedure Parame" +
-                    "ter and set to Type_IdTable\r\n                    var idsParam = command.Paramete" +
-                    "rs.AddWithValue(\"@bookIds\", idDataTable);\r\n                    idsParam.SqlDbTyp" +
-                    "e = SqlDbType.Structured;\r\n                    idsParam.TypeName = \"dbo.Type_Boo" +
-                    "kId_Table\";\r\n\r\n                    connection.Open();\r\n                    var r" +
-                    "eader = command.ExecuteReader();\r\n                    if (reader.HasRows)\r\n     " +
-                    "               {\r\n                        while (reader.Read())\r\n               " +
-                    "         {\r\n                            var data = ParseBookDataModel(reader);\r\n" +
-                    "                            bookData.Add(data);\r\n                        }\r\n    " +
-                    "                }\r\n                }\r\n            }\r\n\r\n            return bookDa" +
-                    "ta;\r\n        }\r\n\r\n        /// <summary>Gets the data for the book with the given" +
-                    " ISBN13.</summary>\r\n        /// <param name=\"isbn13\">The isbn13 value.</param>\r\n" +
-                    "        /// <returns>Book Data Model or null if not found</returns>\r\n        ///" +
-                    " <exception cref=\"System.ArgumentNullException\">isbn13</exception>\r\n        publ" +
-                    "ic BookDataModel GetByISBN13(string isbn13)\r\n        {\r\n            if (string.I" +
-                    "sNullOrWhiteSpace(isbn13))\r\n            {\r\n                throw new ArgumentNul" +
-                    "lException(nameof(isbn13));\r\n            }\r\n\r\n            BookDataModel bookData" +
+            this.Write("// <copyright file=\"");
+            
+            #line 6 "C:\git-scratch\vanilladb\VanillaDb\DataProviders\SqlDataProvider.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(GenerateName()));
+            
+            #line default
+            #line hidden
+            this.Write(".cs\" company=\"MMF Software Developers Inc.\">\r\n// Copyright (c) MMF Software Devel" +
+                    "opers Inc.. All rights reserved.\r\n// </copyright>\r\n\r\nnamespace ");
+            
+            #line 10 "C:\git-scratch\vanilladb\VanillaDb\DataProviders\SqlDataProvider.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(Record));
+            
+            #line default
+            #line hidden
+            this.Write("Service.DataProviders\r\n{\r\n    using System;\r\n    using System.Collections.Generic" +
+                    ";\r\n    using System.Data;\r\n    using System.Data.SqlClient;\r\n    using System.Li" +
+                    "nq;\r\n\r\n    /// <summary>SQL implementation of data provider interface for ");
+            
+            #line 18 "C:\git-scratch\vanilladb\VanillaDb\DataProviders\SqlDataProvider.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(Record));
+            
+            #line default
+            #line hidden
+            this.Write(" data.</summary>\r\n    /// <seealso cref=\"");
+            
+            #line 19 "C:\git-scratch\vanilladb\VanillaDb\DataProviders\SqlDataProvider.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(Record));
+            
+            #line default
+            #line hidden
+            this.Write("Service.DataProviders.I");
+            
+            #line 19 "C:\git-scratch\vanilladb\VanillaDb\DataProviders\SqlDataProvider.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(Record));
+            
+            #line default
+            #line hidden
+            this.Write("DataProvider\" />\r\n    public partial class ");
+            
+            #line 20 "C:\git-scratch\vanilladb\VanillaDb\DataProviders\SqlDataProvider.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(GenerateName()));
+            
+            #line default
+            #line hidden
+            this.Write(" : I");
+            
+            #line 20 "C:\git-scratch\vanilladb\VanillaDb\DataProviders\SqlDataProvider.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(Record));
+            
+            #line default
+            #line hidden
+            this.Write("DataProvider\r\n    {\r\n        /// <summary>Initializes a new instance of the <see " +
+                    "cref=\"");
+            
+            #line 22 "C:\git-scratch\vanilladb\VanillaDb\DataProviders\SqlDataProvider.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(GenerateName()));
+            
+            #line default
+            #line hidden
+            this.Write("\"/> class.</summary>\r\n        /// <param name=\"connectionString\">The connection s" +
+                    "tring.</param>\r\n        public ");
+            
+            #line 24 "C:\git-scratch\vanilladb\VanillaDb\DataProviders\SqlDataProvider.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(GenerateName()));
+            
+            #line default
+            #line hidden
+            this.Write("(string connectionString) // TODO: Add Logger and log statements\r\n        {\r\n    " +
+                    "        this.ConnectionString = connectionString;\r\n        }\r\n\r\n        /// <sum" +
+                    "mary>Gets or sets the connection string.</summary>\r\n        /// <value>The conne" +
+                    "ction string.</value>\r\n        private string ConnectionString { get; set; }\r\n\r\n" +
+                    "        /// <summary>Gets the data for the book with the given BookId.</summary>" +
+                    "\r\n        /// <param name=\"bookId\">The book Id.</param>\r\n        /// <returns>Bo" +
+                    "ok Data Model or null if not found.</returns>\r\n        /// <exception cref=\"Inva" +
+                    "lidOperationException\">${bookId} is not a valid BookId.</exception>\r\n        pub" +
+                    "lic BookDataModel GetByBookId(int bookId)\r\n        {\r\n            if (bookId < 1" +
+                    ")\r\n            {\r\n                throw new InvalidOperationException($\"${bookId" +
+                    "} is not a valid BookId.\");\r\n            }\r\n\r\n            BookDataModel bookData" +
                     " = null;\r\n            using (var connection = new SqlConnection(this.ConnectionS" +
                     "tring))\r\n            {\r\n                using (var command = new SqlCommand(\"USP" +
-                    "_Book_GetByISBN13\"))\r\n                {\r\n                    command.CommandType" +
+                    "_Book_GetByBookId\"))\r\n                {\r\n                    command.CommandType" +
                     " = CommandType.StoredProcedure;\r\n                    command.Connection = connec" +
-                    "tion;\r\n                    command.Parameters.AddWithValue(\"@isbn13\", isbn13);\r\n" +
+                    "tion;\r\n                    command.Parameters.AddWithValue(\"@bookId\", bookId);\r\n" +
                     "\r\n                    connection.Open();\r\n                    var reader = comma" +
                     "nd.ExecuteReader();\r\n                    if (reader.HasRows)\r\n                  " +
                     "  {\r\n                        while (reader.Read())\r\n                        {\r\n " +
                     "                           bookData = ParseBookDataModel(reader);\r\n             " +
                     "           }\r\n                    }\r\n                }\r\n            }\r\n\r\n       " +
                     "     return bookData;\r\n        }\r\n\r\n        /// <summary>Gets the data for the b" +
-                    "ook with the given ISBN13.</summary>\r\n        /// <param name=\"isbn13s\">The isbn" +
-                    "13 values.</param>\r\n        /// <returns>Book Data Model or null if not found.</" +
-                    "returns>\r\n        /// <exception cref=\"System.ArgumentNullException\">isbn13s</ex" +
-                    "ception>\r\n        public IEnumerable<BookDataModel> GetByISBN13(IEnumerable<stri" +
-                    "ng> isbn13s)\r\n        {\r\n            if (isbn13s == null || !isbn13s.Any())\r\n   " +
-                    "         {\r\n                throw new ArgumentNullException(nameof(isbn13s));\r\n " +
-                    "           }\r\n\r\n            // Create an in-memory datatable with all of the Boo" +
-                    "kIds\r\n            var idDataTable = new DataTable();\r\n            idDataTable.Co" +
-                    "lumns.Add(new DataColumn(\"ISBN13\", typeof(string)));\r\n            foreach (var b" +
-                    "ookId in isbn13s)\r\n            {\r\n                idDataTable.Rows.Add(bookId);\r" +
-                    "\n            }\r\n\r\n            var bookData = new List<BookDataModel>();\r\n       " +
-                    "     using (var connection = new SqlConnection(this.ConnectionString))\r\n        " +
-                    "    {\r\n                using (var command = new SqlCommand(\"USP_Book_GetByISBN13" +
-                    "_Multiple\"))\r\n                {\r\n                    command.CommandType = Comma" +
-                    "ndType.StoredProcedure;\r\n                    command.Connection = connection;\r\n\r" +
-                    "\n                    // Create the Stored Procedure Parameter and set to Type_Id" +
-                    "Table\r\n                    var idsParam = command.Parameters.AddWithValue(\"@isbn" +
-                    "13s\", idDataTable);\r\n                    idsParam.SqlDbType = SqlDbType.Structur" +
-                    "ed;\r\n                    idsParam.TypeName = \"dbo.Type_ISBN13_Table\";\r\n\r\n       " +
-                    "             connection.Open();\r\n                    var reader = command.Execut" +
-                    "eReader();\r\n                    if (reader.HasRows)\r\n                    {\r\n    " +
-                    "                    while (reader.Read())\r\n                        {\r\n          " +
-                    "                  var data = ParseBookDataModel(reader);\r\n                      " +
-                    "      bookData.Add(data);\r\n                        }\r\n                    }\r\n   " +
-                    "             }\r\n            }\r\n\r\n            return bookData;\r\n        }\r\n\r\n    " +
-                    "    /// <summary>Gets the data for the book with the given ASIN10.</summary>\r\n  " +
-                    "      /// <param name=\"asin10\">The asin10 value.</param>\r\n        /// <returns>B" +
-                    "ook Data Model or null if not found</returns>\r\n        public BookDataModel GetB" +
-                    "yASIN10(string asin10)\r\n        {\r\n            if (string.IsNullOrWhiteSpace(asi" +
-                    "n10))\r\n            {\r\n                throw new ArgumentNullException(nameof(asi" +
-                    "n10));\r\n            }\r\n\r\n            BookDataModel bookData = null;\r\n           " +
-                    " using (var connection = new SqlConnection(this.ConnectionString))\r\n            " +
-                    "{\r\n                using (var command = new SqlCommand(\"USP_Book_GetByASIN10\"))\r" +
-                    "\n                {\r\n                    command.CommandType = CommandType.Stored" +
-                    "Procedure;\r\n                    command.Connection = connection;\r\n              " +
-                    "      command.Parameters.AddWithValue(\"@asin10\", asin10);\r\n\r\n                   " +
-                    " connection.Open();\r\n                    var reader = command.ExecuteReader();\r\n" +
-                    "                    if (reader.HasRows)\r\n                    {\r\n                " +
-                    "        while (reader.Read())\r\n                        {\r\n                      " +
-                    "      bookData = ParseBookDataModel(reader);\r\n                        }\r\n       " +
-                    "             }\r\n                }\r\n            }\r\n\r\n            return bookData;" +
-                    "\r\n        }\r\n\r\n        /// <summary>Gets the data for the book with the given AS" +
-                    "IN10.</summary>\r\n        /// <param name=\"asin10s\">The asin10 values.</param>\r\n " +
-                    "       /// <returns>Book Data Model or null if not found.</returns>\r\n        ///" +
-                    " <exception cref=\"System.ArgumentNullException\">asin</exception>\r\n        public" +
-                    " IEnumerable<BookDataModel> GetByASIN10(IEnumerable<string> asin10s)\r\n        {\r" +
-                    "\n            if (asin10s == null || !asin10s.Any())\r\n            {\r\n            " +
-                    "    throw new ArgumentNullException(nameof(asin10s));\r\n            }\r\n\r\n        " +
-                    "    // Create an in-memory datatable with all of the BookIds\r\n            var id" +
-                    "DataTable = new DataTable();\r\n            idDataTable.Columns.Add(new DataColumn" +
-                    "(\"ASIN10\", typeof(string)));\r\n            foreach (var bookId in asin10s)\r\n     " +
-                    "       {\r\n                idDataTable.Rows.Add(bookId);\r\n            }\r\n\r\n      " +
-                    "      var bookData = new List<BookDataModel>();\r\n            using (var connecti" +
-                    "on = new SqlConnection(this.ConnectionString))\r\n            {\r\n                u" +
-                    "sing (var command = new SqlCommand(\"USP_Book_GetByASIN10_Multiple\"))\r\n          " +
-                    "      {\r\n                    command.CommandType = CommandType.StoredProcedure;\r" +
-                    "\n                    command.Connection = connection;\r\n\r\n                    // " +
-                    "Create the Stored Procedure Parameter and set to Type_IdTable\r\n                 " +
-                    "   var idsParam = command.Parameters.AddWithValue(\"@asin10s\", idDataTable);\r\n   " +
-                    "                 idsParam.SqlDbType = SqlDbType.Structured;\r\n                   " +
-                    " idsParam.TypeName = \"dbo.Type_ASIN10_Table\";\r\n\r\n                    connection." +
+                    "ook with the given BookId.</summary>\r\n        /// <param name=\"bookIds\">The book" +
+                    " Ids.</param>\r\n        /// <returns>Book Data Model or null if not found.</retur" +
+                    "ns>\r\n        /// <exception cref=\"System.ArgumentNullException\">bookIds</excepti" +
+                    "on>\r\n        public IEnumerable<BookDataModel> GetByBookId(IEnumerable<int> book" +
+                    "Ids)\r\n        {\r\n            if (bookIds == null || !bookIds.Any())\r\n           " +
+                    " {\r\n                throw new ArgumentNullException(nameof(bookIds));\r\n         " +
+                    "   }\r\n\r\n            // Create an in-memory datatable with all of the BookIds\r\n  " +
+                    "          var idDataTable = new DataTable();\r\n            idDataTable.Columns.Ad" +
+                    "d(new DataColumn(\"BookId\", typeof(int)));\r\n            foreach (var bookId in bo" +
+                    "okIds)\r\n            {\r\n                idDataTable.Rows.Add(bookId);\r\n          " +
+                    "  }\r\n\r\n            var bookData = new List<BookDataModel>();\r\n            using " +
+                    "(var connection = new SqlConnection(this.ConnectionString))\r\n            {\r\n    " +
+                    "            using (var command = new SqlCommand(\"USP_Book_GetByBookId_Multiple\")" +
+                    ")\r\n                {\r\n                    command.CommandType = CommandType.Stor" +
+                    "edProcedure;\r\n                    command.Connection = connection;\r\n\r\n          " +
+                    "          // Create the Stored Procedure Parameter and set to Type_IdTable\r\n    " +
+                    "                var idsParam = command.Parameters.AddWithValue(\"@bookIds\", idDat" +
+                    "aTable);\r\n                    idsParam.SqlDbType = SqlDbType.Structured;\r\n      " +
+                    "              idsParam.TypeName = \"dbo.Type_BookId_Table\";\r\n\r\n                  " +
+                    "  connection.Open();\r\n                    var reader = command.ExecuteReader();\r" +
+                    "\n                    if (reader.HasRows)\r\n                    {\r\n               " +
+                    "         while (reader.Read())\r\n                        {\r\n                     " +
+                    "       var data = ParseBookDataModel(reader);\r\n                            bookD" +
+                    "ata.Add(data);\r\n                        }\r\n                    }\r\n              " +
+                    "  }\r\n            }\r\n\r\n            return bookData;\r\n        }\r\n\r\n        /// <su" +
+                    "mmary>Gets the data for the book with the given ISBN13.</summary>\r\n        /// <" +
+                    "param name=\"isbn13\">The isbn13 value.</param>\r\n        /// <returns>Book Data Mo" +
+                    "del or null if not found</returns>\r\n        /// <exception cref=\"System.Argument" +
+                    "NullException\">isbn13</exception>\r\n        public BookDataModel GetByISBN13(stri" +
+                    "ng isbn13)\r\n        {\r\n            if (string.IsNullOrWhiteSpace(isbn13))\r\n     " +
+                    "       {\r\n                throw new ArgumentNullException(nameof(isbn13));\r\n    " +
+                    "        }\r\n\r\n            BookDataModel bookData = null;\r\n            using (var " +
+                    "connection = new SqlConnection(this.ConnectionString))\r\n            {\r\n         " +
+                    "       using (var command = new SqlCommand(\"USP_Book_GetByISBN13\"))\r\n           " +
+                    "     {\r\n                    command.CommandType = CommandType.StoredProcedure;\r\n" +
+                    "                    command.Connection = connection;\r\n                    comman" +
+                    "d.Parameters.AddWithValue(\"@isbn13\", isbn13);\r\n\r\n                    connection." +
                     "Open();\r\n                    var reader = command.ExecuteReader();\r\n            " +
                     "        if (reader.HasRows)\r\n                    {\r\n                        whil" +
-                    "e (reader.Read())\r\n                        {\r\n                            var da" +
-                    "ta = ParseBookDataModel(reader);\r\n                            bookData.Add(data)" +
-                    ";\r\n                        }\r\n                    }\r\n                }\r\n        " +
-                    "    }\r\n\r\n            return bookData;\r\n        }\r\n\r\n        /// <summary>Inserts" +
-                    " the given Book data model into the book table.</summary>\r\n        /// <param na" +
-                    "me=\"bookData\">The book data to insert.</param>\r\n        /// <returns>The ID of t" +
-                    "he inserted Book record.</returns>\r\n        public int Insert(BookDataModel book" +
-                    "Data)\r\n        {\r\n            if (bookData == null)\r\n            {\r\n            " +
-                    "    throw new ArgumentNullException(nameof(bookData));\r\n            }\r\n\r\n       " +
-                    "     if (string.IsNullOrWhiteSpace(this.ConnectionString))\r\n            {\r\n     " +
-                    "           throw new InvalidOperationException(\"Connection String is null.  Inse" +
-                    "rt operation cannot be performed.\");\r\n            }\r\n\r\n            if (bookData." +
-                    "BookId > 0)\r\n            {\r\n                throw new InvalidOperationException(" +
-                    "\"Unable to insert Book Data that already has a BookId.\");\r\n            }\r\n\r\n    " +
-                    "        var bookId = -1;\r\n            using (var connection = new SqlConnection(" +
-                    "this.ConnectionString))\r\n            {\r\n                using (var command = new" +
-                    " SqlCommand(\"USP_Book_Insert\"))\r\n                {\r\n                    command." +
-                    "CommandType = CommandType.StoredProcedure;\r\n                    command.Connecti" +
-                    "on = connection;\r\n                    command.Parameters.AddWithValue(\"@isbn10\"," +
-                    " bookData.ISBN10 ?? (object)DBNull.Value);\r\n                    command.Paramete" +
-                    "rs.AddWithValue(\"@isbn13\", bookData.ISBN13 ?? (object)DBNull.Value);\r\n          " +
-                    "          command.Parameters.AddWithValue(\"@asin10\", bookData.ASIN10 ?? (object)" +
-                    "DBNull.Value);\r\n\r\n                    connection.Open();\r\n                    va" +
-                    "r reader = command.ExecuteReader();\r\n                    if (reader.HasRows)\r\n  " +
-                    "                  {\r\n                        while (reader.Read())\r\n            " +
-                    "            {\r\n                            bookId = (int)reader[\"BookId\"];\r\n    " +
-                    "                    }\r\n                    }\r\n                }\r\n            }\r\n" +
-                    "\r\n            return bookId;\r\n        }\r\n\r\n        /// <summary>Parses the book " +
-                    "data model out of the reader.</summary>\r\n        /// <param name=\"reader\">The re" +
-                    "ader.</param>\r\n        /// <returns>Populated Book Data Model</returns>\r\n       " +
-                    " private BookDataModel ParseBookDataModel(IDataReader reader)\r\n        {\r\n      " +
-                    "      var data = new BookDataModel();\r\n            data.BookId = (int)reader[\"Bo" +
-                    "okId\"];\r\n            data.ISBN10 = reader[\"ISBN10\"] != DBNull.Value ? (string)re" +
-                    "ader[\"ISBN10\"] : string.Empty;\r\n            data.ISBN13 = reader[\"ISBN13\"] != DB" +
-                    "Null.Value ? (string)reader[\"ISBN13\"] : string.Empty;\r\n            data.ASIN10 =" +
-                    " reader[\"ASIN10\"] != DBNull.Value ? (string)reader[\"ASIN10\"] : string.Empty;\r\n  " +
-                    "          return data;\r\n        }\r\n    }\r\n}\r\n");
+                    "e (reader.Read())\r\n                        {\r\n                            bookDa" +
+                    "ta = ParseBookDataModel(reader);\r\n                        }\r\n                   " +
+                    " }\r\n                }\r\n            }\r\n\r\n            return bookData;\r\n        }\r" +
+                    "\n\r\n        /// <summary>Gets the data for the book with the given ISBN13.</summa" +
+                    "ry>\r\n        /// <param name=\"isbn13s\">The isbn13 values.</param>\r\n        /// <" +
+                    "returns>Book Data Model or null if not found.</returns>\r\n        /// <exception " +
+                    "cref=\"System.ArgumentNullException\">isbn13s</exception>\r\n        public IEnumera" +
+                    "ble<BookDataModel> GetByISBN13(IEnumerable<string> isbn13s)\r\n        {\r\n        " +
+                    "    if (isbn13s == null || !isbn13s.Any())\r\n            {\r\n                throw" +
+                    " new ArgumentNullException(nameof(isbn13s));\r\n            }\r\n\r\n            // Cr" +
+                    "eate an in-memory datatable with all of the BookIds\r\n            var idDataTable" +
+                    " = new DataTable();\r\n            idDataTable.Columns.Add(new DataColumn(\"ISBN13\"" +
+                    ", typeof(string)));\r\n            foreach (var bookId in isbn13s)\r\n            {\r" +
+                    "\n                idDataTable.Rows.Add(bookId);\r\n            }\r\n\r\n            var" +
+                    " bookData = new List<BookDataModel>();\r\n            using (var connection = new " +
+                    "SqlConnection(this.ConnectionString))\r\n            {\r\n                using (var" +
+                    " command = new SqlCommand(\"USP_Book_GetByISBN13_Multiple\"))\r\n                {\r\n" +
+                    "                    command.CommandType = CommandType.StoredProcedure;\r\n        " +
+                    "            command.Connection = connection;\r\n\r\n                    // Create th" +
+                    "e Stored Procedure Parameter and set to Type_IdTable\r\n                    var id" +
+                    "sParam = command.Parameters.AddWithValue(\"@isbn13s\", idDataTable);\r\n            " +
+                    "        idsParam.SqlDbType = SqlDbType.Structured;\r\n                    idsParam" +
+                    ".TypeName = \"dbo.Type_ISBN13_Table\";\r\n\r\n                    connection.Open();\r\n" +
+                    "                    var reader = command.ExecuteReader();\r\n                    i" +
+                    "f (reader.HasRows)\r\n                    {\r\n                        while (reader" +
+                    ".Read())\r\n                        {\r\n                            var data = Pars" +
+                    "eBookDataModel(reader);\r\n                            bookData.Add(data);\r\n      " +
+                    "                  }\r\n                    }\r\n                }\r\n            }\r\n\r\n" +
+                    "            return bookData;\r\n        }\r\n\r\n        /// <summary>Gets the data fo" +
+                    "r the book with the given ASIN10.</summary>\r\n        /// <param name=\"asin10\">Th" +
+                    "e asin10 value.</param>\r\n        /// <returns>Book Data Model or null if not fou" +
+                    "nd</returns>\r\n        public BookDataModel GetByASIN10(string asin10)\r\n        {" +
+                    "\r\n            if (string.IsNullOrWhiteSpace(asin10))\r\n            {\r\n           " +
+                    "     throw new ArgumentNullException(nameof(asin10));\r\n            }\r\n\r\n        " +
+                    "    BookDataModel bookData = null;\r\n            using (var connection = new SqlC" +
+                    "onnection(this.ConnectionString))\r\n            {\r\n                using (var com" +
+                    "mand = new SqlCommand(\"USP_Book_GetByASIN10\"))\r\n                {\r\n             " +
+                    "       command.CommandType = CommandType.StoredProcedure;\r\n                    c" +
+                    "ommand.Connection = connection;\r\n                    command.Parameters.AddWithV" +
+                    "alue(\"@asin10\", asin10);\r\n\r\n                    connection.Open();\r\n            " +
+                    "        var reader = command.ExecuteReader();\r\n                    if (reader.Ha" +
+                    "sRows)\r\n                    {\r\n                        while (reader.Read())\r\n  " +
+                    "                      {\r\n                            bookData = ParseBookDataMod" +
+                    "el(reader);\r\n                        }\r\n                    }\r\n                }" +
+                    "\r\n            }\r\n\r\n            return bookData;\r\n        }\r\n\r\n        /// <summa" +
+                    "ry>Gets the data for the book with the given ASIN10.</summary>\r\n        /// <par" +
+                    "am name=\"asin10s\">The asin10 values.</param>\r\n        /// <returns>Book Data Mod" +
+                    "el or null if not found.</returns>\r\n        /// <exception cref=\"System.Argument" +
+                    "NullException\">asin</exception>\r\n        public IEnumerable<BookDataModel> GetBy" +
+                    "ASIN10(IEnumerable<string> asin10s)\r\n        {\r\n            if (asin10s == null " +
+                    "|| !asin10s.Any())\r\n            {\r\n                throw new ArgumentNullExcepti" +
+                    "on(nameof(asin10s));\r\n            }\r\n\r\n            // Create an in-memory datata" +
+                    "ble with all of the BookIds\r\n            var idDataTable = new DataTable();\r\n   " +
+                    "         idDataTable.Columns.Add(new DataColumn(\"ASIN10\", typeof(string)));\r\n   " +
+                    "         foreach (var bookId in asin10s)\r\n            {\r\n                idDataT" +
+                    "able.Rows.Add(bookId);\r\n            }\r\n\r\n            var bookData = new List<Boo" +
+                    "kDataModel>();\r\n            using (var connection = new SqlConnection(this.Conne" +
+                    "ctionString))\r\n            {\r\n                using (var command = new SqlComman" +
+                    "d(\"USP_Book_GetByASIN10_Multiple\"))\r\n                {\r\n                    comm" +
+                    "and.CommandType = CommandType.StoredProcedure;\r\n                    command.Conn" +
+                    "ection = connection;\r\n\r\n                    // Create the Stored Procedure Param" +
+                    "eter and set to Type_IdTable\r\n                    var idsParam = command.Paramet" +
+                    "ers.AddWithValue(\"@asin10s\", idDataTable);\r\n                    idsParam.SqlDbTy" +
+                    "pe = SqlDbType.Structured;\r\n                    idsParam.TypeName = \"dbo.Type_AS" +
+                    "IN10_Table\";\r\n\r\n                    connection.Open();\r\n                    var " +
+                    "reader = command.ExecuteReader();\r\n                    if (reader.HasRows)\r\n    " +
+                    "                {\r\n                        while (reader.Read())\r\n              " +
+                    "          {\r\n                            var data = ParseBookDataModel(reader);\r" +
+                    "\n                            bookData.Add(data);\r\n                        }\r\n   " +
+                    "                 }\r\n                }\r\n            }\r\n\r\n            return bookD" +
+                    "ata;\r\n        }\r\n\r\n        /// <summary>Inserts the given ");
+            
+            #line 281 "C:\git-scratch\vanilladb\VanillaDb\DataProviders\SqlDataProvider.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(Record));
+            
+            #line default
+            #line hidden
+            this.Write(" data model into the ");
+            
+            #line 281 "C:\git-scratch\vanilladb\VanillaDb\DataProviders\SqlDataProvider.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(Record));
+            
+            #line default
+            #line hidden
+            this.Write(" table.</summary>\r\n        /// <param name=\"");
+            
+            #line 282 "C:\git-scratch\vanilladb\VanillaDb\DataProviders\SqlDataProvider.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(RecordCamel));
+            
+            #line default
+            #line hidden
+            this.Write("Data\">The ");
+            
+            #line 282 "C:\git-scratch\vanilladb\VanillaDb\DataProviders\SqlDataProvider.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(RecordLower));
+            
+            #line default
+            #line hidden
+            this.Write(" data to insert.</param>\r\n        /// <returns>The ID of the inserted ");
+            
+            #line 283 "C:\git-scratch\vanilladb\VanillaDb\DataProviders\SqlDataProvider.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(Record));
+            
+            #line default
+            #line hidden
+            this.Write(" record.</returns>\r\n        public int Insert(");
+            
+            #line 284 "C:\git-scratch\vanilladb\VanillaDb\DataProviders\SqlDataProvider.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(Record));
+            
+            #line default
+            #line hidden
+            this.Write("DataModel ");
+            
+            #line 284 "C:\git-scratch\vanilladb\VanillaDb\DataProviders\SqlDataProvider.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(RecordCamel));
+            
+            #line default
+            #line hidden
+            this.Write("Data)\r\n        {\r\n            if (");
+            
+            #line 286 "C:\git-scratch\vanilladb\VanillaDb\DataProviders\SqlDataProvider.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(RecordCamel));
+            
+            #line default
+            #line hidden
+            this.Write("Data == null)\r\n            {\r\n                throw new ArgumentNullException(nam" +
+                    "eof(");
+            
+            #line 288 "C:\git-scratch\vanilladb\VanillaDb\DataProviders\SqlDataProvider.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(RecordCamel));
+            
+            #line default
+            #line hidden
+            this.Write(@"Data));
+            }
+
+            if (string.IsNullOrWhiteSpace(this.ConnectionString))
+            {
+                throw new InvalidOperationException(""Connection String is null.  Insert operation cannot be performed."");
+            }
+// TODO: Matt, you need to add better names, like 'RecordData' and 'RecordDataModel' so this is all more readable
+            if (");
+            
+            #line 296 "C:\git-scratch\vanilladb\VanillaDb\DataProviders\SqlDataProvider.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(RecordCamel));
+            
+            #line default
+            #line hidden
+            this.Write("Data.");
+            
+            #line 296 "C:\git-scratch\vanilladb\VanillaDb\DataProviders\SqlDataProvider.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(Record));
+            
+            #line default
+            #line hidden
+            this.Write("Id > 0)\r\n            {\r\n                throw new InvalidOperationException(\"Unab" +
+                    "le to insert Book Data that already has a BookId.\");\r\n            }\r\n\r\n         " +
+                    "   var bookId = -1;\r\n            using (var connection = new SqlConnection(this." +
+                    "ConnectionString))\r\n            {\r\n                using (var command = new SqlC" +
+                    "ommand(\"USP_Book_Insert\"))\r\n                {\r\n                    command.Comma" +
+                    "ndType = CommandType.StoredProcedure;\r\n                    command.Connection = " +
+                    "connection;\r\n                    command.Parameters.AddWithValue(\"@isbn10\", book" +
+                    "Data.ISBN10 ?? (object)DBNull.Value);\r\n                    command.Parameters.Ad" +
+                    "dWithValue(\"@isbn13\", bookData.ISBN13 ?? (object)DBNull.Value);\r\n               " +
+                    "     command.Parameters.AddWithValue(\"@asin10\", bookData.ASIN10 ?? (object)DBNul" +
+                    "l.Value);\r\n\r\n                    connection.Open();\r\n                    var rea" +
+                    "der = command.ExecuteReader();\r\n                    if (reader.HasRows)\r\n       " +
+                    "             {\r\n                        while (reader.Read())\r\n                 " +
+                    "       {\r\n                            bookId = (int)reader[\"BookId\"];\r\n         " +
+                    "               }\r\n                    }\r\n                }\r\n            }\r\n\r\n   " +
+                    "         return bookId;\r\n        }\r\n\r\n        /// <summary>Parses the book data " +
+                    "model out of the reader.</summary>\r\n        /// <param name=\"reader\">The reader." +
+                    "</param>\r\n        /// <returns>Populated Book Data Model</returns>\r\n        priv" +
+                    "ate BookDataModel ParseBookDataModel(IDataReader reader)\r\n        {\r\n           " +
+                    " var data = new BookDataModel();\r\n            data.BookId = (int)reader[\"BookId\"" +
+                    "];\r\n            data.ISBN10 = reader[\"ISBN10\"] != DBNull.Value ? (string)reader[" +
+                    "\"ISBN10\"] : string.Empty;\r\n            data.ISBN13 = reader[\"ISBN13\"] != DBNull." +
+                    "Value ? (string)reader[\"ISBN13\"] : string.Empty;\r\n            data.ASIN10 = read" +
+                    "er[\"ASIN10\"] != DBNull.Value ? (string)reader[\"ASIN10\"] : string.Empty;\r\n       " +
+                    "     return data;\r\n        }\r\n    }\r\n}\r\n");
             return this.GenerationEnvironment.ToString();
         }
     }

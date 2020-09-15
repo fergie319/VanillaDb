@@ -1,8 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using VanillaDb.Models;
 
 namespace VanillaDb.DataProviders
@@ -24,6 +21,24 @@ namespace VanillaDb.DataProviders
             Indexes = indexes;
         }
 
+        /// <summary>Gets the name of the record type being worked with (the table name).</summary>
+        public string Record
+        {
+            get { return Table.TableName; }
+        }
+
+        /// <summary>Gets the lowercase name of the record type being worked with (the table name).</summary>
+        public string RecordLower
+        {
+            get { return Table.TableName.ToLower(); }
+        }
+
+        /// <summary>Gets the camelCase name of the record type being worked with (the table name).</summary>
+        public string RecordCamel
+        {
+            get { return Table.TableName.ToLower(); }
+        }
+
         /// <summary>Gets the name of the stored procedure.</summary>
         /// <returns>Class name and file name (without .sql).</returns>
         public string GenerateName()
@@ -35,11 +50,12 @@ namespace VanillaDb.DataProviders
         /// <returns>Insert method definition.</returns>
         public string GenerateInsertMethod()
         {
-            /////// <summary>Inserts the given <#= Table.TableName #> data model into the <#= Table.TableName #> table.</summary>
-            /////// <param name="<#= Table.TableName.ToLower() #> Data">The <#= Table.TableName.ToLower() #> data to insert.</param>
-            /////// <returns>The ID of the inserted <#= Table.TableName #> record.</returns>
-            ////int Insert(<#= Table.TableName #>DataModel <#= Table.TableName.ToCamelCase() #>Data);
-            return string.Empty;
+            var indent = "        ";
+            return
+            $"{indent}/// <summary>Inserts the given {Record} data model into the {Record} table.</summary>{Environment.NewLine}" +
+            $"{indent}/// <param name=\"{RecordCamel}Data\">The {RecordLower} data to insert.</param>{Environment.NewLine}" +
+            $"{indent}/// <returns>The ID of the inserted {Record} record.</returns>{Environment.NewLine}" +
+            $"{indent}int Insert({Record}DataModel {RecordCamel}Data);";
         }
     }
 }

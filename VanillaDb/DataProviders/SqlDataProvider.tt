@@ -3,11 +3,11 @@
 <#@ import namespace="System.Linq" #>
 <#@ import namespace="System.Text" #>
 <#@ import namespace="System.Collections.Generic" #>
-// <copyright file="BookSqlDataProvider.cs" company="MMF Software Developers Inc.">
+// <copyright file="<#= GenerateName() #>.cs" company="MMF Software Developers Inc.">
 // Copyright (c) MMF Software Developers Inc.. All rights reserved.
 // </copyright>
 
-namespace BookService.DataProviders
+namespace <#= Record #>Service.DataProviders
 {
     using System;
     using System.Collections.Generic;
@@ -15,13 +15,13 @@ namespace BookService.DataProviders
     using System.Data.SqlClient;
     using System.Linq;
 
-    /// <summary>Database interface implementation for Book data</summary>
-    /// <seealso cref="BookService.DataProviders.IBookDataProvider" />
-    public partial class BookSqlDataProvider : IBookDataProvider
+    /// <summary>SQL implementation of data provider interface for <#= Record #> data.</summary>
+    /// <seealso cref="<#= Record #>Service.DataProviders.I<#= Record #>DataProvider" />
+    public partial class <#= GenerateName() #> : I<#= Record #>DataProvider
     {
-        /// <summary>Initializes a new instance of the <see cref="BookSqlDataProvider"/> class.</summary>
+        /// <summary>Initializes a new instance of the <see cref="<#= GenerateName() #>"/> class.</summary>
         /// <param name="connectionString">The connection string.</param>
-        public BookSqlDataProvider(string connectionString)
+        public <#= GenerateName() #>(string connectionString) // TODO: Add Logger and log statements
         {
             this.ConnectionString = connectionString;
         }
@@ -278,22 +278,22 @@ namespace BookService.DataProviders
             return bookData;
         }
 
-        /// <summary>Inserts the given Book data model into the book table.</summary>
-        /// <param name="bookData">The book data to insert.</param>
-        /// <returns>The ID of the inserted Book record.</returns>
-        public int Insert(BookDataModel bookData)
+        /// <summary>Inserts the given <#= Record #> data model into the <#= Record #> table.</summary>
+        /// <param name="<#= RecordCamel #>Data">The <#= RecordLower #> data to insert.</param>
+        /// <returns>The ID of the inserted <#= Record #> record.</returns>
+        public int Insert(<#= Record #>DataModel <#= RecordCamel #>Data)
         {
-            if (bookData == null)
+            if (<#= RecordCamel #>Data == null)
             {
-                throw new ArgumentNullException(nameof(bookData));
+                throw new ArgumentNullException(nameof(<#= RecordCamel #>Data));
             }
 
             if (string.IsNullOrWhiteSpace(this.ConnectionString))
             {
                 throw new InvalidOperationException("Connection String is null.  Insert operation cannot be performed.");
             }
-
-            if (bookData.BookId > 0)
+// TODO: Matt, you need to add better names, like 'RecordData' and 'RecordDataModel' so this is all more readable
+            if (<#= RecordCamel #>Data.<#= Record #>Id > 0)
             {
                 throw new InvalidOperationException("Unable to insert Book Data that already has a BookId.");
             }

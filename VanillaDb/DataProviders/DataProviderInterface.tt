@@ -7,18 +7,15 @@
 // Copyright (c) MMF Software Developers Inc.. All rights reserved.
 // </copyright>
 
-namespace [<#= Table.TableName #>]Service.DataProviders
+namespace <#= Record #>Service.DataProviders
 {
     using System;
     using System.Collections.Generic;
 
-    /// <summary>Interface for <#= Table.TableName #> Data Providers.</summary>
+    /// <summary>Interface for <#= Record #> Data Providers.</summary>
     public interface <#= GenerateName() #>
     {
-        /// <summary>Inserts the given <#= Table.TableName #> data model into the <#= Table.TableName #> table.</summary>
-        /// <param name="<#= Table.TableName.ToLower() #> Data">The <#= Table.TableName.ToLower() #> data to insert.</param>
-        /// <returns>The ID of the inserted <#= Table.TableName #> record.</returns>
-        int Insert(<#= Table.TableName #>DataModel <#= Table.TableName.ToCamelCase() #>Data);
+<#= GenerateInsertMethod() #>
 
         /// <summary>Gets the data for the book with the given BookId.</summary>
         /// <param name="bookId">The book Id.</param>
