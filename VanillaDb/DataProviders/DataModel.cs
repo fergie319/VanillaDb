@@ -7,21 +7,20 @@
 //     the code is regenerated.
 // </auto-generated>
 // ------------------------------------------------------------------------------
-namespace VanillaDb.InsertProcs
+namespace VanillaDb.DataProviders
 {
     using System.Linq;
     using System.Text;
     using System.Collections.Generic;
-    using VanillaDb.Models;
     using System;
     
     /// <summary>
     /// Class to produce the template output
     /// </summary>
     
-    #line 1 "C:\git-scratch\vanilladb\VanillaDb\InsertProcs\InsertStoredProc.tt"
+    #line 1 "C:\git-scratch\vanilladb\VanillaDb\DataProviders\DataModel.tt"
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.TextTemplating", "16.0.0.0")]
-    public partial class InsertStoredProc : InsertStoredProcBase
+    public partial class DataModel : DataModelBase
     {
 #line hidden
         /// <summary>
@@ -29,49 +28,43 @@ namespace VanillaDb.InsertProcs
         /// </summary>
         public virtual string TransformText()
         {
-            this.Write("CREATE PROCEDURE [dbo].[");
+            this.Write("// <copyright file=\"");
             
-            #line 7 "C:\git-scratch\vanilladb\VanillaDb\InsertProcs\InsertStoredProc.tt"
+            #line 6 "C:\git-scratch\vanilladb\VanillaDb\DataProviders\DataModel.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(GenerateName()));
             
             #line default
             #line hidden
-            this.Write("]\r\n");
+            this.Write(".cs\" company=\"MMF Software Developers Inc.\">\r\n// Copyright (c) MMF Software Devel" +
+                    "opers Inc.. All rights reserved.\r\n// </copyright>\r\n\r\nnamespace ");
             
-            #line 8 "C:\git-scratch\vanilladb\VanillaDb\InsertProcs\InsertStoredProc.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(GenerateProcParameters()));
-            
-            #line default
-            #line hidden
-            this.Write("\r\nAS\r\nBEGIN\r\n    SET NOCOUNT ON\r\n\r\n    INSERT INTO [");
-            
-            #line 13 "C:\git-scratch\vanilladb\VanillaDb\InsertProcs\InsertStoredProc.tt"
+            #line 10 "C:\git-scratch\vanilladb\VanillaDb\DataProviders\DataModel.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(Table.TableName));
             
             #line default
             #line hidden
-            this.Write("] (");
+            this.Write("Service.DataProviders\r\n{\r\n    /// <summary>The ");
             
-            #line 13 "C:\git-scratch\vanilladb\VanillaDb\InsertProcs\InsertStoredProc.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(GenerateInsertParameters()));
-            
-            #line default
-            #line hidden
-            this.Write(")\r\n    OUTPUT ");
-            
-            #line 14 "C:\git-scratch\vanilladb\VanillaDb\InsertProcs\InsertStoredProc.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(GenerateOutputFields()));
+            #line 12 "C:\git-scratch\vanilladb\VanillaDb\DataProviders\DataModel.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(Table.TableName));
             
             #line default
             #line hidden
-            this.Write("\r\n    VALUES (");
+            this.Write(" Data Model.</summary>\r\n    public class ");
             
-            #line 15 "C:\git-scratch\vanilladb\VanillaDb\InsertProcs\InsertStoredProc.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(GenerateValuesFields()));
+            #line 13 "C:\git-scratch\vanilladb\VanillaDb\DataProviders\DataModel.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(GenerateName()));
             
             #line default
             #line hidden
-            this.Write(")\r\n\r\n    SET NOCOUNT OFF\r\nEND\r\n\r\nGO\r\n");
+            this.Write("\r\n    {\r\n");
+            
+            #line 15 "C:\git-scratch\vanilladb\VanillaDb\DataProviders\DataModel.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(GenerateProperties()));
+            
+            #line default
+            #line hidden
+            this.Write("\r\n    }\r\n}");
             return this.GenerationEnvironment.ToString();
         }
     }
@@ -83,7 +76,7 @@ namespace VanillaDb.InsertProcs
     /// Base class for this transformation
     /// </summary>
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.TextTemplating", "16.0.0.0")]
-    public class InsertStoredProcBase
+    public class DataModelBase
     {
         #region Fields
         private global::System.Text.StringBuilder generationEnvironmentField;

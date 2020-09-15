@@ -1,0 +1,17 @@
+﻿<#@ template language="C#" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="System.Collections.Generic" #>
+// <copyright file="<#= GenerateName() #>.cs" company="MMF Software Developers Inc.">
+// Copyright (c) MMF Software Developers Inc.. All rights reserved.
+// </copyright>
+
+namespace <#= Table.TableName #>Service.DataProviders
+{
+    /// <summary>The <#= Table.TableName #> Data Model.</summary>
+    public class <#= GenerateName() #>
+    {
+<#= GenerateProperties() #>
+    }
+}

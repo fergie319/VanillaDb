@@ -1,0 +1,37 @@
+﻿using System;
+using System.Linq;
+using VanillaDb.Models;
+
+namespace VanillaDb.DataProviders
+{
+    /// <summary>Partial class supplies parameters to the T4 Template.</summary>
+    /// <seealso cref="VanillaDb.DataProviders.DataModelBase" />
+    public partial class DataModel
+    {
+        private TableModel Table { get; set; }
+
+        /// <summary>Initializes a new instance of the <see cref="DataModel" /> class.</summary>
+        /// <param name="table">The table model.</param>
+        public DataModel(TableModel table)
+        {
+            Table = table;
+        }
+
+        /// <summary>Gets the name of the stored procedure.</summary>
+        /// <returns>Class name and file name (without .sql).</returns>
+        public string GenerateName()
+        {
+            return $"{Table.TableName}DataModel";
+        }
+
+        /// <summary>Generates the properties for the datamodel.</summary>
+        /// <returns>C# getter/setter properties.</returns>
+        public string GenerateProperties()
+        {
+            var properties = Table.Fields
+                .Select(f => $"        /// <summary>Gets or sets the {f.FieldName}.</summary>{Environment.NewLine}" +
+                             $"        public {f.FieldType.FieldType.GetAliasOrName()} {f.FieldName}");
+            return string.Join($"{Environment.NewLine}{Environment.NewLine}", properties);
+        }
+    }
+}

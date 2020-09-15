@@ -1,0 +1,340 @@
+﻿<#@ template language="C#" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="VanillaDb" #>
+// <copyright file="<#= GenerateName() #>.cs" company="MMF Software Developers Inc.">
+// Copyright (c) MMF Software Developers Inc.. All rights reserved.
+// </copyright>
+
+namespace <#= Record #>Service.DataProviders
+{
+    using System;
+    using System.Collections.Generic;
+    using System.Data;
+    using System.Data.SqlClient;
+    using System.Linq;
+
+    /// <summary>SQL implementation of data provider interface for <#= Record #> data.</summary>
+    /// <seealso cref="<#= Record #>Service.DataProviders.I<#= Record #>DataProvider" />
+    public partial class <#= GenerateName() #> : I<#= Record #>DataProvider
+    {
+        /// <summary>Initializes a new instance of the <see cref="<#= GenerateName() #>"/> class.</summary>
+        /// <param name="connectionString">The connection string.</param>
+        public <#= GenerateName() #>(string connectionString) // TODO: Add Logger and log statements
+        {
+            this.ConnectionString = connectionString;
+        }
+
+        /// <summary>Gets or sets the connection string.</summary>
+        /// <value>The connection string.</value>
+        private string ConnectionString { get; set; }
+
+        /// <summary>Gets the data for the book with the given BookId.</summary>
+        /// <param name="bookId">The book Id.</param>
+        /// <returns>Book Data Model or null if not found.</returns>
+        /// <exception cref="InvalidOperationException">${bookId} is not a valid BookId.</exception>
+        public BookDataModel GetByBookId(int bookId)
+        {
+            if (bookId < 1)
+            {
+                throw new InvalidOperationException($"${bookId} is not a valid BookId.");
+            }
+
+            BookDataModel bookData = null;
+            using (var connection = new SqlConnection(this.ConnectionString))
+            {
+                using (var command = new SqlCommand("USP_Book_GetByBookId"))
+                {
+                    command.CommandType = CommandType.StoredProcedure;
+                    command.Connection = connection;
+                    command.Parameters.AddWithValue("@bookId", bookId);
+
+                    connection.Open();
+                    var reader = command.ExecuteReader();
+                    if (reader.HasRows)
+                    {
+                        while (reader.Read())
+                        {
+                            bookData = ParseBookDataModel(reader);
+                        }
+                    }
+                }
+            }
+
+            return bookData;
+        }
+
+        /// <summary>Gets the data for the book with the given BookId.</summary>
+        /// <param name="bookIds">The book Ids.</param>
+        /// <returns>Book Data Model or null if not found.</returns>
+        /// <exception cref="System.ArgumentNullException">bookIds</exception>
+        public IEnumerable<BookDataModel> GetByBookId(IEnumerable<int> bookIds)
+        {
+            if (bookIds == null || !bookIds.Any())
+            {
+                throw new ArgumentNullException(nameof(bookIds));
+            }
+
+            // Create an in-memory datatable with all of the BookIds
+            var idDataTable = new DataTable();
+            idDataTable.Columns.Add(new DataColumn("BookId", typeof(int)));
+            foreach (var bookId in bookIds)
+            {
+                idDataTable.Rows.Add(bookId);
+            }
+
+            var bookData = new List<BookDataModel>();
+            using (var connection = new SqlConnection(this.ConnectionString))
+            {
+                using (var command = new SqlCommand("USP_Book_GetByBookId_Multiple"))
+                {
+                    command.CommandType = CommandType.StoredProcedure;
+                    command.Connection = connection;
+
+                    // Create the Stored Procedure Parameter and set to Type_IdTable
+                    var idsParam = command.Parameters.AddWithValue("@bookIds", idDataTable);
+                    idsParam.SqlDbType = SqlDbType.Structured;
+                    idsParam.TypeName = "dbo.Type_BookId_Table";
+
+                    connection.Open();
+                    var reader = command.ExecuteReader();
+                    if (reader.HasRows)
+                    {
+                        while (reader.Read())
+                        {
+                            var data = ParseBookDataModel(reader);
+                            bookData.Add(data);
+                        }
+                    }
+                }
+            }
+
+            return bookData;
+        }
+
+        /// <summary>Gets the data for the book with the given ISBN13.</summary>
+        /// <param name="isbn13">The isbn13 value.</param>
+        /// <returns>Book Data Model or null if not found</returns>
+        /// <exception cref="System.ArgumentNullException">isbn13</exception>
+        public BookDataModel GetByISBN13(string isbn13)
+        {
+            if (string.IsNullOrWhiteSpace(isbn13))
+            {
+                throw new ArgumentNullException(nameof(isbn13));
+            }
+
+            BookDataModel bookData = null;
+            using (var connection = new SqlConnection(this.ConnectionString))
+            {
+                using (var command = new SqlCommand("USP_Book_GetByISBN13"))
+                {
+                    command.CommandType = CommandType.StoredProcedure;
+                    command.Connection = connection;
+                    command.Parameters.AddWithValue("@isbn13", isbn13);
+
+                    connection.Open();
+                    var reader = command.ExecuteReader();
+                    if (reader.HasRows)
+                    {
+                        while (reader.Read())
+                        {
+                            bookData = ParseBookDataModel(reader);
+                        }
+                    }
+                }
+            }
+
+            return bookData;
+        }
+
+        /// <summary>Gets the data for the book with the given ISBN13.</summary>
+        /// <param name="isbn13s">The isbn13 values.</param>
+        /// <returns>Book Data Model or null if not found.</returns>
+        /// <exception cref="System.ArgumentNullException">isbn13s</exception>
+        public IEnumerable<BookDataModel> GetByISBN13(IEnumerable<string> isbn13s)
+        {
+            if (isbn13s == null || !isbn13s.Any())
+            {
+                throw new ArgumentNullException(nameof(isbn13s));
+            }
+
+            // Create an in-memory datatable with all of the BookIds
+            var idDataTable = new DataTable();
+            idDataTable.Columns.Add(new DataColumn("ISBN13", typeof(string)));
+            foreach (var bookId in isbn13s)
+            {
+                idDataTable.Rows.Add(bookId);
+            }
+
+            var bookData = new List<BookDataModel>();
+            using (var connection = new SqlConnection(this.ConnectionString))
+            {
+                using (var command = new SqlCommand("USP_Book_GetByISBN13_Multiple"))
+                {
+                    command.CommandType = CommandType.StoredProcedure;
+                    command.Connection = connection;
+
+                    // Create the Stored Procedure Parameter and set to Type_IdTable
+                    var idsParam = command.Parameters.AddWithValue("@isbn13s", idDataTable);
+                    idsParam.SqlDbType = SqlDbType.Structured;
+                    idsParam.TypeName = "dbo.Type_ISBN13_Table";
+
+                    connection.Open();
+                    var reader = command.ExecuteReader();
+                    if (reader.HasRows)
+                    {
+                        while (reader.Read())
+                        {
+                            var data = ParseBookDataModel(reader);
+                            bookData.Add(data);
+                        }
+                    }
+                }
+            }
+
+            return bookData;
+        }
+
+        /// <summary>Gets the data for the book with the given ASIN10.</summary>
+        /// <param name="asin10">The asin10 value.</param>
+        /// <returns>Book Data Model or null if not found</returns>
+        public BookDataModel GetByASIN10(string asin10)
+        {
+            if (string.IsNullOrWhiteSpace(asin10))
+            {
+                throw new ArgumentNullException(nameof(asin10));
+            }
+
+            BookDataModel bookData = null;
+            using (var connection = new SqlConnection(this.ConnectionString))
+            {
+                using (var command = new SqlCommand("USP_Book_GetByASIN10"))
+                {
+                    command.CommandType = CommandType.StoredProcedure;
+                    command.Connection = connection;
+                    command.Parameters.AddWithValue("@asin10", asin10);
+
+                    connection.Open();
+                    var reader = command.ExecuteReader();
+                    if (reader.HasRows)
+                    {
+                        while (reader.Read())
+                        {
+                            bookData = ParseBookDataModel(reader);
+                        }
+                    }
+                }
+            }
+
+            return bookData;
+        }
+
+        /// <summary>Gets the data for the book with the given ASIN10.</summary>
+        /// <param name="asin10s">The asin10 values.</param>
+        /// <returns>Book Data Model or null if not found.</returns>
+        /// <exception cref="System.ArgumentNullException">asin</exception>
+        public IEnumerable<BookDataModel> GetByASIN10(IEnumerable<string> asin10s)
+        {
+            if (asin10s == null || !asin10s.Any())
+            {
+                throw new ArgumentNullException(nameof(asin10s));
+            }
+
+            // Create an in-memory datatable with all of the BookIds
+            var idDataTable = new DataTable();
+            idDataTable.Columns.Add(new DataColumn("ASIN10", typeof(string)));
+            foreach (var bookId in asin10s)
+            {
+                idDataTable.Rows.Add(bookId);
+            }
+
+            var bookData = new List<BookDataModel>();
+            using (var connection = new SqlConnection(this.ConnectionString))
+            {
+                using (var command = new SqlCommand("USP_Book_GetByASIN10_Multiple"))
+                {
+                    command.CommandType = CommandType.StoredProcedure;
+                    command.Connection = connection;
+
+                    // Create the Stored Procedure Parameter and set to Type_IdTable
+                    var idsParam = command.Parameters.AddWithValue("@asin10s", idDataTable);
+                    idsParam.SqlDbType = SqlDbType.Structured;
+                    idsParam.TypeName = "dbo.Type_ASIN10_Table";
+
+                    connection.Open();
+                    var reader = command.ExecuteReader();
+                    if (reader.HasRows)
+                    {
+                        while (reader.Read())
+                        {
+                            var data = ParseBookDataModel(reader);
+                            bookData.Add(data);
+                        }
+                    }
+                }
+            }
+
+            return bookData;
+        }
+
+        /// <summary>Inserts the given <#= Record #> data model into the <#= Record #> table.</summary>
+        /// <param name="<#= RecordCamel #>Data">The <#= RecordLower #> data to insert.</param>
+        /// <returns>The ID of the inserted <#= Record #> record.</returns>
+        public int Insert(<#= Record #>DataModel <#= RecordCamel #>Data)
+        {
+            if (<#= RecordCamel #>Data == null)
+            {
+                throw new ArgumentNullException(nameof(<#= RecordCamel #>Data));
+            }
+
+            if (string.IsNullOrWhiteSpace(this.ConnectionString))
+            {
+                throw new InvalidOperationException("Connection String is null.  Insert operation cannot be performed.");
+            }
+
+            if (<#= RecordCamel #>Data.<#= PrimaryKey #> > 0)
+            {
+                throw new InvalidOperationException("Unable to insert <#= Record #> Data that already has a <#= PrimaryKey #>.");
+            }
+
+            var <#= PrimaryKey.ToCamelCase() #> = -1;
+            using (var connection = new SqlConnection(this.ConnectionString))
+            {
+                using (var command = new SqlCommand("<#= GenerateInsertProcName() #>"))
+                {
+                    command.CommandType = CommandType.StoredProcedure;
+                    command.Connection = connection;
+                    <#= GenerateInsertProcParams() #>
+
+                    connection.Open();
+                    var reader = command.ExecuteReader();
+                    if (reader.HasRows)
+                    {
+                        while (reader.Read())
+                        {
+                            <#= PrimaryKey.ToCamelCase() #> = (int)reader["<#= PrimaryKey #>"];
+                        }
+                    }
+                }
+            }
+
+            return <#= PrimaryKey.ToCamelCase() #>;
+        }
+
+        /// <summary>Parses the book data model out of the reader.</summary>
+        /// <param name="reader">The reader.</param>
+        /// <returns>Populated Book Data Model</returns>
+        private BookDataModel ParseBookDataModel(IDataReader reader)
+        {
+            var data = new BookDataModel();
+            data.BookId = (int)reader["BookId"];
+            data.ISBN10 = reader["ISBN10"] != DBNull.Value ? (string)reader["ISBN10"] : string.Empty;
+            data.ISBN13 = reader["ISBN13"] != DBNull.Value ? (string)reader["ISBN13"] : string.Empty;
+            data.ASIN10 = reader["ASIN10"] != DBNull.Value ? (string)reader["ASIN10"] : string.Empty;
+            return data;
+        }
+    }
+}

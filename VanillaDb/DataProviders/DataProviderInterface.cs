@@ -7,21 +7,20 @@
 //     the code is regenerated.
 // </auto-generated>
 // ------------------------------------------------------------------------------
-namespace VanillaDb.InsertProcs
+namespace VanillaDb.DataProviders
 {
     using System.Linq;
     using System.Text;
     using System.Collections.Generic;
-    using VanillaDb.Models;
     using System;
     
     /// <summary>
     /// Class to produce the template output
     /// </summary>
     
-    #line 1 "C:\git-scratch\vanilladb\VanillaDb\InsertProcs\InsertStoredProc.tt"
+    #line 1 "C:\git-scratch\vanilladb\VanillaDb\DataProviders\DataProviderInterface.tt"
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.TextTemplating", "16.0.0.0")]
-    public partial class InsertStoredProc : InsertStoredProcBase
+    public partial class DataProviderInterface : DataProviderInterfaceBase
     {
 #line hidden
         /// <summary>
@@ -29,49 +28,69 @@ namespace VanillaDb.InsertProcs
         /// </summary>
         public virtual string TransformText()
         {
-            this.Write("CREATE PROCEDURE [dbo].[");
+            this.Write("// <copyright file=\"");
             
-            #line 7 "C:\git-scratch\vanilladb\VanillaDb\InsertProcs\InsertStoredProc.tt"
+            #line 6 "C:\git-scratch\vanilladb\VanillaDb\DataProviders\DataProviderInterface.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(GenerateName()));
             
             #line default
             #line hidden
-            this.Write("]\r\n");
+            this.Write(".cs\" company=\"MMF Software Developers Inc.\">\r\n// Copyright (c) MMF Software Devel" +
+                    "opers Inc.. All rights reserved.\r\n// </copyright>\r\n\r\nnamespace ");
             
-            #line 8 "C:\git-scratch\vanilladb\VanillaDb\InsertProcs\InsertStoredProc.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(GenerateProcParameters()));
-            
-            #line default
-            #line hidden
-            this.Write("\r\nAS\r\nBEGIN\r\n    SET NOCOUNT ON\r\n\r\n    INSERT INTO [");
-            
-            #line 13 "C:\git-scratch\vanilladb\VanillaDb\InsertProcs\InsertStoredProc.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(Table.TableName));
+            #line 10 "C:\git-scratch\vanilladb\VanillaDb\DataProviders\DataProviderInterface.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(Record));
             
             #line default
             #line hidden
-            this.Write("] (");
+            this.Write("Service.DataProviders\r\n{\r\n    using System;\r\n    using System.Collections.Generic" +
+                    ";\r\n\r\n    /// <summary>Interface for ");
             
-            #line 13 "C:\git-scratch\vanilladb\VanillaDb\InsertProcs\InsertStoredProc.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(GenerateInsertParameters()));
-            
-            #line default
-            #line hidden
-            this.Write(")\r\n    OUTPUT ");
-            
-            #line 14 "C:\git-scratch\vanilladb\VanillaDb\InsertProcs\InsertStoredProc.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(GenerateOutputFields()));
+            #line 15 "C:\git-scratch\vanilladb\VanillaDb\DataProviders\DataProviderInterface.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(Record));
             
             #line default
             #line hidden
-            this.Write("\r\n    VALUES (");
+            this.Write(" Data Providers.</summary>\r\n    public interface ");
             
-            #line 15 "C:\git-scratch\vanilladb\VanillaDb\InsertProcs\InsertStoredProc.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(GenerateValuesFields()));
+            #line 16 "C:\git-scratch\vanilladb\VanillaDb\DataProviders\DataProviderInterface.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(GenerateName()));
             
             #line default
             #line hidden
-            this.Write(")\r\n\r\n    SET NOCOUNT OFF\r\nEND\r\n\r\nGO\r\n");
+            this.Write("\r\n    {\r\n");
+            
+            #line 18 "C:\git-scratch\vanilladb\VanillaDb\DataProviders\DataProviderInterface.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(GenerateInsertMethod()));
+            
+            #line default
+            #line hidden
+            this.Write("\r\n\r\n        /// <summary>Gets the data for the book with the given BookId.</summa" +
+                    "ry>\r\n        /// <param name=\"bookId\">The book Id.</param>\r\n        /// <returns" +
+                    ">Book Data Model or null if not found.</returns>\r\n        /// <exception cref=\"I" +
+                    "nvalidOperationException\">${bookId} is not a valid BookId.</exception>\r\n        " +
+                    "BookDataModel GetByBookId(int bookId);\r\n\r\n        /// <summary>Gets the data for" +
+                    " the book with the given BookId.</summary>\r\n        /// <param name=\"bookIds\">Th" +
+                    "e book Ids.</param>\r\n        /// <returns>Book Data Model or null if not found.<" +
+                    "/returns>\r\n        /// <exception cref=\"System.ArgumentNullException\">bookIds</e" +
+                    "xception>\r\n        IEnumerable<BookDataModel> GetByBookId(IEnumerable<int> bookI" +
+                    "ds);\r\n\r\n        /// <summary>Gets the data for the book with the given ISBN13.</" +
+                    "summary>\r\n        /// <param name=\"isbn13\">The isbn13 value.</param>\r\n        //" +
+                    "/ <returns>Book Data Model or null if not found</returns>\r\n        BookDataModel" +
+                    " GetByISBN13(string isbn13);\r\n\r\n        /// <summary>Gets the data for the book " +
+                    "with the given ISBN13.</summary>\r\n        /// <param name=\"isbn13s\">The isbn13 v" +
+                    "alues.</param>\r\n        /// <returns>Book Data Model or null if not found.</retu" +
+                    "rns>\r\n        /// <exception cref=\"System.ArgumentNullException\">isbn13s</except" +
+                    "ion>\r\n        IEnumerable<BookDataModel> GetByISBN13(IEnumerable<string> isbn13s" +
+                    ");\r\n\r\n        /// <summary>Gets the data for the book with the given ASIN10.</su" +
+                    "mmary>\r\n        /// <param name=\"asin10\">The asin10 value.</param>\r\n        /// " +
+                    "<returns>Book Data Model or null if not found</returns>\r\n        BookDataModel G" +
+                    "etByASIN10(string asin10);\r\n\r\n        /// <summary>Gets the data for the book wi" +
+                    "th the given ASIN10.</summary>\r\n        /// <param name=\"asin10s\">The asin10 val" +
+                    "ues.</param>\r\n        /// <returns>Book Data Model or null if not found.</return" +
+                    "s>\r\n        /// <exception cref=\"System.ArgumentNullException\">asin</exception>\r" +
+                    "\n        IEnumerable<BookDataModel> GetByASIN10(IEnumerable<string> asin10s);\r\n " +
+                    "   }\r\n}");
             return this.GenerationEnvironment.ToString();
         }
     }
@@ -83,7 +102,7 @@ namespace VanillaDb.InsertProcs
     /// Base class for this transformation
     /// </summary>
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.TextTemplating", "16.0.0.0")]
-    public class InsertStoredProcBase
+    public class DataProviderInterfaceBase
     {
         #region Fields
         private global::System.Text.StringBuilder generationEnvironmentField;

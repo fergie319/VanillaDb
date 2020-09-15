@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using Serilog;
 using Serilog.Sinks.SystemConsole.Themes;
+using VanillaDb.DataProviders;
 using VanillaDb.GetProcs;
 using VanillaDb.InsertProcs;
 using VanillaDb.Models;
@@ -59,6 +60,10 @@ namespace VanillaDb
                 // NOTE: Parsing is inflexible, any deviation from expectations results in error
 
                 // TODO: Add more detailed logging along the way.
+
+                // TODO: Add output directory arguments (one for sql file output, the other for C# output)
+
+                // TODO: Add C# namespace input argument
 
                 // First line should be table creation - extract table name (last parameter)
                 var createTable = reader.ReadLine();
@@ -196,20 +201,42 @@ namespace VanillaDb
                 var getBy = new GetBySingleStoredProc(table, index);
                 sqlContent = getBy.TransformText();
                 Log.Debug($"Content: {sqlContent}");
-                File.WriteAllText($"{storedProcDir}\\{getBy.GenerateName()}", sqlContent);
+                File.WriteAllText($"{storedProcDir}\\{getBy.GenerateName()}.sql", sqlContent);
 
                 // Generate the bulk-select stored procedures
                 var getByBulk = new GetByBulkStoredProc(table, index);
                 sqlContent = getByBulk.TransformText();
                 Log.Debug($"Content: {sqlContent}");
-                File.WriteAllText($"{storedProcDir}\\{getByBulk.GenerateName()}", sqlContent);
+                File.WriteAllText($"{storedProcDir}\\{getByBulk.GenerateName()}.sql", sqlContent);
             }
 
             // Generate the Insert stored procedure
             var insertStoredProc = new InsertStoredProc(table);
             var insertContent = insertStoredProc.TransformText();
             Log.Debug($"Content: {insertContent}");
-            File.WriteAllText($"{storedProcDir}\\USP_{table.TableName}_Insert", insertContent);
+            File.WriteAllText($"{storedProcDir}\\{insertStoredProc.GenerateName()}.sql", insertContent);
+
+            // Create Data Provider directory
+            var dataProviderDir = Path.Combine(outputDir, "DataProviders");
+            Directory.CreateDirectory(dataProviderDir);
+
+            // Generate the DataModel class
+            var dataModelGen = new DataModel(table);
+            var content = dataModelGen.TransformText();
+            Log.Debug($"Content: {content}");
+            File.WriteAllText($"{dataProviderDir}\\{dataModelGen.GenerateName()}.cs", content);
+
+            // Generate the DataProvider interface
+            var dataProviderInterfaceGen = new DataProviderInterface(table, indexes);
+            content = dataProviderInterfaceGen.TransformText();
+            Log.Debug($"Content: {content}");
+            File.WriteAllText($"{dataProviderDir}\\{dataProviderInterfaceGen.GenerateName()}.cs", content);
+
+            // Generate the SqlDataProvider class
+            var sqlDataProviderGen = new SqlDataProvider(table, indexes);
+            content = sqlDataProviderGen.TransformText();
+            Log.Debug($"Content: {content}");
+            File.WriteAllText($"{dataProviderDir}\\{sqlDataProviderGen.GenerateName()}.cs", content);
 
             // TODO: This is temporary for VS debugging - remove
             Console.ReadKey();

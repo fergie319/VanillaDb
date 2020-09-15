@@ -26,7 +26,7 @@ namespace VanillaDb.GetProcs
         // TODO: Add method to all transform classes for getting proc/file name.
 
         /// <summary>Gets the name of the stored procedure.</summary>
-        /// <returns>Type Table name and file name (without .sql).</returns>
+        /// <returns>Procedure name and file name (without .sql).</returns>
         public string GenerateName()
         {
             var fieldNames = Index.Fields.Select(f => f.FieldName);
