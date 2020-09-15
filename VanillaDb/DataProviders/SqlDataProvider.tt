@@ -324,16 +324,13 @@ namespace <#= Record #>Service.DataProviders
             return <#= PrimaryKey.ToCamelCase() #>;
         }
 
-        /// <summary>Parses the book data model out of the reader.</summary>
+        /// <summary>Parses the <#= Record #> data model out of the reader.</summary>
         /// <param name="reader">The reader.</param>
-        /// <returns>Populated Book Data Model</returns>
-        private BookDataModel ParseBookDataModel(IDataReader reader)
+        /// <returns>Populated <#= Record #> Data Model</returns>
+        private <#= Record #>DataModel Parse<#= Record #>DataModel(IDataReader reader)
         {
-            var data = new BookDataModel();
-            data.BookId = (int)reader["BookId"];
-            data.ISBN10 = reader["ISBN10"] != DBNull.Value ? (string)reader["ISBN10"] : string.Empty;
-            data.ISBN13 = reader["ISBN13"] != DBNull.Value ? (string)reader["ISBN13"] : string.Empty;
-            data.ASIN10 = reader["ASIN10"] != DBNull.Value ? (string)reader["ASIN10"] : string.Empty;
+            var data = new <#= Record #>DataModel();
+            <#= GenerateReadFields() #>
             return data;
         }
     }

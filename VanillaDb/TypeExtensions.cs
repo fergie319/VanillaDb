@@ -38,5 +38,27 @@ namespace VanillaDb
 
             return alias;
         }
+
+        /// <summary>Gets the default value for a type and returns it as a string.</summary>
+        /// <param name="type">The type.</param>
+        /// <returns>Type value as a string</returns>
+        public static string GetDefaultValueString(this Type type)
+        {
+            var defaultValueString = "null";
+            if (type == typeof(string))
+            {
+                defaultValueString = "string.Empty";
+            }
+            else if (type == typeof(int))
+            {
+                defaultValueString = "-1";
+            }
+            else if (type == typeof(bool))
+            {
+                defaultValueString = "false";
+            }
+
+            return defaultValueString;
+        }
     }
 }

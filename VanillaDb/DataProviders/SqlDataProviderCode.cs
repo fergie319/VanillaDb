@@ -1,5 +1,4 @@
 ﻿using System;
-using System.CodeDom;
 using System.Collections.Generic;
 using System.Linq;
 using VanillaDb.Models;
@@ -72,16 +71,29 @@ namespace VanillaDb.DataProviders
                 .Where(f => !f.IsIdentity)
                 .Select(f =>
                 {
-                    var param = string.Empty;
-                    param = (f.IsNullable)
-                                ? $"\"@{f.FieldName.ToCamelCase()}\", {recordParam}.{f.FieldName} ?? (object)DBNull.Value"
-                                : $"\"@{f.FieldName.ToCamelCase()}\", {recordParam}.{f.FieldName}";
-                    return param;
+                    return (f.IsNullable)
+                        ? $"\"@{f.FieldName.ToCamelCase()}\", {recordParam}.{f.FieldName} ?? (object)DBNull.Value"
+                        : $"\"@{f.FieldName.ToCamelCase()}\", {recordParam}.{f.FieldName}";
                 });
 
             var addParameters = parameters.Select(p => $"command.Parameters.AddWithValue({p});");
 
             return string.Join($"{Environment.NewLine}{indent}", addParameters);
+        }
+
+        /// <summary>Generates the lines for reading each field from a db reader.</summary>
+        /// <returns>Code to read each field and populate the data model.</returns>
+        public string GenerateReadFields()
+        {
+            var indent = "            ";
+            var readLines = Table.Fields.Select(f =>
+            {
+                return (f.IsNullable)
+                    ? $"data.{f.FieldName} = (reader[\"{f.FieldName}\"] != DBNull.Value) ? ({f.FieldType.FieldType.GetAliasOrName()})reader[\"{f.FieldName}\"] : null;"
+                    : $"data.{f.FieldName} = ({f.FieldType.FieldType.GetAliasOrName()})reader[\"{f.FieldName}\"];";
+            });
+
+            return string.Join($"{Environment.NewLine}{indent}", readLines);
         }
     }
 }

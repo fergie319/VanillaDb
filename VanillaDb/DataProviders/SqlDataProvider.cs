@@ -383,24 +383,50 @@ namespace VanillaDb.DataProviders
             
             #line default
             #line hidden
-            this.Write(@";
-        }
-
-        /// <summary>Parses the book data model out of the reader.</summary>
-        /// <param name=""reader"">The reader.</param>
-        /// <returns>Populated Book Data Model</returns>
-        private BookDataModel ParseBookDataModel(IDataReader reader)
-        {
-            var data = new BookDataModel();
-            data.BookId = (int)reader[""BookId""];
-            data.ISBN10 = reader[""ISBN10""] != DBNull.Value ? (string)reader[""ISBN10""] : string.Empty;
-            data.ISBN13 = reader[""ISBN13""] != DBNull.Value ? (string)reader[""ISBN13""] : string.Empty;
-            data.ASIN10 = reader[""ASIN10""] != DBNull.Value ? (string)reader[""ASIN10""] : string.Empty;
-            return data;
-        }
-    }
-}
-");
+            this.Write(";\r\n        }\r\n\r\n        /// <summary>Parses the ");
+            
+            #line 327 "C:\git-scratch\vanilladb\VanillaDb\DataProviders\SqlDataProvider.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(Record));
+            
+            #line default
+            #line hidden
+            this.Write(" data model out of the reader.</summary>\r\n        /// <param name=\"reader\">The re" +
+                    "ader.</param>\r\n        /// <returns>Populated ");
+            
+            #line 329 "C:\git-scratch\vanilladb\VanillaDb\DataProviders\SqlDataProvider.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(Record));
+            
+            #line default
+            #line hidden
+            this.Write(" Data Model</returns>\r\n        private ");
+            
+            #line 330 "C:\git-scratch\vanilladb\VanillaDb\DataProviders\SqlDataProvider.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(Record));
+            
+            #line default
+            #line hidden
+            this.Write("DataModel Parse");
+            
+            #line 330 "C:\git-scratch\vanilladb\VanillaDb\DataProviders\SqlDataProvider.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(Record));
+            
+            #line default
+            #line hidden
+            this.Write("DataModel(IDataReader reader)\r\n        {\r\n            var data = new ");
+            
+            #line 332 "C:\git-scratch\vanilladb\VanillaDb\DataProviders\SqlDataProvider.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(Record));
+            
+            #line default
+            #line hidden
+            this.Write("DataModel();\r\n            ");
+            
+            #line 333 "C:\git-scratch\vanilladb\VanillaDb\DataProviders\SqlDataProvider.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(GenerateReadFields()));
+            
+            #line default
+            #line hidden
+            this.Write("\r\n            return data;\r\n        }\r\n    }\r\n}\r\n");
             return this.GenerationEnvironment.ToString();
         }
     }
