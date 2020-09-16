@@ -207,21 +207,28 @@ namespace <#= Record #>Service.DataProviders
         /// <summary>Gets the data for the <#= Record #> with the given <#= ReadableFields(index.Fields) #>.</summary>
         <#= GenerateGetByIndexParamsXmlComments(index.Fields) #>
         /// <returns><#= Record #> Data Model or null if not found</returns>
-        public <#= Record #>DataModel GetByASIN10(string asin10)
+        public <#= Record #>DataModel <#= GenerateGetByIndexMethodName(index.Fields) #>(<#= GenerateGetByIndexMethodParams(index.Fields) #>)
         {
-            if (string.IsNullOrWhiteSpace(asin10))
+<#
+        foreach (FieldModel field in index.Fields)
+        {
+#>
+            if (string.IsNullOrWhiteSpace(<#= field.FieldName.ToCamelCase() #>))
             {
-                throw new ArgumentNullException(nameof(asin10));
+                throw new ArgumentNullException(nameof(<#= field.FieldName.ToCamelCase() #>));
             }
+<#
+        }
+#>
 
-            BookDataModel bookData = null;
+            <#= Record #>DataModel <#= RecordCamel #>Data = null;
             using (var connection = new SqlConnection(this.ConnectionString))
             {
-                using (var command = new SqlCommand("USP_Book_GetByASIN10"))
+                using (var command = new SqlCommand("<#= GenerateGetByIndexStoredProcName(index) #>"))
                 {
                     command.CommandType = CommandType.StoredProcedure;
                     command.Connection = connection;
-                    command.Parameters.AddWithValue("@asin10", asin10);
+                    <#= GenerateGetByIndexAddParametersCode(index.Fields) #>
 
                     connection.Open();
                     var reader = command.ExecuteReader();
@@ -229,13 +236,13 @@ namespace <#= Record #>Service.DataProviders
                     {
                         while (reader.Read())
                         {
-                            bookData = ParseBookDataModel(reader);
+                            bookData = Parse<#= Record #>DataModel(reader);
                         }
                     }
                 }
             }
 
-            return bookData;
+            return <#= RecordCamel #>Data;
         }
 
         <#

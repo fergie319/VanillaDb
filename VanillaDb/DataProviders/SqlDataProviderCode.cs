@@ -113,5 +113,38 @@ namespace VanillaDb.DataProviders
             var xmlParams = fields.Select(f => $"/// <param name=\"{f.FieldName.ToCamelCase()}\">The {f.FieldName} value.</param>");
             return string.Join($"{Environment.NewLine}{indent}", xmlParams);
         }
+
+        /// <summary>Generates the get by index method parameters.</summary>
+        /// <param name="fields">The fields.</param>
+        /// <returns></returns>
+        public string GenerateGetByIndexMethodParams(IEnumerable<FieldModel> fields)
+        {
+            return string.Join(", ", fields.Select(f => $"{f.FieldType.FieldType} {f.FieldName.ToCamelCase()}"));
+        }
+
+        /// <summary>Generates the name of the get by index method.</summary>
+        /// <param name="fields">The fields.</param>
+        /// <returns></returns>
+        public string GenerateGetByIndexMethodName(IEnumerable<FieldModel> fields)
+        {
+            return $"GetBy{string.Join("And", fields.Select(f => f.FieldName))}";
+        }
+
+        /// <summary>Generates the name of the get by index stored proc.</summary>
+        /// <returns></returns>
+        public string GenerateGetByIndexStoredProcName(IndexModel index)
+        {
+            var procNameFields = index.Fields.Select(f => f.FieldName);
+            return $"USP_{Table.TableName}_GetBy{string.Join("_", procNameFields)}";
+        }
+
+        /// <summary>Generates the code to add parameters for the get by index procedure.</summary>
+        /// <returns></returns>
+        public string GenerateGetByIndexAddParametersCode(IEnumerable<FieldModel> fields)
+        {
+            var indent = "                    ";
+            var addParamsLines = fields.Select(f => $"command.Parameters.AddWithValue(\"@{f.FieldName.ToCamelCase()}\", {f.FieldName.ToCamelCase()});");
+            return string.Join($"{Environment.NewLine}{indent}", addParamsLines);
+        }
     }
 }
