@@ -5,6 +5,7 @@
 <#@ import namespace="System.Text" #>
 <#@ import namespace="System.Collections.Generic" #>
 <#@ import namespace="VanillaDb" #>
+<#@ import namespace="VanillaDb.Models" #>
 // <copyright file="<#= GenerateName() #>.cs" company="MMF Software Developers Inc.">
 // Copyright (c) MMF Software Developers Inc.. All rights reserved.
 // </copyright>
@@ -198,10 +199,15 @@ namespace <#= Record #>Service.DataProviders
             return bookData;
         }
 
-        /// <summary>Gets the data for the book with the given ASIN10.</summary>
-        /// <param name="asin10">The asin10 value.</param>
-        /// <returns>Book Data Model or null if not found</returns>
-        public BookDataModel GetByASIN10(string asin10)
+<#
+    // Generate the GetBy-Index and GetBy-Index-Bulk methods for each index
+    foreach (IndexModel index in Indexes)
+    {
+#>
+        /// <summary>Gets the data for the <#= Record #> with the given <#= ReadableFields(index.Fields) #>.</summary>
+        <#= GenerateGetByIndexParamsXmlComments(index.Fields) #>
+        /// <returns><#= Record #> Data Model or null if not found</returns>
+        public <#= Record #>DataModel GetByASIN10(string asin10)
         {
             if (string.IsNullOrWhiteSpace(asin10))
             {
@@ -232,6 +238,13 @@ namespace <#= Record #>Service.DataProviders
             return bookData;
         }
 
+        <#
+            // Hey Future Matt!  It's-a-me, Past Matt.  You are probably here trying to
+            // figure out how to add Get-By-Index-Bulk support for a multi-field index.
+            // I just thought I'd let you know that you need to generate a custom type or
+            // make use of Tuples (yuck!) to do this.  Then a user would pass in an enumerable
+            // of these objects all with unique pairings of the fields in the index.
+        #>
         /// <summary>Gets the data for the book with the given ASIN10.</summary>
         /// <param name="asin10s">The asin10 values.</param>
         /// <returns>Book Data Model or null if not found.</returns>
@@ -279,6 +292,10 @@ namespace <#= Record #>Service.DataProviders
 
             return bookData;
         }
+
+<#
+    }
+#>
 
         /// <summary>Inserts the given <#= Record #> data model into the <#= Record #> table.</summary>
         /// <param name="<#= RecordCamel #>Data">The <#= RecordLower #> data to insert.</param>
