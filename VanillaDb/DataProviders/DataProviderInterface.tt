@@ -15,7 +15,7 @@ namespace <#= Record #>Service.DataProviders
     /// <summary>Interface for <#= Record #> Data Providers.</summary>
     public interface <#= GenerateName() #>
     {
-<#= GenerateInsertMethod() #>
+        <#= GenerateInsertMethod() #>
 
         /// <summary>Gets the data for the book with the given BookId.</summary>
         /// <param name="bookId">The book Id.</param>

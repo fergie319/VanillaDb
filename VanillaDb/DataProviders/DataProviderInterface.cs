@@ -58,7 +58,7 @@ namespace VanillaDb.DataProviders
             
             #line default
             #line hidden
-            this.Write("\r\n    {\r\n");
+            this.Write("\r\n    {\r\n        ");
             
             #line 18 "C:\git-scratch\vanilladb\VanillaDb\DataProviders\DataProviderInterface.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(GenerateInsertMethod()));

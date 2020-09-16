@@ -70,7 +70,68 @@ namespace <#= Record #>Service.DataProviders
                     {
                         while (reader.Read())
                         {
-                            bookData = Parse<#= Record #>DataModel(reader);
+                            <#= RecordCamel #>Data = Parse<#= Record #>DataModel(reader);
+                        }
+                    }
+                }
+            }
+
+            return <#= RecordCamel #>Data;
+        }
+        <#
+            // Hey Future Matt!  It's-a-me, Past Matt.  You are probably here trying to
+            // figure out how to add Get-By-Index-Bulk support for a multi-field index.
+            // I just thought I'd let you know that you need to generate a custom type or
+            // make use of Tuples (yuck!) to do this.  Then a user would pass in an enumerable
+            // of these objects all with unique pairings of the fields in the index.
+        #>
+
+        /// <summary>Gets the data for the <#= Record #>(s) with the given collection of <#= ReadableFields(index.Fields) #>.</summary>
+        <#= GenerateGetByIndexBulkParamsXmlComments(index.Fields) #>
+        /// <returns><#= Record #> Data Model or null if not found.</returns>
+        public IEnumerable<<#= Record #>DataModel> <#= GenerateGetByIndexMethodName(index.Fields) #>(<#= GenerateGetByIndexBulkMethodParams(index.Fields) #>)
+        {
+<#
+        foreach (FieldModel field in index.Fields)
+        {
+#>
+            if (<#= field.FieldName.ToCamelCase() #>s == null || !<#= field.FieldName.ToCamelCase() #>.Any())
+            {
+                throw new ArgumentNullException(nameof(<#= field.FieldName.ToCamelCase() #>));
+            }
+<#
+        }
+#>
+
+            // Create an in-memory datatable with all of the field values
+            var idDataTable = new DataTable();
+            <#= GenerateInMemoryDataColumns(index.Fields) #>
+            for (var i = 0; i < <#= index.Fields.ElementAt(0).FieldName.ToCamelCase() #>s.Count(); i++)
+            {
+                <#= GenerateInMemoryRowCreation(index.Fields) #>
+            }
+
+            var <#= RecordCamel #>Data = new List<<#= Record #>DataModel>();
+            using (var connection = new SqlConnection(this.ConnectionString))
+            {
+                using (var command = new SqlCommand("<#= GenerateGetByIndexBulkStoredProcName(index) #>"))
+                {
+                    command.CommandType = CommandType.StoredProcedure;
+                    command.Connection = connection;
+
+                    // Create the Stored Procedure Parameter and set to Type_IdTable
+                    var idsParam = command.Parameters.AddWithValue("<#= GenerateBulkProcParameter(index) #>", idDataTable);
+                    idsParam.SqlDbType = SqlDbType.Structured;
+                    idsParam.TypeName = "<#= GenerateBulkTypeIdTable(index) #>";
+
+                    connection.Open();
+                    var reader = command.ExecuteReader();
+                    if (reader.HasRows)
+                    {
+                        while (reader.Read())
+                        {
+                            var data = Parse<#= Record #>DataModel(reader);
+                            <#= RecordCamel #>Data.Add(data);
                         }
                     }
                 }
@@ -79,64 +140,9 @@ namespace <#= Record #>Service.DataProviders
             return <#= RecordCamel #>Data;
         }
 
-        <#
-            // Hey Future Matt!  It's-a-me, Past Matt.  You are probably here trying to
-            // figure out how to add Get-By-Index-Bulk support for a multi-field index.
-            // I just thought I'd let you know that you need to generate a custom type or
-            // make use of Tuples (yuck!) to do this.  Then a user would pass in an enumerable
-            // of these objects all with unique pairings of the fields in the index.
-        #>
-        /// <summary>Gets the data for the <#= Record #>(s) with the given collection of <#= ReadableFields(index.Fields) #>.</summary>
-        <#= GenerateGetByIndexBulkParamsXmlComments(index.Fields) #>
-        /// <returns><#= Record #> Data Model or null if not found.</returns>
-        public IEnumerable<<#= Record #>DataModel> <#= GenerateGetByIndexMethodName(index.Fields) #>(<#= GenerateGetByIndexBulkMethodParams(index.Fields) #>)
-        {
-            if (asin10s == null || !asin10s.Any())
-            {
-                throw new ArgumentNullException(nameof(asin10s));
-            }
-
-            // Create an in-memory datatable with all of the BookIds
-            var idDataTable = new DataTable();
-            idDataTable.Columns.Add(new DataColumn("ASIN10", typeof(string)));
-            foreach (var bookId in asin10s)
-            {
-                idDataTable.Rows.Add(bookId);
-            }
-
-            var bookData = new List<BookDataModel>();
-            using (var connection = new SqlConnection(this.ConnectionString))
-            {
-                using (var command = new SqlCommand("USP_Book_GetByASIN10_Multiple"))
-                {
-                    command.CommandType = CommandType.StoredProcedure;
-                    command.Connection = connection;
-
-                    // Create the Stored Procedure Parameter and set to Type_IdTable
-                    var idsParam = command.Parameters.AddWithValue("@asin10s", idDataTable);
-                    idsParam.SqlDbType = SqlDbType.Structured;
-                    idsParam.TypeName = "dbo.Type_ASIN10_Table";
-
-                    connection.Open();
-                    var reader = command.ExecuteReader();
-                    if (reader.HasRows)
-                    {
-                        while (reader.Read())
-                        {
-                            var data = ParseBookDataModel(reader);
-                            bookData.Add(data);
-                        }
-                    }
-                }
-            }
-
-            return bookData;
-        }
-
 <#
     }
 #>
-
         /// <summary>Inserts the given <#= Record #> data model into the <#= Record #> table.</summary>
         /// <param name="<#= RecordCamel #>Data">The <#= RecordLower #> data to insert.</param>
         /// <returns>The ID of the inserted <#= Record #> record.</returns>

@@ -30,7 +30,16 @@ namespace VanillaDb.GetProcs
         public string GenerateName()
         {
             var fieldNames = Index.Fields.Select(f => f.FieldName);
-            return $"USP_{Table.TableName}_GetBy{string.Join("_", fieldNames)}_BULK";
+            return $"USP_{Table.TableName}_GetBy{string.Join("_", fieldNames)}_Bulk";
+        }
+
+        /// <summary>Generates the GetBy(Bulk) stored procedure's parameter name.</summary>
+        /// <returns>Newline separated stored procedure parameters</returns>
+        public string GenerateBulkProcParameter(IndexModel index)
+        {
+            var typeTable = new TypeTable(index);
+            var fieldNames = index.Fields.Select(f => f.FieldName.ToCamelCase());
+            return $"@{string.Join("_", fieldNames)}s";
         }
 
         /// <summary>Generates the stored procedure's parameter list.</summary>
@@ -39,7 +48,7 @@ namespace VanillaDb.GetProcs
         {
             var typeTable = new TypeTable(Index);
             var fieldNames = Index.Fields.Select(f => f.FieldName.ToCamelCase());
-            return $"    @{string.Join("_", fieldNames)} dbo.{typeTable.GenerateName()} READONLY";
+            return $"    {GenerateBulkProcParameter(Index)} dbo.{typeTable.GenerateName()} READONLY";
         }
 
         /// <summary>Generates the fields for the SELECT clause.</summary>
@@ -59,20 +68,13 @@ namespace VanillaDb.GetProcs
 
         /// <summary>Generates the where clause for the select statement.</summary>
         /// <returns>SQL Where Clause.</returns>
-        public string GenerateWhereClause()
+        public string GenerateJoinClause()
         {
-            // TODO: This probably won't make logical sense with multi-field indexes - will need to revisit if that comes up
-            // See: https://stackoverflow.com/questions/1136380/sql-where-in-clause-multiple-columns
-            // Solution: SELECT * FROM firstTable INNER JOIN otherTable ON (firstTable.x = otherTable.x AND firstTable.y = otherTable.y)
-            if (Index.Fields.Count > 1)
-            {
-                throw new InvalidOperationException("See comment above this line in code - this logic needs to be reconsidered for multi-field indexes.");
-            }
-
             var alias = GetTableAlias();
-            var param = $"@{string.Join("_", Index.Fields.Select(f => f.FieldName))}";
-            var clauses = Index.Fields.Select(f => $"{alias}.{f.FieldName} IN (SELECT {f.FieldName} FROM @{f.FieldName.ToCamelCase()})");
-            return string.Join(" AND " + Environment.NewLine, clauses);
+            var param = GenerateBulkProcParameter(Index);
+            var fieldClauses = Index.Fields.Select(f => $"{alias}.{f.FieldName} = {param}.{f.FieldName})");
+            var andClauses = string.Join(" AND " + Environment.NewLine, fieldClauses);
+            return $"{param} ON ({andClauses})";
         }
     }
 }

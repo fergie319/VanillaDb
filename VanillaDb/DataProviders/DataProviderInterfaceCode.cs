@@ -52,7 +52,7 @@ namespace VanillaDb.DataProviders
         {
             var indent = "        ";
             return
-            $"{indent}/// <summary>Inserts the given {Record} data model into the {Record} table.</summary>{Environment.NewLine}" +
+            $"/// <summary>Inserts the given {Record} data model into the {Record} table.</summary>{Environment.NewLine}" +
             $"{indent}/// <param name=\"{RecordCamel}Data\">The {RecordLower} data to insert.</param>{Environment.NewLine}" +
             $"{indent}/// <returns>The ID of the inserted {Record} record.</returns>{Environment.NewLine}" +
             $"{indent}int Insert({Record}DataModel {RecordCamel}Data);";
