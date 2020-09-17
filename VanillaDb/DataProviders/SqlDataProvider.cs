@@ -128,14 +128,14 @@ namespace VanillaDb.DataProviders
             this.Write(" with the given ");
             
             #line 41 "C:\git-scratch\vanilladb\VanillaDb\DataProviders\SqlDataProvider.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(ReadableFields(index.Fields)));
+            this.Write(this.ToStringHelper.ToStringWithCulture(index.ReadableFields()));
             
             #line default
             #line hidden
             this.Write(".</summary>\r\n        ");
             
             #line 42 "C:\git-scratch\vanilladb\VanillaDb\DataProviders\SqlDataProvider.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(GenerateGetByIndexParamsXmlComments(index.Fields)));
+            this.Write(this.ToStringHelper.ToStringWithCulture(index.GetByIndexParamsXmlComments()));
             
             #line default
             #line hidden
@@ -149,21 +149,21 @@ namespace VanillaDb.DataProviders
             this.Write(" Data Model or null if not found</returns>\r\n        public ");
             
             #line 44 "C:\git-scratch\vanilladb\VanillaDb\DataProviders\SqlDataProvider.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(Record));
+            this.Write(this.ToStringHelper.ToStringWithCulture(index.GetByIndexReturnType()));
             
             #line default
             #line hidden
-            this.Write("DataModel ");
+            this.Write(" ");
             
             #line 44 "C:\git-scratch\vanilladb\VanillaDb\DataProviders\SqlDataProvider.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(GenerateGetByIndexMethodName(index.Fields)));
+            this.Write(this.ToStringHelper.ToStringWithCulture(index.GetByIndexMethodName()));
             
             #line default
             #line hidden
             this.Write("(");
             
             #line 44 "C:\git-scratch\vanilladb\VanillaDb\DataProviders\SqlDataProvider.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(GenerateGetByIndexMethodParams(index.Fields)));
+            this.Write(this.ToStringHelper.ToStringWithCulture(index.GetByIndexMethodParams()));
             
             #line default
             #line hidden
@@ -285,7 +285,7 @@ namespace VanillaDb.DataProviders
             this.Write("(s) with the given collection of ");
             
             #line 89 "C:\git-scratch\vanilladb\VanillaDb\DataProviders\SqlDataProvider.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(ReadableFields(index.Fields)));
+            this.Write(this.ToStringHelper.ToStringWithCulture(index.ReadableFields()));
             
             #line default
             #line hidden
@@ -313,7 +313,7 @@ namespace VanillaDb.DataProviders
             this.Write("DataModel> ");
             
             #line 92 "C:\git-scratch\vanilladb\VanillaDb\DataProviders\SqlDataProvider.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(GenerateGetByIndexMethodName(index.Fields)));
+            this.Write(this.ToStringHelper.ToStringWithCulture(index.GetByIndexMethodName()));
             
             #line default
             #line hidden

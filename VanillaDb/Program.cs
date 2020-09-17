@@ -107,6 +107,7 @@ namespace VanillaDb
                     {
                         var index = new IndexModel()
                         {
+                            Table = table,
                             Fields = new[] { newField },
                             IsUnique = true
                         };
@@ -148,6 +149,7 @@ namespace VanillaDb
                                 // For each named field, find it add it to an index model
                                 var index = new IndexModel()
                                 {
+                                    Table = table,
                                     Fields = new List<FieldModel>(),
                                     IsUnique = isUnique
                                 };

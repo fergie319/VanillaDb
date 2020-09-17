@@ -3,6 +3,8 @@
 <#@ import namespace="System.Linq" #>
 <#@ import namespace="System.Text" #>
 <#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="VanillaDb" #>
+<#@ import namespace="VanillaDb.Models" #>
 // <copyright file="<#= GenerateName() #>.cs" company="MMF Software Developers Inc.">
 // Copyright (c) MMF Software Developers Inc.. All rights reserved.
 // </copyright>
@@ -16,39 +18,20 @@ namespace <#= Record #>Service.DataProviders
     public interface <#= GenerateName() #>
     {
         <#= GenerateInsertMethod() #>
+<#
+    // Generate the GetBy-Index and GetBy-Index-Bulk methods for each index
+    foreach (IndexModel index in Indexes)
+    {
+#>
 
-        /// <summary>Gets the data for the book with the given BookId.</summary>
-        /// <param name="bookId">The book Id.</param>
-        /// <returns>Book Data Model or null if not found.</returns>
-        /// <exception cref="InvalidOperationException">${bookId} is not a valid BookId.</exception>
-        BookDataModel GetByBookId(int bookId);
+        /// <summary>Gets the data for the <#= Record #> with the given <#= index.ReadableFields() #>.</summary>
+        <#= index.GetByIndexParamsXmlComments() #>
+        /// <returns><#= Record #> Data Model or null if not found</returns>
+        public <#= index.GetByIndexReturnType() #> <#= index.GetByIndexMethodName() #>(<#= index.GetByIndexMethodParams() #>);
 
-        /// <summary>Gets the data for the book with the given BookId.</summary>
-        /// <param name="bookIds">The book Ids.</param>
-        /// <returns>Book Data Model or null if not found.</returns>
-        /// <exception cref="System.ArgumentNullException">bookIds</exception>
-        IEnumerable<BookDataModel> GetByBookId(IEnumerable<int> bookIds);
-
-        /// <summary>Gets the data for the book with the given ISBN13.</summary>
-        /// <param name="isbn13">The isbn13 value.</param>
-        /// <returns>Book Data Model or null if not found</returns>
-        BookDataModel GetByISBN13(string isbn13);
-
-        /// <summary>Gets the data for the book with the given ISBN13.</summary>
-        /// <param name="isbn13s">The isbn13 values.</param>
-        /// <returns>Book Data Model or null if not found.</returns>
-        /// <exception cref="System.ArgumentNullException">isbn13s</exception>
-        IEnumerable<BookDataModel> GetByISBN13(IEnumerable<string> isbn13s);
-
-        /// <summary>Gets the data for the book with the given ASIN10.</summary>
-        /// <param name="asin10">The asin10 value.</param>
-        /// <returns>Book Data Model or null if not found</returns>
-        BookDataModel GetByASIN10(string asin10);
-
-        /// <summary>Gets the data for the book with the given ASIN10.</summary>
-        /// <param name="asin10s">The asin10 values.</param>
-        /// <returns>Book Data Model or null if not found.</returns>
-        /// <exception cref="System.ArgumentNullException">asin</exception>
-        IEnumerable<BookDataModel> GetByASIN10(IEnumerable<string> asin10s);
+        // TODO: Fill in the BulkGetByIndex method and update the SqlDataProvider as well - move more code into the Model classes
+<#
+    }
+#>
     }
 }

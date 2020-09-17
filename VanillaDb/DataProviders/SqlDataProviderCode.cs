@@ -97,42 +97,6 @@ namespace VanillaDb.DataProviders
             return string.Join($"{Environment.NewLine}{indent}", readLines);
         }
 
-        /// <summary>Creates a readable list of the given fields' names (joined by 'and').</summary>
-        /// <param name="fields">The fields.</param>
-        /// <returns>Human readable list of fields.</returns>
-        public string ReadableFields(IEnumerable<FieldModel> fields)
-        {
-            return string.Join(" and ", fields.Select(f => f.FieldName));
-        }
-
-        /// <summary>Generates the get by index parameters XML comments.</summary>
-        /// <param name="fields">The fields.</param>
-        /// <returns></returns>
-        public string GenerateGetByIndexParamsXmlComments(IEnumerable<FieldModel> fields)
-        {
-            var indent = "        ";
-            var xmlParams = fields.Select(f => $"/// <param name=\"{f.FieldName.ToCamelCase()}\">The {f.FieldName} value.</param>");
-            return string.Join($"{Environment.NewLine}{indent}", xmlParams);
-        }
-
-        /// <summary>Generates the get by index method parameters.</summary>
-        /// <param name="fields">The fields.</param>
-        /// <returns></returns>
-        public string GenerateGetByIndexMethodParams(IEnumerable<FieldModel> fields)
-        {
-            return string.Join(", ", fields.Select(f => $"{f.FieldType.FieldType.GetAliasOrName()} {f.FieldName.ToCamelCase()}"));
-        }
-
-        /// <summary>Generates the name of the get by index method.</summary>
-        /// <param name="fields">The fields.</param>
-        /// <returns></returns>
-        public string GenerateGetByIndexMethodName(IEnumerable<FieldModel> fields)
-        {
-            return $"GetBy{string.Join("And", fields.Select(f => f.FieldName))}";
-        }
-
-        // TODO: Implement GenerateGetByIndexReturnType(IEnumerable<FieldModel> fields) // changes for non-unique indexes
-
         /// <summary>Generates the name of the get by index stored proc.</summary>
         /// <returns></returns>
         public string GenerateGetByIndexStoredProcName(IndexModel index)

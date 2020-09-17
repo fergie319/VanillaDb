@@ -38,10 +38,10 @@ namespace <#= Record #>Service.DataProviders
     foreach (IndexModel index in Indexes)
     {
 #>
-        /// <summary>Gets the data for the <#= Record #> with the given <#= ReadableFields(index.Fields) #>.</summary>
-        <#= GenerateGetByIndexParamsXmlComments(index.Fields) #>
+        /// <summary>Gets the data for the <#= Record #> with the given <#= index.ReadableFields() #>.</summary>
+        <#= index.GetByIndexParamsXmlComments() #>
         /// <returns><#= Record #> Data Model or null if not found</returns>
-        public <#= Record #>DataModel <#= GenerateGetByIndexMethodName(index.Fields) #>(<#= GenerateGetByIndexMethodParams(index.Fields) #>)
+        public <#= index.GetByIndexReturnType() #> <#= index.GetByIndexMethodName() #>(<#= index.GetByIndexMethodParams() #>)
         {
 <#
         foreach (FieldModel field in index.Fields)
@@ -86,10 +86,10 @@ namespace <#= Record #>Service.DataProviders
             // of these objects all with unique pairings of the fields in the index.
         #>
 
-        /// <summary>Gets the data for the <#= Record #>(s) with the given collection of <#= ReadableFields(index.Fields) #>.</summary>
+        /// <summary>Gets the data for the <#= Record #>(s) with the given collection of <#= index.ReadableFields() #>.</summary>
         <#= GenerateGetByIndexBulkParamsXmlComments(index.Fields) #>
         /// <returns><#= Record #> Data Model or null if not found.</returns>
-        public IEnumerable<<#= Record #>DataModel> <#= GenerateGetByIndexMethodName(index.Fields) #>(<#= GenerateGetByIndexBulkMethodParams(index.Fields) #>)
+        public IEnumerable<<#= Record #>DataModel> <#= index.GetByIndexMethodName() #>(<#= GenerateGetByIndexBulkMethodParams(index.Fields) #>)
         {
 <#
         foreach (FieldModel field in index.Fields)
