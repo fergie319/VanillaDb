@@ -27,12 +27,12 @@ namespace <#= Record #>Service.DataProviders
         /// <summary>Gets the data for the <#= Record #> with the given <#= index.ReadableFields() #>.</summary>
         <#= index.GetByIndexParamsXmlComments() #>
         /// <returns><#= Record #> Data Model or null if not found</returns>
-        public <#= index.GetByIndexReturnType() #> <#= index.GetByIndexMethodName() #>(<#= index.GetByIndexMethodParams() #>);
+        <#= index.GetByIndexReturnType() #> <#= index.GetByIndexMethodName() #>(<#= index.GetByIndexMethodParams() #>);
 
         /// <summary>Gets the data for the <#= Record #>(s) with the given collection of <#= index.ReadableFields() #>.</summary>
         <#= index.BulkGetByIndexParamsXmlComments() #>
         /// <returns><#= Record #> Data Model or null if not found.</returns>
-        public IEnumerable<<#= Table.GetDataModelName() #>> <#= index.GetByIndexMethodName() #>(<#= index.BulkGetByIndexMethodParams() #>)
+        IEnumerable<<#= Table.GetDataModelName() #>> <#= index.GetByIndexMethodName() #>(<#= index.BulkGetByIndexMethodParams() #>)
 <#
     }
 #>

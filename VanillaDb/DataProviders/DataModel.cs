@@ -57,7 +57,7 @@ namespace VanillaDb.DataProviders
             
             #line default
             #line hidden
-            this.Write("\r\n    {\r\n");
+            this.Write("\r\n    {\r\n        ");
             
             #line 15 "C:\git-scratch\vanilladb\VanillaDb\DataProviders\DataModel.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(GenerateProperties()));

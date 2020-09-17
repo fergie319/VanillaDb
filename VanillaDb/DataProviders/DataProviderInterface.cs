@@ -106,7 +106,7 @@ namespace VanillaDb.DataProviders
             
             #line default
             #line hidden
-            this.Write(" Data Model or null if not found</returns>\r\n        public ");
+            this.Write(" Data Model or null if not found</returns>\r\n        ");
             
             #line 30 "C:\git-scratch\vanilladb\VanillaDb\DataProviders\DataProviderInterface.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(index.GetByIndexReturnType()));
@@ -155,7 +155,7 @@ namespace VanillaDb.DataProviders
             
             #line default
             #line hidden
-            this.Write(" Data Model or null if not found.</returns>\r\n        public IEnumerable<");
+            this.Write(" Data Model or null if not found.</returns>\r\n        IEnumerable<");
             
             #line 35 "C:\git-scratch\vanilladb\VanillaDb\DataProviders\DataProviderInterface.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(Table.GetDataModelName()));

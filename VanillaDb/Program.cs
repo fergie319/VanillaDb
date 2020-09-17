@@ -32,9 +32,9 @@ namespace VanillaDb
             Serilog.Log.Logger = Log;
 
             var result = 0;
-            if (args.Length == 0)
+            if (args.Length != 3)
             {
-                throw new ArgumentException("<Table>.sql file must be supplied as the first argument.");
+                throw new ArgumentException("Required Arguments: <Table>.sql <outSqlDir> <outCodeDir>.");
             }
 
             // First param is the table file - expect *.sql
@@ -181,12 +181,13 @@ namespace VanillaDb
 
             // Generate output in subdirectories of the table file directory's parent
             // In other words, we're assuming the table is in a Tables folder and want our output next to that folder
-            var outputDir = sqlFileInfo.Directory.Parent.FullName;
+            var outputSqlDir = args[1];
+            var outputCodeDir = args[2];
 
             // Create the output directories for all of the different files
-            var typeTableDir = Path.Combine(outputDir, "Types");
+            var typeTableDir = Path.Combine(outputSqlDir, "Types");
             Directory.CreateDirectory(typeTableDir);
-            var storedProcDir = Path.Combine(outputDir, "Stored Procedures");
+            var storedProcDir = Path.Combine(outputSqlDir, "Stored Procedures");
             Directory.CreateDirectory(storedProcDir);
 
             // Generate the stored procedures using our parsed table information
@@ -219,7 +220,7 @@ namespace VanillaDb
             File.WriteAllText($"{storedProcDir}\\{insertStoredProc.GenerateName()}.sql", insertContent);
 
             // Create Data Provider directory
-            var dataProviderDir = Path.Combine(outputDir, "DataProviders");
+            var dataProviderDir = Path.Combine(outputCodeDir, "DataProviders");
             Directory.CreateDirectory(dataProviderDir);
 
             // Generate the DataModel class
