@@ -54,5 +54,21 @@ namespace VanillaDb.Models
         {
             return string.Join(", ", Fields.Select(f => $"{f.FieldType.FieldType.GetAliasOrName()} {f.FieldName.ToCamelCase()}"));
         }
+
+        /// <summary>Generates the bulk get by index parameters XML comments.</summary>
+        /// <returns></returns>
+        public string BulkGetByIndexParamsXmlComments()
+        {
+            var indent = "        ";
+            var xmlParams = Fields.Select(f => $"/// <param name=\"{f.FieldName.ToCamelCase()}s\">The {f.FieldName.ToCamelCase()} values.</param>");
+            return string.Join($"{Environment.NewLine}{indent}", xmlParams);
+        }
+
+        /// <summary>Generates the bulk get by index method parameters.</summary>
+        /// <returns></returns>
+        public string BulkGetByIndexMethodParams()
+        {
+            return string.Join(", ", Fields.Select(f => $"IEnumerable<{f.FieldType.FieldType.GetAliasOrName()}> {f.FieldName.ToCamelCase()}"));
+        }
     }
 }

@@ -78,18 +78,11 @@ namespace <#= Record #>Service.DataProviders
 
             return <#= RecordCamel #>Data;
         }
-        <#
-            // Hey Future Matt!  It's-a-me, Past Matt.  You are probably here trying to
-            // figure out how to add Get-By-Index-Bulk support for a multi-field index.
-            // I just thought I'd let you know that you need to generate a custom type or
-            // make use of Tuples (yuck!) to do this.  Then a user would pass in an enumerable
-            // of these objects all with unique pairings of the fields in the index.
-        #>
 
         /// <summary>Gets the data for the <#= Record #>(s) with the given collection of <#= index.ReadableFields() #>.</summary>
-        <#= GenerateGetByIndexBulkParamsXmlComments(index.Fields) #>
+        <#= index.BulkGetByIndexParamsXmlComments() #>
         /// <returns><#= Record #> Data Model or null if not found.</returns>
-        public IEnumerable<<#= Record #>DataModel> <#= index.GetByIndexMethodName() #>(<#= GenerateGetByIndexBulkMethodParams(index.Fields) #>)
+        public IEnumerable<<#= Record #>DataModel> <#= index.GetByIndexMethodName() #>(<#= index.BulkGetByIndexMethodParams() #>)
         {
 <#
         foreach (FieldModel field in index.Fields)

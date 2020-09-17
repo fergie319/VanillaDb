@@ -114,24 +114,6 @@ namespace VanillaDb.DataProviders
             return string.Join($"{Environment.NewLine}{indent}", addParamsLines);
         }
 
-        /// <summary>Generates the get by index bulk parameters XML comments.</summary>
-        /// <param name="fields">The fields.</param>
-        /// <returns></returns>
-        public string GenerateGetByIndexBulkParamsXmlComments(IEnumerable<FieldModel> fields)
-        {
-            var indent = "        ";
-            var xmlParams = fields.Select(f => $"/// <param name=\"{f.FieldName.ToCamelCase()}s\">The {f.FieldName.ToCamelCase()} values.</param>");
-            return string.Join($"{Environment.NewLine}{indent}", xmlParams);
-        }
-
-        /// <summary>Generates the get by index method parameters.</summary>
-        /// <param name="fields">The fields.</param>
-        /// <returns></returns>
-        public string GenerateGetByIndexBulkMethodParams(IEnumerable<FieldModel> fields)
-        {
-            return string.Join(", ", fields.Select(f => $"IEnumerable<{f.FieldType.FieldType.GetAliasOrName()}> {f.FieldName.ToCamelCase()}"));
-        }
-
         /// <summary>Generates the in memory data columns creation code.</summary>
         /// <param name="fields">The fields.</param>
         /// <returns></returns>

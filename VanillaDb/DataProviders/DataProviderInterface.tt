@@ -29,7 +29,10 @@ namespace <#= Record #>Service.DataProviders
         /// <returns><#= Record #> Data Model or null if not found</returns>
         public <#= index.GetByIndexReturnType() #> <#= index.GetByIndexMethodName() #>(<#= index.GetByIndexMethodParams() #>);
 
-        // TODO: Fill in the BulkGetByIndex method and update the SqlDataProvider as well - move more code into the Model classes
+        /// <summary>Gets the data for the <#= Record #>(s) with the given collection of <#= index.ReadableFields() #>.</summary>
+        <#= index.BulkGetByIndexParamsXmlComments() #>
+        /// <returns><#= Record #> Data Model or null if not found.</returns>
+        public IEnumerable<<#= Table.GetDataModelName() #>> <#= index.GetByIndexMethodName() #>(<#= index.BulkGetByIndexMethodParams() #>)
 <#
     }
 #>

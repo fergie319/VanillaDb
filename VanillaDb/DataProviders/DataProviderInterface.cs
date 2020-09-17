@@ -127,10 +127,58 @@ namespace VanillaDb.DataProviders
             
             #line default
             #line hidden
-            this.Write(");\r\n\r\n        // TODO: Fill in the BulkGetByIndex method and update the SqlDataPr" +
-                    "ovider as well - move more code into the Model classes\r\n");
+            this.Write(");\r\n\r\n        /// <summary>Gets the data for the ");
+            
+            #line 32 "C:\git-scratch\vanilladb\VanillaDb\DataProviders\DataProviderInterface.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(Record));
+            
+            #line default
+            #line hidden
+            this.Write("(s) with the given collection of ");
+            
+            #line 32 "C:\git-scratch\vanilladb\VanillaDb\DataProviders\DataProviderInterface.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(index.ReadableFields()));
+            
+            #line default
+            #line hidden
+            this.Write(".</summary>\r\n        ");
             
             #line 33 "C:\git-scratch\vanilladb\VanillaDb\DataProviders\DataProviderInterface.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(index.BulkGetByIndexParamsXmlComments()));
+            
+            #line default
+            #line hidden
+            this.Write("\r\n        /// <returns>");
+            
+            #line 34 "C:\git-scratch\vanilladb\VanillaDb\DataProviders\DataProviderInterface.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(Record));
+            
+            #line default
+            #line hidden
+            this.Write(" Data Model or null if not found.</returns>\r\n        public IEnumerable<");
+            
+            #line 35 "C:\git-scratch\vanilladb\VanillaDb\DataProviders\DataProviderInterface.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(Table.GetDataModelName()));
+            
+            #line default
+            #line hidden
+            this.Write("> ");
+            
+            #line 35 "C:\git-scratch\vanilladb\VanillaDb\DataProviders\DataProviderInterface.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(index.GetByIndexMethodName()));
+            
+            #line default
+            #line hidden
+            this.Write("(");
+            
+            #line 35 "C:\git-scratch\vanilladb\VanillaDb\DataProviders\DataProviderInterface.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(index.BulkGetByIndexMethodParams()));
+            
+            #line default
+            #line hidden
+            this.Write(")\r\n");
+            
+            #line 36 "C:\git-scratch\vanilladb\VanillaDb\DataProviders\DataProviderInterface.tt"
 
     }
 
