@@ -32,7 +32,7 @@ namespace <#= Record #>Service.DataProviders
         /// <summary>Gets the data for the <#= Record #>(s) with the given collection of <#= index.ReadableFields() #>.</summary>
         <#= index.BulkGetByIndexParamsXmlComments() #>
         /// <returns><#= Record #> Data Model or null if not found.</returns>
-        IEnumerable<<#= Table.GetDataModelName() #>> <#= index.GetByIndexMethodName() #>(<#= index.BulkGetByIndexMethodParams() #>)
+        IEnumerable<<#= Table.GetDataModelName() #>> <#= index.GetByIndexMethodName() #>(<#= index.BulkGetByIndexMethodParams() #>);
 <#
     }
 #>

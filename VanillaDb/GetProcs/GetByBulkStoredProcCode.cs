@@ -55,7 +55,8 @@ namespace VanillaDb.GetProcs
         /// <returns>Comma-separated Table Fields</returns>
         public string GenerateSelectFields()
         {
-            var selectFields = Table.Fields.Select(f => f.FieldName);
+            var alias = GetTableAlias();
+            var selectFields = Table.Fields.Select(f => $"{alias}.{f.FieldName}");
             return string.Join(", ", selectFields);
         }
 
@@ -63,7 +64,7 @@ namespace VanillaDb.GetProcs
         /// <returns>single character table alias.</returns>
         public string GetTableAlias()
         {
-            return Table.TableName[0].ToString();
+            return "A";
         }
 
         /// <summary>Generates the where clause for the select statement.</summary>
@@ -72,9 +73,10 @@ namespace VanillaDb.GetProcs
         {
             var alias = GetTableAlias();
             var param = GenerateBulkProcParameter(Index);
-            var fieldClauses = Index.Fields.Select(f => $"{alias}.{f.FieldName} = {param}.{f.FieldName})");
+            var paramAlias = "B";
+            var fieldClauses = Index.Fields.Select(f => $"{alias}.{f.FieldName} = {paramAlias}.{f.FieldName}");
             var andClauses = string.Join(" AND " + Environment.NewLine, fieldClauses);
-            return $"{param} ON ({andClauses})";
+            return $"{param} AS {paramAlias} ON ({andClauses})";
         }
     }
 }

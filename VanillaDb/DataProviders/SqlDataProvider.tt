@@ -44,17 +44,32 @@ namespace <#= Record #>Service.DataProviders
         public <#= index.GetByIndexReturnType() #> <#= index.GetByIndexMethodName() #>(<#= index.GetByIndexMethodParams() #>)
         {
 <#
-        foreach (FieldModel field in index.Fields)
+        foreach (FieldModel field in index.Fields.Where(f => !f.IsNullable))
         {
+            if (field.FieldType.FieldType == typeof(string))
+            {
 #>
             if (string.IsNullOrWhiteSpace(<#= field.FieldName.ToCamelCase() #>))
             {
                 throw new ArgumentNullException(nameof(<#= field.FieldName.ToCamelCase() #>));
             }
+
 <#
+            }
+#>
+<#
+            if (field.IsIdentity && field.FieldType.FieldType == typeof(int))
+            {
+#>
+            if (<#= field.FieldName.ToCamelCase() #> < 1)
+            {
+                throw new InvalidOperationException($"{<#= field.FieldName.ToCamelCase() #>} is not a valid <#= field.FieldName #>");
+            }
+
+<#
+            }
         }
 #>
-
             <#= Record #>DataModel <#= RecordCamel #>Data = null;
             using (var connection = new SqlConnection(this.ConnectionString))
             {
@@ -88,9 +103,9 @@ namespace <#= Record #>Service.DataProviders
         foreach (FieldModel field in index.Fields)
         {
 #>
-            if (<#= field.FieldName.ToCamelCase() #>s == null || !<#= field.FieldName.ToCamelCase() #>.Any())
+            if (<#= field.FieldName.ToCamelCase() #>s == null || !<#= field.FieldName.ToCamelCase() #>s.Any())
             {
-                throw new ArgumentNullException(nameof(<#= field.FieldName.ToCamelCase() #>));
+                throw new ArgumentNullException(nameof(<#= field.FieldName.ToCamelCase() #>s));
             }
 <#
         }

@@ -61,8 +61,6 @@ namespace VanillaDb
 
                 // TODO: Add more detailed logging along the way.
 
-                // TODO: Add output directory arguments (one for sql file output, the other for C# output)
-
                 // TODO: Add C# namespace input argument
 
                 // First line should be table creation - extract table name (last parameter)
@@ -240,9 +238,6 @@ namespace VanillaDb
             content = sqlDataProviderGen.TransformText();
             Log.Debug($"Content: {content}");
             File.WriteAllText($"{dataProviderDir}\\{sqlDataProviderGen.GenerateName()}.cs", content);
-
-            // TODO: This is temporary for VS debugging - remove
-            Console.ReadKey();
 
             return result;
         }

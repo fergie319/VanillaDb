@@ -52,7 +52,11 @@ namespace VanillaDb.Models
         /// <returns></returns>
         public string GetByIndexMethodParams()
         {
-            return string.Join(", ", Fields.Select(f => $"{f.FieldType.FieldType.GetAliasOrName()} {f.FieldName.ToCamelCase()}"));
+            var fields = Fields
+                .Select(f => (f.IsNullable && f.FieldType.FieldType != typeof(string))
+                                ? $"{f.FieldType.FieldType.GetAliasOrName()}? {f.FieldName.ToCamelCase()}"
+                                : $"{f.FieldType.FieldType.GetAliasOrName()} {f.FieldName.ToCamelCase()}");
+            return string.Join(", ", fields);
         }
 
         /// <summary>Generates the bulk get by index parameters XML comments.</summary>
@@ -68,7 +72,7 @@ namespace VanillaDb.Models
         /// <returns></returns>
         public string BulkGetByIndexMethodParams()
         {
-            return string.Join(", ", Fields.Select(f => $"IEnumerable<{f.FieldType.FieldType.GetAliasOrName()}> {f.FieldName.ToCamelCase()}"));
+            return string.Join(", ", Fields.Select(f => $"IEnumerable<{f.FieldType.FieldType.GetAliasOrName()}> {f.FieldName.ToCamelCase()}s"));
         }
     }
 }

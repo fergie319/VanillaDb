@@ -176,7 +176,7 @@ namespace VanillaDb.DataProviders
             
             #line default
             #line hidden
-            this.Write(")\r\n");
+            this.Write(");\r\n");
             
             #line 36 "C:\git-scratch\vanilladb\VanillaDb\DataProviders\DataProviderInterface.tt"
 
