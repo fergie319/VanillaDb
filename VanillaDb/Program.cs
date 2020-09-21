@@ -34,17 +34,44 @@ namespace VanillaDb
             var result = 0;
             if (args.Length != 3)
             {
-                throw new ArgumentException("Required Arguments: <Table>.sql <outSqlDir> <outCodeDir>.");
+                throw new ArgumentException("Required Arguments: <Table>.sql|<directory> <outSqlDir> <outCodeDir>.");
             }
 
-            // First param is the table file - expect *.sql
+            // First param is the table file - expect *.sql - or directory containing *.sql table definition files
             var sqlFileName = args[0];
             var sqlFileInfo = new FileInfo(sqlFileName);
+            var sqlDirectory = new DirectoryInfo(sqlFileName);
             if (!sqlFileInfo.Exists)
             {
-                throw new InvalidOperationException($"{sqlFileName} does not exist.");
+                if (!sqlDirectory.Exists)
+                {
+                    throw new InvalidOperationException($"{sqlFileName} does not exist.");
+                }
             }
 
+
+            // Generate output in subdirectories of the table file directory's parent
+            // In other words, we're assuming the table is in a Tables folder and want our output next to that folder
+            var outputSqlDir = args[1];
+            var outputCodeDir = args[2];
+
+            if (sqlFileInfo.Exists)
+            {
+                ProcessTableSql(sqlFileInfo, outputSqlDir, outputCodeDir);
+            }
+            else if (sqlDirectory.Exists)
+            {
+                foreach (var fileInfo in sqlDirectory.EnumerateFiles("*.sql", SearchOption.AllDirectories))
+                {
+                    ProcessTableSql(fileInfo, outputSqlDir, outputCodeDir);
+                }
+            }
+
+            return result;
+        }
+
+        private static void ProcessTableSql(FileInfo sqlFileInfo, string outputSqlDir, string outputCodeDir)
+        {
             // Open the file and start parsing
             var table = new TableModel()
             {
@@ -82,7 +109,7 @@ namespace VanillaDb
 
                 // Now Loop and record each field until end of statement is reached ')'
                 var fieldDef = reader.ReadLine();
-                while (fieldDef != ")")
+                while (!fieldDef.StartsWith(")"))
                 {
                     var splitFieldTokens = fieldDef.Split(new[] { " ", "[", "]", ",", "\t" }, StringSplitOptions.RemoveEmptyEntries);
                     if (splitFieldTokens.Length < 2)
@@ -96,7 +123,7 @@ namespace VanillaDb
                         FieldType = ParseFieldType(splitFieldTokens[1]),
                         IsIdentity = splitFieldTokens.Any(s => string.Equals(s, "identity", StringComparison.InvariantCultureIgnoreCase)),
                         IsPrimaryKey = splitFieldTokens.Any(s => string.Equals(s, "primary", StringComparison.InvariantCultureIgnoreCase)),
-                        IsNullable = fieldDef.IndexOf(" NOT NULL ", StringComparison.InvariantCultureIgnoreCase) == -1,
+                        IsNullable = fieldDef.IndexOf(" NOT NULL", StringComparison.InvariantCultureIgnoreCase) == -1,
                     };
                     table.Fields.Add(newField);
 
@@ -177,11 +204,6 @@ namespace VanillaDb
             Log.Debug("Table: {@Table}", table);
             Log.Debug("Indexes: {@Indexes}", indexes);
 
-            // Generate output in subdirectories of the table file directory's parent
-            // In other words, we're assuming the table is in a Tables folder and want our output next to that folder
-            var outputSqlDir = args[1];
-            var outputCodeDir = args[2];
-
             // Create the output directories for all of the different files
             var typeTableDir = Path.Combine(outputSqlDir, "Types");
             Directory.CreateDirectory(typeTableDir);
@@ -238,8 +260,6 @@ namespace VanillaDb
             content = sqlDataProviderGen.TransformText();
             Log.Debug($"Content: {content}");
             File.WriteAllText($"{dataProviderDir}\\{sqlDataProviderGen.GenerateName()}.cs", content);
-
-            return result;
         }
 
         /// <summary>Parses the type of the field from the given SQL Type markup.</summary>
