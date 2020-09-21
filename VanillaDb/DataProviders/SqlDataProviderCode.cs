@@ -67,7 +67,7 @@ namespace VanillaDb.DataProviders
         public string GenerateInsertProcParams()
         {
             var indent = "                    ";
-            var recordParam = $"{Table.TableName.ToCamelCase()}Data";
+            var recordParam = $"{RecordCamel}Data";
             var parameters = Table.Fields
                 .Where(f => !f.IsIdentity)
                 .Select(f =>
