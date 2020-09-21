@@ -28,10 +28,11 @@ namespace VanillaDb.DataProviders
         /// <returns>C# getter/setter properties.</returns>
         public string GenerateProperties()
         {
+            var indent = "        ";
             var properties = Table.Fields
-                .Select(f => $"        /// <summary>Gets or sets the {f.FieldName}.</summary>{Environment.NewLine}" +
-                             $"        public {f.FieldType.FieldType.GetAliasOrName()} {f.FieldName}");
-            return string.Join($"{Environment.NewLine}{Environment.NewLine}", properties);
+                .Select(f => $"/// <summary>Gets or sets the {f.FieldName}.</summary>{Environment.NewLine}" +
+                             $"{indent}public {f.FieldType.FieldType.GetAliasOrName()} {f.FieldName} {{ get; set; }}");
+            return string.Join($"{Environment.NewLine}{Environment.NewLine}{indent}", properties);
         }
     }
 }

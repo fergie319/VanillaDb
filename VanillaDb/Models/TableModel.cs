@@ -10,5 +10,12 @@ namespace VanillaDb.Models
 
         /// <summary>Gets or sets the fields.</summary>
         public IList<FieldModel> Fields { get; set; }
+
+        /// <summary>Gets the name of the generated data model for this table.</summary>
+        /// <returns></returns>
+        public string GetDataModelName()
+        {
+            return $"{TableName}DataModel";
+        }
     }
 }

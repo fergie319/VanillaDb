@@ -12,7 +12,7 @@ Begin
 	SELECT <#= GenerateSelectFields() #>
 	FROM [<#= Table.TableName #>]
 	AS <#= GetTableAlias() #>
-	WHERE <#= GenerateWhereClause() #>
+	INNER JOIN <#= GenerateJoinClause() #>
 
 	SET NOCOUNT OFF
 End

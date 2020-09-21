@@ -12,6 +12,8 @@ namespace VanillaDb.DataProviders
     using System.Linq;
     using System.Text;
     using System.Collections.Generic;
+    using VanillaDb;
+    using VanillaDb.Models;
     using System;
     
     /// <summary>
@@ -30,7 +32,7 @@ namespace VanillaDb.DataProviders
         {
             this.Write("// <copyright file=\"");
             
-            #line 6 "C:\git-scratch\vanilladb\VanillaDb\DataProviders\DataProviderInterface.tt"
+            #line 8 "C:\git-scratch\vanilladb\VanillaDb\DataProviders\DataProviderInterface.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(GenerateName()));
             
             #line default
@@ -38,7 +40,7 @@ namespace VanillaDb.DataProviders
             this.Write(".cs\" company=\"MMF Software Developers Inc.\">\r\n// Copyright (c) MMF Software Devel" +
                     "opers Inc.. All rights reserved.\r\n// </copyright>\r\n\r\nnamespace ");
             
-            #line 10 "C:\git-scratch\vanilladb\VanillaDb\DataProviders\DataProviderInterface.tt"
+            #line 12 "C:\git-scratch\vanilladb\VanillaDb\DataProviders\DataProviderInterface.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(Record));
             
             #line default
@@ -46,51 +48,144 @@ namespace VanillaDb.DataProviders
             this.Write("Service.DataProviders\r\n{\r\n    using System;\r\n    using System.Collections.Generic" +
                     ";\r\n\r\n    /// <summary>Interface for ");
             
-            #line 15 "C:\git-scratch\vanilladb\VanillaDb\DataProviders\DataProviderInterface.tt"
+            #line 17 "C:\git-scratch\vanilladb\VanillaDb\DataProviders\DataProviderInterface.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(Record));
             
             #line default
             #line hidden
             this.Write(" Data Providers.</summary>\r\n    public interface ");
             
-            #line 16 "C:\git-scratch\vanilladb\VanillaDb\DataProviders\DataProviderInterface.tt"
+            #line 18 "C:\git-scratch\vanilladb\VanillaDb\DataProviders\DataProviderInterface.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(GenerateName()));
             
             #line default
             #line hidden
-            this.Write("\r\n    {\r\n");
+            this.Write("\r\n    {\r\n        ");
             
-            #line 18 "C:\git-scratch\vanilladb\VanillaDb\DataProviders\DataProviderInterface.tt"
+            #line 20 "C:\git-scratch\vanilladb\VanillaDb\DataProviders\DataProviderInterface.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(GenerateInsertMethod()));
             
             #line default
             #line hidden
-            this.Write("\r\n\r\n        /// <summary>Gets the data for the book with the given BookId.</summa" +
-                    "ry>\r\n        /// <param name=\"bookId\">The book Id.</param>\r\n        /// <returns" +
-                    ">Book Data Model or null if not found.</returns>\r\n        /// <exception cref=\"I" +
-                    "nvalidOperationException\">${bookId} is not a valid BookId.</exception>\r\n        " +
-                    "BookDataModel GetByBookId(int bookId);\r\n\r\n        /// <summary>Gets the data for" +
-                    " the book with the given BookId.</summary>\r\n        /// <param name=\"bookIds\">Th" +
-                    "e book Ids.</param>\r\n        /// <returns>Book Data Model or null if not found.<" +
-                    "/returns>\r\n        /// <exception cref=\"System.ArgumentNullException\">bookIds</e" +
-                    "xception>\r\n        IEnumerable<BookDataModel> GetByBookId(IEnumerable<int> bookI" +
-                    "ds);\r\n\r\n        /// <summary>Gets the data for the book with the given ISBN13.</" +
-                    "summary>\r\n        /// <param name=\"isbn13\">The isbn13 value.</param>\r\n        //" +
-                    "/ <returns>Book Data Model or null if not found</returns>\r\n        BookDataModel" +
-                    " GetByISBN13(string isbn13);\r\n\r\n        /// <summary>Gets the data for the book " +
-                    "with the given ISBN13.</summary>\r\n        /// <param name=\"isbn13s\">The isbn13 v" +
-                    "alues.</param>\r\n        /// <returns>Book Data Model or null if not found.</retu" +
-                    "rns>\r\n        /// <exception cref=\"System.ArgumentNullException\">isbn13s</except" +
-                    "ion>\r\n        IEnumerable<BookDataModel> GetByISBN13(IEnumerable<string> isbn13s" +
-                    ");\r\n\r\n        /// <summary>Gets the data for the book with the given ASIN10.</su" +
-                    "mmary>\r\n        /// <param name=\"asin10\">The asin10 value.</param>\r\n        /// " +
-                    "<returns>Book Data Model or null if not found</returns>\r\n        BookDataModel G" +
-                    "etByASIN10(string asin10);\r\n\r\n        /// <summary>Gets the data for the book wi" +
-                    "th the given ASIN10.</summary>\r\n        /// <param name=\"asin10s\">The asin10 val" +
-                    "ues.</param>\r\n        /// <returns>Book Data Model or null if not found.</return" +
-                    "s>\r\n        /// <exception cref=\"System.ArgumentNullException\">asin</exception>\r" +
-                    "\n        IEnumerable<BookDataModel> GetByASIN10(IEnumerable<string> asin10s);\r\n " +
-                    "   }\r\n}");
+            this.Write("\r\n");
+            
+            #line 21 "C:\git-scratch\vanilladb\VanillaDb\DataProviders\DataProviderInterface.tt"
+
+    // Generate the GetBy-Index and GetBy-Index-Bulk methods for each index
+    foreach (IndexModel index in Indexes)
+    {
+
+            
+            #line default
+            #line hidden
+            this.Write("\r\n        /// <summary>Gets the data for the ");
+            
+            #line 27 "C:\git-scratch\vanilladb\VanillaDb\DataProviders\DataProviderInterface.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(Record));
+            
+            #line default
+            #line hidden
+            this.Write(" with the given ");
+            
+            #line 27 "C:\git-scratch\vanilladb\VanillaDb\DataProviders\DataProviderInterface.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(index.ReadableFields()));
+            
+            #line default
+            #line hidden
+            this.Write(".</summary>\r\n        ");
+            
+            #line 28 "C:\git-scratch\vanilladb\VanillaDb\DataProviders\DataProviderInterface.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(index.GetByIndexParamsXmlComments()));
+            
+            #line default
+            #line hidden
+            this.Write("\r\n        /// <returns>");
+            
+            #line 29 "C:\git-scratch\vanilladb\VanillaDb\DataProviders\DataProviderInterface.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(Record));
+            
+            #line default
+            #line hidden
+            this.Write(" Data Model or null if not found</returns>\r\n        ");
+            
+            #line 30 "C:\git-scratch\vanilladb\VanillaDb\DataProviders\DataProviderInterface.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(index.GetByIndexReturnType()));
+            
+            #line default
+            #line hidden
+            this.Write(" ");
+            
+            #line 30 "C:\git-scratch\vanilladb\VanillaDb\DataProviders\DataProviderInterface.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(index.GetByIndexMethodName()));
+            
+            #line default
+            #line hidden
+            this.Write("(");
+            
+            #line 30 "C:\git-scratch\vanilladb\VanillaDb\DataProviders\DataProviderInterface.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(index.GetByIndexMethodParams()));
+            
+            #line default
+            #line hidden
+            this.Write(");\r\n\r\n        /// <summary>Gets the data for the ");
+            
+            #line 32 "C:\git-scratch\vanilladb\VanillaDb\DataProviders\DataProviderInterface.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(Record));
+            
+            #line default
+            #line hidden
+            this.Write("(s) with the given collection of ");
+            
+            #line 32 "C:\git-scratch\vanilladb\VanillaDb\DataProviders\DataProviderInterface.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(index.ReadableFields()));
+            
+            #line default
+            #line hidden
+            this.Write(".</summary>\r\n        ");
+            
+            #line 33 "C:\git-scratch\vanilladb\VanillaDb\DataProviders\DataProviderInterface.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(index.BulkGetByIndexParamsXmlComments()));
+            
+            #line default
+            #line hidden
+            this.Write("\r\n        /// <returns>");
+            
+            #line 34 "C:\git-scratch\vanilladb\VanillaDb\DataProviders\DataProviderInterface.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(Record));
+            
+            #line default
+            #line hidden
+            this.Write(" Data Model or null if not found.</returns>\r\n        IEnumerable<");
+            
+            #line 35 "C:\git-scratch\vanilladb\VanillaDb\DataProviders\DataProviderInterface.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(Table.GetDataModelName()));
+            
+            #line default
+            #line hidden
+            this.Write("> ");
+            
+            #line 35 "C:\git-scratch\vanilladb\VanillaDb\DataProviders\DataProviderInterface.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(index.GetByIndexMethodName()));
+            
+            #line default
+            #line hidden
+            this.Write("(");
+            
+            #line 35 "C:\git-scratch\vanilladb\VanillaDb\DataProviders\DataProviderInterface.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(index.BulkGetByIndexMethodParams()));
+            
+            #line default
+            #line hidden
+            this.Write(");\r\n");
+            
+            #line 36 "C:\git-scratch\vanilladb\VanillaDb\DataProviders\DataProviderInterface.tt"
+
+    }
+
+            
+            #line default
+            #line hidden
+            this.Write("    }\r\n}");
             return this.GenerationEnvironment.ToString();
         }
     }

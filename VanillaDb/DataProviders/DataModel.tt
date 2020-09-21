@@ -12,6 +12,6 @@ namespace <#= Table.TableName #>Service.DataProviders
     /// <summary>The <#= Table.TableName #> Data Model.</summary>
     public class <#= GenerateName() #>
     {
-<#= GenerateProperties() #>
+        <#= GenerateProperties() #>
     }
 }

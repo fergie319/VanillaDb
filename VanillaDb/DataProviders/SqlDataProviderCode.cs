@@ -1,8 +1,8 @@
 ﻿using System;
-using System.CodeDom;
 using System.Collections.Generic;
 using System.Linq;
 using VanillaDb.Models;
+using VanillaDb.TypeTables;
 
 namespace VanillaDb.DataProviders
 {
@@ -72,16 +72,93 @@ namespace VanillaDb.DataProviders
                 .Where(f => !f.IsIdentity)
                 .Select(f =>
                 {
-                    var param = string.Empty;
-                    param = (f.IsNullable)
-                                ? $"\"@{f.FieldName.ToCamelCase()}\", {recordParam}.{f.FieldName} ?? (object)DBNull.Value"
-                                : $"\"@{f.FieldName.ToCamelCase()}\", {recordParam}.{f.FieldName}";
-                    return param;
+                    return (f.IsNullable)
+                        ? $"\"@{f.FieldName.ToCamelCase()}\", {recordParam}.{f.FieldName} ?? (object)DBNull.Value"
+                        : $"\"@{f.FieldName.ToCamelCase()}\", {recordParam}.{f.FieldName}";
                 });
 
             var addParameters = parameters.Select(p => $"command.Parameters.AddWithValue({p});");
 
             return string.Join($"{Environment.NewLine}{indent}", addParameters);
+        }
+
+        /// <summary>Generates the lines for reading each field from a db reader.</summary>
+        /// <returns>Code to read each field and populate the data model.</returns>
+        public string GenerateReadFields()
+        {
+            var indent = "            ";
+            var readLines = Table.Fields.Select(f =>
+            {
+                return (f.IsNullable)
+                    ? $"data.{f.FieldName} = (reader[\"{f.FieldName}\"] != DBNull.Value) ? ({f.FieldType.FieldType.GetAliasOrName()})reader[\"{f.FieldName}\"] : null;"
+                    : $"data.{f.FieldName} = ({f.FieldType.FieldType.GetAliasOrName()})reader[\"{f.FieldName}\"];";
+            });
+
+            return string.Join($"{Environment.NewLine}{indent}", readLines);
+        }
+
+        /// <summary>Generates the name of the get by index stored proc.</summary>
+        /// <returns></returns>
+        public string GenerateGetByIndexStoredProcName(IndexModel index)
+        {
+            var procNameFields = index.Fields.Select(f => f.FieldName);
+            return $"dbo.USP_{Table.TableName}_GetBy{string.Join("_", procNameFields)}";
+        }
+
+        /// <summary>Generates the code to add parameters for the get by index procedure.</summary>
+        /// <returns></returns>
+        public string GenerateGetByIndexAddParametersCode(IEnumerable<FieldModel> fields)
+        {
+            var indent = "                    ";
+            var addParamsLines = fields.Select(f => $"command.Parameters.AddWithValue(\"@{f.FieldName.ToCamelCase()}\", {f.FieldName.ToCamelCase()});");
+            return string.Join($"{Environment.NewLine}{indent}", addParamsLines);
+        }
+
+        /// <summary>Generates the in memory data columns creation code.</summary>
+        /// <param name="fields">The fields.</param>
+        /// <returns></returns>
+        public string GenerateInMemoryDataColumns(IEnumerable<FieldModel> fields)
+        {
+            var indent = "            ";
+            var columnCode = fields.Select(f => $"idDataTable.Columns.Add(new DataColumn(\"{f.FieldName}\", typeof({f.FieldType.FieldType.GetAliasOrName()})));");
+            return string.Join($"{Environment.NewLine}{indent}", columnCode);
+        }
+
+        /// <summary>Generates the in memory row creation code.</summary>
+        /// <param name="fields">The fields.</param>
+        /// <returns></returns>
+        public string GenerateInMemoryRowCreation(IEnumerable<FieldModel> fields)
+        {
+            var indent = "                ";
+            var rows = fields.Select(f => $"idDataTable.Rows.Add({f.FieldName.ToCamelCase()}s.ElementAt(i));");
+            return string.Join($"{Environment.NewLine}{indent}", rows);
+        }
+
+        /// <summary>Generates the name of the get by index bulk stored procedure.</summary>
+        /// <param name="index">The index.</param>
+        /// <returns></returns>
+        public string GenerateGetByIndexBulkStoredProcName(IndexModel index)
+        {
+            var fieldNames = index.Fields.Select(f => f.FieldName);
+            return $"dbo.USP_{Table.TableName}_GetBy{string.Join("_", fieldNames)}_Bulk";
+        }
+
+        /// <summary>Generates the bulk type identifier table.</summary>
+        /// <param name="index">The index.</param>
+        /// <returns></returns>
+        public string GenerateBulkTypeIdTable(IndexModel index)
+        {
+            var fieldNames = index.Fields.Select(f => f.FieldName);
+            return $"Type_{string.Join("_", fieldNames)}_Table";
+        }
+
+        /// <summary>Generates the GetBy(Bulk) stored procedure's parameter name.</summary>
+        /// <returns>Newline separated stored procedure parameters</returns>
+        public string GenerateBulkProcParameter(IndexModel index)
+        {
+            var typeTable = new TypeTable(index);
+            var fieldNames = index.Fields.Select(f => f.FieldName.ToCamelCase());
+            return $"@{string.Join("_", fieldNames)}s";
         }
     }
 }

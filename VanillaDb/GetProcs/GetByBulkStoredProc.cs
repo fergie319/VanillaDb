@@ -63,10 +63,10 @@ namespace VanillaDb.GetProcs
             
             #line default
             #line hidden
-            this.Write("\r\n\tWHERE ");
+            this.Write("\r\n\tINNER JOIN ");
             
             #line 15 "C:\git-scratch\vanilladb\VanillaDb\GetProcs\GetByBulkStoredProc.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(GenerateWhereClause()));
+            this.Write(this.ToStringHelper.ToStringWithCulture(GenerateJoinClause()));
             
             #line default
             #line hidden
