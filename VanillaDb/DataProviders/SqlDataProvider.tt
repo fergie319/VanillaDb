@@ -77,7 +77,7 @@ namespace <#= Record #>Service.DataProviders
             }
         }
 #>
-            <#= Record #>DataModel <#= RecordCamel #>Data = null;
+            var <#= RecordCamel #>Data = new List<<#= Record #>DataModel>();
             using (var connection = new SqlConnection(this.ConnectionString))
             {
                 using (var command = new SqlCommand("<#= GenerateGetByIndexStoredProcName(index) #>"))
@@ -92,13 +92,27 @@ namespace <#= Record #>Service.DataProviders
                     {
                         while (reader.Read())
                         {
-                            <#= RecordCamel #>Data = Parse<#= Record #>DataModel(reader);
+                            var data = Parse<#= Record #>DataModel(reader);
+                            <#= RecordCamel #>Data.Add(data);
                         }
                     }
                 }
             }
 
+<#
+            if (index.IsUnique)
+            {
+#>
+            return <#= RecordCamel #>Data.ElementAt(0);
+<#
+            }
+            else
+            {
+#>
             return <#= RecordCamel #>Data;
+<#
+            }
+#>
         }
 
         /// <summary>Gets the data for the <#= Record #>(s) with the given collection of <#= index.ReadableFields() #>.</summary>

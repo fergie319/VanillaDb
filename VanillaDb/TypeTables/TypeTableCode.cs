@@ -29,7 +29,7 @@ namespace VanillaDb.TypeTables
         public string GenerateFields()
         {
             var fieldDefs = Index.Fields.Select(f => $"    {f.FieldName} {f.FieldType.SqlType}");
-            return string.Join(Environment.NewLine, fieldDefs);
+            return string.Join($",{Environment.NewLine}", fieldDefs);
         }
     }
 }
