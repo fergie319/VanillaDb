@@ -324,7 +324,7 @@ namespace ");
             
             #line default
             #line hidden
-            this.Write("Data.ElementAt(0);\r\n");
+            this.Write("Data.FirstOrDefault();\r\n");
             
             #line 107 "C:\git-scratch\vanilladb\VanillaDb\DataProviders\SqlDataProvider.tt"
 
