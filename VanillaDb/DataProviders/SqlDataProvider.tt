@@ -103,7 +103,7 @@ namespace <#= Record #>Service.DataProviders
             if (index.IsUnique)
             {
 #>
-            return <#= RecordCamel #>Data.ElementAt(0);
+            return <#= RecordCamel #>Data.FirstOrDefault();
 <#
             }
             else
