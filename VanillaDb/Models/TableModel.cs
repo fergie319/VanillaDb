@@ -17,5 +17,27 @@ namespace VanillaDb.Models
         {
             return $"{TableName}DataModel";
         }
+
+        /// <summary>Generates the name of the insert stored proc.</summary>
+        /// <returns>Insert Stored proce name</returns>
+        public string GetInsertProcName()
+        {
+            return $"USP_{TableName}_Insert";
+        }
+
+
+        /// <summary>Gets the name of the delete stored procedure.</summary>
+        /// <returns>Stored procedure name</returns>
+        public string GetDeleteProcName()
+        {
+            return $"USP_{TableName}_Delete";
+        }
+
+        /// <summary>Gets the name of the delete stored procedure.</summary>
+        /// <returns>Stored procedure name</returns>
+        public string GetDeleteBulkProcName()
+        {
+            return $"USP_{TableName}_DeleteBulk";
+        }
     }
 }

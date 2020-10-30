@@ -25,6 +25,14 @@ namespace <#= Record #>Service.DataProviders
     public interface <#= GenerateName() #>
     {
         <#= GenerateInsertMethod() #>
+
+        /// <summary>Deletes record with the given <#= PrimaryKey.FieldName #> from the <#= Table.TableName #> table.</summary>
+        /// <param name="<#= PrimaryKey.GetCodeParamName() #>">The <#= PrimaryKey.FieldName #>.</param>
+        int Delete(int <#= PrimaryKey.GetCodeParamName() #>);
+
+        /// <summary>Deletes the records with the given <#= PrimaryKey.FieldName #>s from the <#= Table.TableName #> table.</summary>
+        /// <param name="<#= PrimaryKey.GetCodeParamName() #>s">The <#= PrimaryKey.FieldName #>s.</param>
+        int Delete(IEnumerable<int> <#= PrimaryKey.GetCodeParamName() #>s);
 <#
     // Generate the GetBy-Index and GetBy-Index-Bulk methods for each index
     foreach (IndexModel index in Indexes)

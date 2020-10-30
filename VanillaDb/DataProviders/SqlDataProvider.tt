@@ -151,7 +151,7 @@ namespace <#= Record #>Service.DataProviders
                     // Create the Stored Procedure Parameter and set to Type_IdTable
                     var idsParam = command.Parameters.AddWithValue("<#= GenerateBulkProcParameter(index) #>", idDataTable);
                     idsParam.SqlDbType = SqlDbType.Structured;
-                    idsParam.TypeName = "<#= GenerateBulkTypeIdTable(index) #>";
+                    idsParam.TypeName = "<#= index.GetBulkTypeIdTable() #>";
 
                     connection.Open();
                     var reader = command.ExecuteReader();
@@ -187,15 +187,15 @@ namespace <#= Record #>Service.DataProviders
                 throw new InvalidOperationException("Connection String is null.  Insert operation cannot be performed.");
             }
 
-            if (<#= RecordCamel #>Data.<#= PrimaryKey #> > 0)
+            if (<#= RecordCamel #>Data.<#= PrimaryKey.FieldName #> > 0)
             {
-                throw new InvalidOperationException("Unable to insert <#= Record #> Data that already has a <#= PrimaryKey #>.");
+                throw new InvalidOperationException("Unable to insert <#= Record #> Data that already has a <#= PrimaryKey.FieldName #>.");
             }
 
-            var <#= PrimaryKey.ToCamelCase() #> = -1;
+            var <#= PrimaryKey.GetCodeParamName() #> = -1;
             using (var connection = new SqlConnection(this.ConnectionString))
             {
-                using (var command = new SqlCommand("<#= GenerateInsertProcName() #>"))
+                using (var command = new SqlCommand("<#= Table.GetInsertProcName() #>"))
                 {
                     command.CommandType = CommandType.StoredProcedure;
                     command.Connection = connection;
@@ -207,13 +207,87 @@ namespace <#= Record #>Service.DataProviders
                     {
                         while (reader.Read())
                         {
-                            <#= PrimaryKey.ToCamelCase() #> = (int)reader["<#= PrimaryKey #>"];
+                            <#= PrimaryKey.GetCodeParamName() #> = (int)reader["<#= PrimaryKey.FieldName #>"];
                         }
                     }
                 }
             }
 
-            return <#= PrimaryKey.ToCamelCase() #>;
+            return <#= PrimaryKey.GetCodeParamName() #>;
+        }
+
+        /// <summary>Deletes record with the given <#= PrimaryKey.FieldName #> from the <#= Table.TableName #> table.</summary>
+        /// <param name="<#= PrimaryKey.GetCodeParamName() #>">The <#= PrimaryKey.FieldName #>.</param>
+        public int Delete(int <#= PrimaryKey.GetCodeParamName() #>)
+        {
+            if (<#=PrimaryKey.GetCodeParamName() #> <= 0)
+            {
+                throw new InvalidOperationException("A valid <#=PrimaryKey.FieldName #> must be provided to delete.");
+            }
+
+            var affectedRows = 0;
+            using (var connection = new SqlConnection(this.ConnectionString))
+            {
+                using (var command = new SqlCommand("<#= Table.GetDeleteProcName() #>"))
+                {
+                    command.CommandType = CommandType.StoredProcedure;
+                    command.Connection = connection;
+                    command.Parameters.AddWithValue("<#= PrimaryKey.GetParamName() #>", <#= PrimaryKey.GetCodeParamName() #>);
+
+                    connection.Open();
+                    affectedRows = command.ExecuteNonQuery();
+                }
+            }
+
+            return affectedRows;
+        }
+
+        /// <summary>Deletes the records with the given <#= PrimaryKey.FieldName #>s from the <#= Table.TableName #> table.</summary>
+        /// <param name="<#= PrimaryKey.GetCodeParamName() #>s">The <#= PrimaryKey.FieldName #>s.</param>
+        public int Delete(IEnumerable<int> <#= PrimaryKey.GetCodeParamName() #>s)
+        {
+            if (<#= PrimaryKey.GetCodeParamName() #>s == null)
+            {
+                throw new ArgumentNullException(nameof(<#= PrimaryKey.GetCodeParamName() #>s));
+            }
+
+            if (!<#= PrimaryKey.GetCodeParamName() #>s.Any())
+            {
+                throw new ArgumentException("At least one <#= PrimaryKey.FieldName #> must be provided to delete.", nameof(<#= PrimaryKey.GetCodeParamName() #>s));
+            }
+
+            if (<#= PrimaryKey.GetCodeParamName() #>s.Any(i => i <= 0))
+            {
+                throw new InvalidOperationException("All <#=PrimaryKey.FieldName #>s must be valid to delete.");
+            }
+
+            // Create an in-memory datatable with the primary key values
+            var idDataTable = new DataTable();
+            idDataTable.Columns.Add(new DataColumn("<#=PrimaryKey.FieldName #>"));
+            for (var i = 0; i < <#= PrimaryKey.GetCodeParamName() #>s.Count(); i++)
+            {
+                idDataTable.Rows.Add(<#= PrimaryKey.GetCodeParamName() #>s.ElementAt(i));
+            }
+
+            var affectedRows = 0;
+            using (var connection = new SqlConnection(this.ConnectionString))
+            {
+                using (var command = new SqlCommand("<#= Table.GetDeleteBulkProcName() #>"))
+                {
+                    command.CommandType = CommandType.StoredProcedure;
+                    command.Connection = connection;
+
+                    // Create the Stored Procedure Parameter and set to the Type table
+                    var idsParam = command.Parameters.AddWithValue("<#= PrimaryKey.GetParamName() #>", idDataTable);
+                    idsParam.SqlDbType = SqlDbType.Structured;
+                    idsParam.TypeName = "<#= PrimaryKeyIndex.GetBulkTypeIdTable() #>";
+
+                    connection.Open();
+                    affectedRows = command.ExecuteNonQuery();
+                }
+            }
+
+            return affectedRows;
         }
 
         /// <summary>Parses the <#= Record #> data model out of the reader.</summary>

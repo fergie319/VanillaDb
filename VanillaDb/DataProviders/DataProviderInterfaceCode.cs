@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using VanillaDb.Models;
 
 namespace VanillaDb.DataProviders
@@ -19,6 +20,13 @@ namespace VanillaDb.DataProviders
         {
             Table = table;
             Indexes = indexes;
+        }
+
+        /// <summary>Gets the primary key for the table model - throws exception if more than one primary key exists.</summary>
+        /// <value>The primary key.</value>
+        public FieldModel PrimaryKey
+        {
+            get { return Table.Fields.Single(f => f.IsPrimaryKey); }
         }
 
         /// <summary>Gets the name of the record type being worked with (the table name).</summary>
