@@ -216,6 +216,43 @@ namespace <#= Record #>Service.DataProviders
             return <#= PrimaryKey.GetCodeParamName() #>;
         }
 
+        /// <summary>Updates the given <#= Record #> data model in the <#= Record #> table.</summary>
+        /// <param name="<#= RecordCamel #>Data">The <#= RecordLower #> data to update.</param>
+        /// <returns>The number of records affected by the update.</returns>
+        public int Update(<#= Record #>DataModel <#= RecordCamel #>Data)
+        {
+            if (<#= RecordCamel #>Data == null)
+            {
+                throw new ArgumentNullException(nameof(<#= RecordCamel #>Data));
+            }
+
+            if (string.IsNullOrWhiteSpace(this.ConnectionString))
+            {
+                throw new InvalidOperationException("Connection String is null.  Insert operation cannot be performed.");
+            }
+
+            if (<#= RecordCamel #>Data.<#=PrimaryKey.FieldName #> <= 0)
+            {
+                throw new InvalidOperationException("A valid <#=PrimaryKey.FieldName #> must be provided to update.");
+            }
+
+            var affectedRows = 0;
+            using (var connection = new SqlConnection(this.ConnectionString))
+            {
+                using (var command = new SqlCommand("<#= Table.GetUpdateProcName() #>"))
+                {
+                    command.CommandType = CommandType.StoredProcedure;
+                    command.Connection = connection;
+                    <#= GenerateUpdateProcParams() #>
+
+                    connection.Open();
+                    affectedRows = command.ExecuteNonQuery();
+                }
+            }
+
+            return affectedRows;
+        }
+
         /// <summary>Deletes record with the given <#= PrimaryKey.FieldName #> from the <#= Table.TableName #> table.</summary>
         /// <param name="<#= PrimaryKey.GetCodeParamName() #>">The <#= PrimaryKey.FieldName #>.</param>
         public int Delete(int <#= PrimaryKey.GetCodeParamName() #>)

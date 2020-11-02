@@ -80,6 +80,25 @@ namespace VanillaDb.DataProviders
             return string.Join($"{Environment.NewLine}{indent}", addParameters);
         }
 
+        /// <summary>Generates the update proc parameters.</summary>
+        /// <returns>Code to add parameters for invoking update stored proc.</returns>
+        public string GenerateUpdateProcParams()
+        {
+            var indent = "                    ";
+            var recordParam = $"{RecordCamel}Data";
+            var parameters = Table.Fields
+                .Select(f =>
+                {
+                    return (f.IsNullable)
+                        ? $"\"{f.GetParamName()}\", {recordParam}.{f.FieldName} ?? (object)DBNull.Value"
+                        : $"\"{f.GetParamName()}\", {recordParam}.{f.FieldName}";
+                });
+
+            var addParameters = parameters.Select(p => $"command.Parameters.AddWithValue({p});");
+
+            return string.Join($"{Environment.NewLine}{indent}", addParameters);
+        }
+
         /// <summary>Generates the lines for reading each field from a db reader.</summary>
         /// <returns>Code to read each field and populate the data model.</returns>
         public string GenerateReadFields()

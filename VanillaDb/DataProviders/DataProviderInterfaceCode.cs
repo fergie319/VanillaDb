@@ -64,5 +64,17 @@ namespace VanillaDb.DataProviders
             $"{indent}/// <returns>The ID of the inserted {Record} record.</returns>{Environment.NewLine}" +
             $"{indent}int Insert({Record}DataModel {RecordCamel}Data);";
         }
+
+        /// <summary>Generates the insert method for the data provider.</summary>
+        /// <returns>Insert method definition.</returns>
+        public string GenerateUpdateMethod()
+        {
+            var indent = "        ";
+            return
+            $"/// <summary>Updates the given {Record} data model in the {Record} table.</summary>{Environment.NewLine}" +
+            $"{indent}/// <param name=\"{RecordCamel}Data\">The {RecordLower} data to update.</param>{Environment.NewLine}" +
+            $"{indent}/// <returns>The number of records affected by the update.</returns>{Environment.NewLine}" +
+            $"{indent}int Update({Record}DataModel {RecordCamel}Data);";
+        }
     }
 }

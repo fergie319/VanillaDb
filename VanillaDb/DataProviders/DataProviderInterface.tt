@@ -26,6 +26,8 @@ namespace <#= Record #>Service.DataProviders
     {
         <#= GenerateInsertMethod() #>
 
+        <#= GenerateUpdateMethod() #>
+
         /// <summary>Deletes record with the given <#= PrimaryKey.FieldName #> from the <#= Table.TableName #> table.</summary>
         /// <param name="<#= PrimaryKey.GetCodeParamName() #>">The <#= PrimaryKey.FieldName #>.</param>
         int Delete(int <#= PrimaryKey.GetCodeParamName() #>);
