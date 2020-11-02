@@ -10,6 +10,7 @@ using VanillaDb.GetProcs;
 using VanillaDb.InsertProcs;
 using VanillaDb.Models;
 using VanillaDb.TypeTables;
+using VanillaDb.UpdateProcs;
 
 namespace VanillaDb
 {
@@ -239,6 +240,12 @@ namespace VanillaDb
             var insertContent = insertStoredProc.TransformText();
             Log.Debug($"Content: {insertContent}");
             File.WriteAllText($"{storedProcDir}\\{insertStoredProc.GenerateName()}.sql", insertContent);
+
+            // Generate the Update stored procedure
+            var updateStoredProc = new UpdateStoredProc(table);
+            var updateContent = updateStoredProc.TransformText();
+            Log.Debug($"Content: {updateContent}");
+            File.WriteAllText($"{storedProcDir}\\{updateStoredProc.GenerateName()}.sql", updateContent);
 
             // Generate the Delete stored procedure
             var deleteStoredProc = new DeleteStoredProc(table);

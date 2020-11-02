@@ -44,7 +44,7 @@ namespace VanillaDb.DataProviders
         /// <summary>Gets the name of the primary key field.</summary>
         public FieldModel PrimaryKey
         {
-            get { return Table.Fields.Single(f => f.IsPrimaryKey); }
+            get { return Table.PrimaryKey; }
         }
 
         /// <summary>Gets the index for the primary key.</summary>

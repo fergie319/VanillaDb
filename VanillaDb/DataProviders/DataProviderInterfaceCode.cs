@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using VanillaDb.Models;
 
 namespace VanillaDb.DataProviders
@@ -26,7 +25,7 @@ namespace VanillaDb.DataProviders
         /// <value>The primary key.</value>
         public FieldModel PrimaryKey
         {
-            get { return Table.Fields.Single(f => f.IsPrimaryKey); }
+            get { return Table.PrimaryKey; }
         }
 
         /// <summary>Gets the name of the record type being worked with (the table name).</summary>

@@ -131,6 +131,12 @@
       <DependentUpon>TypeTable.tt</DependentUpon>
     </Compile>
     <Compile Include="TypeTables\TypeTableCode.cs" />
+    <Compile Include="UpdateProcs\UpdateStoredProc.cs">
+      <DependentUpon>UpdateStoredProc.tt</DependentUpon>
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+    </Compile>
+    <Compile Include="UpdateProcs\UpdateStoredProcCode.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
@@ -148,6 +154,10 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="UpdateProcs\UpdateStoredProc.tt">
+      <Generator>TextTemplatingFilePreprocessor</Generator>
+      <LastGenOutput>UpdateStoredProc.cs</LastGenOutput>
+    </Content>
     <None Include="packages.config" />
     <None Include="TestInput\Book.sql" />
     <Content Include="DataProviders\DataModel.tt">
