@@ -315,7 +315,7 @@ namespace <#= Record #>Service.DataProviders
                     command.Connection = connection;
 
                     // Create the Stored Procedure Parameter and set to the Type table
-                    var idsParam = command.Parameters.AddWithValue("<#= PrimaryKey.GetParamName() #>", idDataTable);
+                    var idsParam = command.Parameters.AddWithValue("<#= PrimaryKey.GetParamName() #>s", idDataTable);
                     idsParam.SqlDbType = SqlDbType.Structured;
                     idsParam.TypeName = "<#= PrimaryKeyIndex.GetBulkTypeIdTable() #>";
 

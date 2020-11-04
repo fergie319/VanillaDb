@@ -1019,8 +1019,8 @@ namespace ");
             
             #line default
             #line hidden
-            this.Write("\", idDataTable);\r\n                    idsParam.SqlDbType = SqlDbType.Structured;\r" +
-                    "\n                    idsParam.TypeName = \"");
+            this.Write("s\", idDataTable);\r\n                    idsParam.SqlDbType = SqlDbType.Structured;" +
+                    "\r\n                    idsParam.TypeName = \"");
             
             #line 320 "C:\git-scratch\vanilladb\VanillaDb\DataProviders\SqlDataProvider.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(PrimaryKeyIndex.GetBulkTypeIdTable()));
