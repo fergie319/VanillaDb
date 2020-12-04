@@ -87,6 +87,18 @@
       <DependentUpon>SqlDataProvider.tt</DependentUpon>
     </Compile>
     <Compile Include="DataProviders\SqlDataProviderCode.cs" />
+    <Compile Include="DeleteProcs\DeleteStoredProc.cs">
+      <DependentUpon>DeleteStoredProc.tt</DependentUpon>
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+    </Compile>
+    <Compile Include="DeleteProcs\DeleteStoredProcCode.cs" />
+    <Compile Include="DeleteProcs\DeleteBulkStoredProc.cs">
+      <DependentUpon>DeleteBulkStoredProc.tt</DependentUpon>
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+    </Compile>
+    <Compile Include="DeleteProcs\DeleteBulkStoredProcCode.cs" />
     <Compile Include="GetProcs\GetByBulkStoredProc.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -119,6 +131,12 @@
       <DependentUpon>TypeTable.tt</DependentUpon>
     </Compile>
     <Compile Include="TypeTables\TypeTableCode.cs" />
+    <Compile Include="UpdateProcs\UpdateStoredProc.cs">
+      <DependentUpon>UpdateStoredProc.tt</DependentUpon>
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+    </Compile>
+    <Compile Include="UpdateProcs\UpdateStoredProcCode.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
@@ -136,6 +154,10 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="UpdateProcs\UpdateStoredProc.tt">
+      <Generator>TextTemplatingFilePreprocessor</Generator>
+      <LastGenOutput>UpdateStoredProc.cs</LastGenOutput>
+    </Content>
     <None Include="packages.config" />
     <None Include="TestInput\Book.sql" />
     <Content Include="DataProviders\DataModel.tt">
@@ -149,6 +171,14 @@
     <Content Include="DataProviders\SqlDataProvider.tt">
       <Generator>TextTemplatingFilePreprocessor</Generator>
       <LastGenOutput>SqlDataProvider.cs</LastGenOutput>
+    </Content>
+    <Content Include="DeleteProcs\DeleteStoredProc.tt">
+      <Generator>TextTemplatingFilePreprocessor</Generator>
+      <LastGenOutput>DeleteStoredProc.cs</LastGenOutput>
+    </Content>
+    <Content Include="DeleteProcs\DeleteBulkStoredProc.tt">
+      <Generator>TextTemplatingFilePreprocessor</Generator>
+      <LastGenOutput>DeleteBulkStoredProc.cs</LastGenOutput>
     </Content>
     <Content Include="GetProcs\GetByBulkStoredProc.tt">
       <Generator>TextTemplatingFilePreprocessor</Generator>

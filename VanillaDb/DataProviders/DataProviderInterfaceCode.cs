@@ -21,6 +21,13 @@ namespace VanillaDb.DataProviders
             Indexes = indexes;
         }
 
+        /// <summary>Gets the primary key for the table model - throws exception if more than one primary key exists.</summary>
+        /// <value>The primary key.</value>
+        public FieldModel PrimaryKey
+        {
+            get { return Table.PrimaryKey; }
+        }
+
         /// <summary>Gets the name of the record type being worked with (the table name).</summary>
         public string Record
         {
@@ -56,6 +63,18 @@ namespace VanillaDb.DataProviders
             $"{indent}/// <param name=\"{RecordCamel}Data\">The {RecordLower} data to insert.</param>{Environment.NewLine}" +
             $"{indent}/// <returns>The ID of the inserted {Record} record.</returns>{Environment.NewLine}" +
             $"{indent}int Insert({Record}DataModel {RecordCamel}Data);";
+        }
+
+        /// <summary>Generates the insert method for the data provider.</summary>
+        /// <returns>Insert method definition.</returns>
+        public string GenerateUpdateMethod()
+        {
+            var indent = "        ";
+            return
+            $"/// <summary>Updates the given {Record} data model in the {Record} table.</summary>{Environment.NewLine}" +
+            $"{indent}/// <param name=\"{RecordCamel}Data\">The {RecordLower} data to update.</param>{Environment.NewLine}" +
+            $"{indent}/// <returns>The number of records affected by the update.</returns>{Environment.NewLine}" +
+            $"{indent}int Update({Record}DataModel {RecordCamel}Data);";
         }
     }
 }

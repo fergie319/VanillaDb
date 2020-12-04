@@ -16,6 +16,9 @@ namespace VanillaDb.Models
         /// <summary>Gets or sets whether the index is unique (only one record per-value - no duplicates).</summary>
         public bool IsUnique { get; set; }
 
+        /// <summary>Gets or sets whether this index is for the table's primary key.</summary>
+        public bool IsPrimaryKey { get; set; }
+
         /// <summary>Creates a readable list of the indexes' field names (joined by 'and').</summary>
         /// <returns>Human readable list of fields.</returns>
         public string ReadableFields()
@@ -74,5 +77,14 @@ namespace VanillaDb.Models
         {
             return string.Join(", ", Fields.Select(f => $"IEnumerable<{f.FieldType.FieldType.GetAliasOrName()}> {f.FieldName.ToCamelCase()}s"));
         }
+
+        /// <summary>Generates the bulk type identifier table.</summary>
+        /// <returns>Type ID Table Name.</returns>
+        public string GetBulkTypeIdTable()
+        {
+            var fieldNames = Fields.Select(f => f.FieldName);
+            return $"Type_{string.Join("_", fieldNames)}_Table";
+        }
+
     }
 }

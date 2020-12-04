@@ -20,7 +20,7 @@ namespace VanillaDb.InsertProcs
         /// <returns>Stored Procedure name and file name (without .sql).</returns>
         public string GenerateName()
         {
-            return $"USP_{Table.TableName}_Insert";
+            return Table.GetInsertProcName();
         }
 
         /// <summary>Generates the stored procedure's parameter list.</summary>

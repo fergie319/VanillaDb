@@ -5,10 +5,12 @@ using System.Linq;
 using Serilog;
 using Serilog.Sinks.SystemConsole.Themes;
 using VanillaDb.DataProviders;
+using VanillaDb.DeleteProcs;
 using VanillaDb.GetProcs;
 using VanillaDb.InsertProcs;
 using VanillaDb.Models;
 using VanillaDb.TypeTables;
+using VanillaDb.UpdateProcs;
 
 namespace VanillaDb
 {
@@ -48,7 +50,6 @@ namespace VanillaDb
                     throw new InvalidOperationException($"{sqlFileName} does not exist.");
                 }
             }
-
 
             // Generate output in subdirectories of the table file directory's parent
             // In other words, we're assuming the table is in a Tables folder and want our output next to that folder
@@ -134,7 +135,8 @@ namespace VanillaDb
                         {
                             Table = table,
                             Fields = new[] { newField },
-                            IsUnique = true
+                            IsUnique = true,
+                            IsPrimaryKey = true,
                         };
                         indexes.Add(index);
                     }
@@ -238,6 +240,24 @@ namespace VanillaDb
             var insertContent = insertStoredProc.TransformText();
             Log.Debug($"Content: {insertContent}");
             File.WriteAllText($"{storedProcDir}\\{insertStoredProc.GenerateName()}.sql", insertContent);
+
+            // Generate the Update stored procedure
+            var updateStoredProc = new UpdateStoredProc(table);
+            var updateContent = updateStoredProc.TransformText();
+            Log.Debug($"Content: {updateContent}");
+            File.WriteAllText($"{storedProcDir}\\{updateStoredProc.GenerateName()}.sql", updateContent);
+
+            // Generate the Delete stored procedure
+            var deleteStoredProc = new DeleteStoredProc(table);
+            var deleteContent = deleteStoredProc.TransformText();
+            Log.Debug($"Content: {deleteContent}");
+            File.WriteAllText($"{storedProcDir}\\{deleteStoredProc.GenerateName()}.sql", deleteContent);
+
+            // Generate the Bulk Delete stored procedure
+            var deleteBulkStoredProc = new DeleteBulkStoredProc(table, indexes.First(i => i.IsPrimaryKey));
+            var deleteBulkContent = deleteBulkStoredProc.TransformText();
+            Log.Debug($"Content: {deleteBulkContent}");
+            File.WriteAllText($"{storedProcDir}\\{deleteBulkStoredProc.GenerateName()}.sql", deleteBulkContent);
 
             // Create Data Provider directory
             var dataProviderDir = Path.Combine(outputCodeDir, "DataProviders");

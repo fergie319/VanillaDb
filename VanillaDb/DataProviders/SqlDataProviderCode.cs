@@ -42,9 +42,15 @@ namespace VanillaDb.DataProviders
         }
 
         /// <summary>Gets the name of the primary key field.</summary>
-        public string PrimaryKey
+        public FieldModel PrimaryKey
         {
-            get { return Table.Fields.First(f => f.IsPrimaryKey).FieldName; }
+            get { return Table.PrimaryKey; }
+        }
+
+        /// <summary>Gets the index for the primary key.</summary>
+        public IndexModel PrimaryKeyIndex
+        {
+            get { return Indexes.Single(i => i.IsPrimaryKey); }
         }
 
         /// <summary>Gets the name of the stored procedure.</summary>
@@ -53,14 +59,6 @@ namespace VanillaDb.DataProviders
         {
             return $"{Table.TableName}SqlDataProvider";
         }
-
-        /// <summary>Generates the name of the insert stored proc.</summary>
-        /// <returns>Insert Stored proce name</returns>
-        public string GenerateInsertProcName()
-        {
-            return $"USP_{Table.TableName}_Insert";
-        }
-
 
         /// <summary>Generates the insert proc parameters.</summary>
         /// <returns>Code to add parameters for invoking insert stored proc.</returns>
@@ -75,6 +73,25 @@ namespace VanillaDb.DataProviders
                     return (f.IsNullable)
                         ? $"\"@{f.FieldName.ToCamelCase()}\", {recordParam}.{f.FieldName} ?? (object)DBNull.Value"
                         : $"\"@{f.FieldName.ToCamelCase()}\", {recordParam}.{f.FieldName}";
+                });
+
+            var addParameters = parameters.Select(p => $"command.Parameters.AddWithValue({p});");
+
+            return string.Join($"{Environment.NewLine}{indent}", addParameters);
+        }
+
+        /// <summary>Generates the update proc parameters.</summary>
+        /// <returns>Code to add parameters for invoking update stored proc.</returns>
+        public string GenerateUpdateProcParams()
+        {
+            var indent = "                    ";
+            var recordParam = $"{RecordCamel}Data";
+            var parameters = Table.Fields
+                .Select(f =>
+                {
+                    return (f.IsNullable)
+                        ? $"\"{f.GetParamName()}\", {recordParam}.{f.FieldName} ?? (object)DBNull.Value"
+                        : $"\"{f.GetParamName()}\", {recordParam}.{f.FieldName}";
                 });
 
             var addParameters = parameters.Select(p => $"command.Parameters.AddWithValue({p});");
@@ -141,15 +158,6 @@ namespace VanillaDb.DataProviders
         {
             var fieldNames = index.Fields.Select(f => f.FieldName);
             return $"dbo.USP_{Table.TableName}_GetBy{string.Join("_", fieldNames)}_Bulk";
-        }
-
-        /// <summary>Generates the bulk type identifier table.</summary>
-        /// <param name="index">The index.</param>
-        /// <returns></returns>
-        public string GenerateBulkTypeIdTable(IndexModel index)
-        {
-            var fieldNames = index.Fields.Select(f => f.FieldName);
-            return $"Type_{string.Join("_", fieldNames)}_Table";
         }
 
         /// <summary>Generates the GetBy(Bulk) stored procedure's parameter name.</summary>
