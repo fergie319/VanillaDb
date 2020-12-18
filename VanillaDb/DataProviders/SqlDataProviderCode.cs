@@ -146,9 +146,9 @@ namespace VanillaDb.DataProviders
         /// <returns></returns>
         public string GenerateInMemoryRowCreation(IEnumerable<FieldModel> fields)
         {
-            var indent = "                ";
-            var rows = fields.Select(f => $"idDataTable.Rows.Add({f.FieldName.ToCamelCase()}s.ElementAt(i));");
-            return string.Join($"{Environment.NewLine}{indent}", rows);
+            var rows = fields.Select(f => $"{f.FieldName.ToCamelCase()}s.ElementAt(i)");
+            var rowParams = string.Join(", ", rows);
+            return $"idDataTable.Rows.Add({rowParams});";
         }
 
         /// <summary>Generates the name of the get by index bulk stored procedure.</summary>

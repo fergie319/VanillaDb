@@ -328,6 +328,9 @@ namespace VanillaDb
                 case "BIT":
                     fieldType.FieldType = typeof(bool);
                     break;
+                case "DATETIME":
+                    fieldType.FieldType = typeof(DateTime);
+                    break;
             }
 
             return fieldType;
