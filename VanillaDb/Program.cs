@@ -325,6 +325,9 @@ namespace VanillaDb
                 case "INT":
                     fieldType.FieldType = typeof(int);
                     break;
+                case "BIT":
+                    fieldType.FieldType = typeof(bool);
+                    break;
             }
 
             return fieldType;
