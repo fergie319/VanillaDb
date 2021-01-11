@@ -34,39 +34,21 @@ namespace VanillaDb.UpdateProcs
         /// <returns></returns>
         public string GenerateProcParameters()
         {
-            var updateParams = Table.Fields
+            var updateParams = Table.UpdateFields
                 .Select(f => $"    {f.GetParamName()} {f.FieldType.SqlType}");
             return string.Join("," + Environment.NewLine, updateParams);
-        }
-
-        /// <summary>Generates the update parameters for the stored procedure.</summary>
-        /// <returns>Comma-separated list of non-identity fields.</returns>
-        public string GenerateUpdateParameters()
-        {
-            var updateParams = Table.Fields
-                .Where(f => !f.IsIdentity)
-                .Select(f => f.FieldName);
-            return string.Join(", ", updateParams);
         }
 
         /// <summary>Generates the fields for the OUTPUT clause of the Update statement.</summary>
         /// <returns></returns>
         public string GenerateSetFields()
         {
-            var setStatements = Table.Fields
-                .Where(f => !f.IsPrimaryKey)
-                .Select(f => $"{f.FieldName} = {f.GetParamName()}");
-            return string.Join(", ", setStatements);
-        }
-
-        /// <summary>Generates the fields for the VALUES (...) clause of the Update statement.</summary>
-        /// <returns></returns>
-        public string GenerateValuesFields()
-        {
-            var updateParams = Table.Fields
+            var setStatements = Table.UpdateFields
                 .Where(f => !f.IsIdentity)
-                .Select(f => "@" + f.FieldName.ToCamelCase());
-            return string.Join(", ", updateParams);
+                .Select(f => $"{f.FieldName} = {f.GetParamName()}");
+            var timeStampValues = Table.UpdateTimeStampFields.Select(f => $"{f.FieldName} = GETUTCDATE()");
+            setStatements = setStatements.Concat(timeStampValues);
+            return string.Join(", ", setStatements);
         }
     }
 }

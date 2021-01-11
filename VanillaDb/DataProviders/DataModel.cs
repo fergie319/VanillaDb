@@ -53,23 +53,23 @@ namespace ");
             
             #line default
             #line hidden
-            this.Write("Service.DataProviders\r\n{\r\n    /// <summary>The ");
+            this.Write("Service.DataProviders\r\n{\r\n    using System;\r\n\r\n    /// <summary>The ");
             
-            #line 19 "C:\git-scratch\vanilladb\VanillaDb\DataProviders\DataModel.tt"
+            #line 21 "C:\git-scratch\vanilladb\VanillaDb\DataProviders\DataModel.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(Table.TableName));
             
             #line default
             #line hidden
             this.Write(" Data Model.</summary>\r\n    public class ");
             
-            #line 20 "C:\git-scratch\vanilladb\VanillaDb\DataProviders\DataModel.tt"
+            #line 22 "C:\git-scratch\vanilladb\VanillaDb\DataProviders\DataModel.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(GenerateName()));
             
             #line default
             #line hidden
             this.Write("\r\n    {\r\n        ");
             
-            #line 22 "C:\git-scratch\vanilladb\VanillaDb\DataProviders\DataModel.tt"
+            #line 24 "C:\git-scratch\vanilladb\VanillaDb\DataProviders\DataModel.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(GenerateProperties()));
             
             #line default

@@ -66,8 +66,7 @@ namespace VanillaDb.DataProviders
         {
             var indent = "                    ";
             var recordParam = $"{RecordCamel}Data";
-            var parameters = Table.Fields
-                .Where(f => !f.IsIdentity)
+            var parameters = Table.InsertFields
                 .Select(f =>
                 {
                     return (f.IsNullable)
@@ -86,7 +85,7 @@ namespace VanillaDb.DataProviders
         {
             var indent = "                    ";
             var recordParam = $"{RecordCamel}Data";
-            var parameters = Table.Fields
+            var parameters = Table.UpdateFields
                 .Select(f =>
                 {
                     return (f.IsNullable)
