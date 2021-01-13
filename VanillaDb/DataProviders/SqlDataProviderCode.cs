@@ -86,6 +86,7 @@ namespace VanillaDb.DataProviders
             var indent = "                    ";
             var recordParam = $"{RecordCamel}Data";
             var parameters = Table.UpdateFields
+                .Prepend(PrimaryKey)
                 .Select(f =>
                 {
                     return (f.IsNullable)

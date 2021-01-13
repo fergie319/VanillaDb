@@ -37,7 +37,7 @@ namespace VanillaDb.Models
         /// <value>The update fields.</value>
         public IEnumerable<FieldModel> UpdateFields
         {
-            get { return Fields.Where(f => !TimeStampFieldNames.Contains(f.FieldName)); }
+            get { return Fields.Where(f => !f.IsIdentity && !TimeStampFieldNames.Contains(f.FieldName)); }
         }
 
         /// <summary>Gets the update time stamp fields.</summary>
