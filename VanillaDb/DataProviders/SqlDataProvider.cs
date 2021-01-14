@@ -601,7 +601,7 @@ namespace ");
             
             #line default
             #line hidden
-            this.Write(" record.</returns>\r\n        public int Insert(");
+            this.Write(" record.</returns>\r\n        public async Task<int> Insert(");
             
             #line 191 "C:\git-scratch\vanilladb\VanillaDb\DataProviders\SqlDataProvider.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(Record));
@@ -698,7 +698,7 @@ namespace ");
             this.Write(@"
 
                     connection.Open();
-                    var reader = command.ExecuteReader();
+                    var reader = await command.ExecuteReaderAsync();
                     if (reader.HasRows)
                     {
                         while (reader.Read())
@@ -754,7 +754,7 @@ namespace ");
             #line default
             #line hidden
             this.Write(" data to update.</param>\r\n        /// <returns>The number of records affected by " +
-                    "the update.</returns>\r\n        public int Update(");
+                    "the update.</returns>\r\n        public async Task<int> Update(");
             
             #line 239 "C:\git-scratch\vanilladb\VanillaDb\DataProviders\SqlDataProvider.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(Record));
@@ -838,7 +838,7 @@ namespace ");
             this.Write(@"
 
                     connection.Open();
-                    affectedRows = command.ExecuteNonQuery();
+                    affectedRows = await command.ExecuteNonQueryAsync();
                 }
             }
 
@@ -874,7 +874,7 @@ namespace ");
             
             #line default
             #line hidden
-            this.Write(".</param>\r\n        public int Delete(int ");
+            this.Write(".</param>\r\n        public async Task<int> Delete(int ");
             
             #line 279 "C:\git-scratch\vanilladb\VanillaDb\DataProviders\SqlDataProvider.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(PrimaryKey.GetCodeParamName()));
@@ -928,7 +928,7 @@ namespace ");
             this.Write(@");
 
                     connection.Open();
-                    affectedRows = command.ExecuteNonQuery();
+                    affectedRows = await command.ExecuteNonQueryAsync();
                 }
             }
 
@@ -964,7 +964,7 @@ namespace ");
             
             #line default
             #line hidden
-            this.Write("s.</param>\r\n        public int Delete(IEnumerable<int> ");
+            this.Write("s.</param>\r\n        public async Task<int> Delete(IEnumerable<int> ");
             
             #line 309 "C:\git-scratch\vanilladb\VanillaDb\DataProviders\SqlDataProvider.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(PrimaryKey.GetCodeParamName()));
@@ -1078,10 +1078,18 @@ namespace ");
             
             #line default
             #line hidden
-            this.Write("\";\r\n\r\n                    connection.Open();\r\n                    affectedRows = " +
-                    "command.ExecuteNonQuery();\r\n                }\r\n            }\r\n\r\n            Log." +
-                    "TraceEnd();\r\n            return affectedRows;\r\n        }\r\n\r\n        /// <summary" +
-                    ">Parses the ");
+            this.Write(@""";
+
+                    connection.Open();
+                    affectedRows = await command.ExecuteNonQueryAsync();
+                }
+            }
+
+            Log.TraceEnd();
+            return affectedRows;
+        }
+
+        /// <summary>Parses the ");
             
             #line 359 "C:\git-scratch\vanilladb\VanillaDb\DataProviders\SqlDataProvider.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(Record));

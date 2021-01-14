@@ -188,7 +188,7 @@ namespace <#= Record #>Service.DataProviders
         /// <summary>Inserts the given <#= Record #> data model into the <#= Record #> table.</summary>
         /// <param name="<#= RecordCamel #>Data">The <#= RecordLower #> data to insert.</param>
         /// <returns>The ID of the inserted <#= Record #> record.</returns>
-        public int Insert(<#= Record #>DataModel <#= RecordCamel #>Data)
+        public async Task<int> Insert(<#= Record #>DataModel <#= RecordCamel #>Data)
         {
             Log.TraceBegin();
             if (<#= RecordCamel #>Data == null)
@@ -218,7 +218,7 @@ namespace <#= Record #>Service.DataProviders
                     <#= GenerateInsertProcParams() #>
 
                     connection.Open();
-                    var reader = command.ExecuteReader();
+                    var reader = await command.ExecuteReaderAsync();
                     if (reader.HasRows)
                     {
                         while (reader.Read())
@@ -236,7 +236,7 @@ namespace <#= Record #>Service.DataProviders
         /// <summary>Updates the given <#= Record #> data model in the <#= Record #> table.</summary>
         /// <param name="<#= RecordCamel #>Data">The <#= RecordLower #> data to update.</param>
         /// <returns>The number of records affected by the update.</returns>
-        public int Update(<#= Record #>DataModel <#= RecordCamel #>Data)
+        public async Task<int> Update(<#= Record #>DataModel <#= RecordCamel #>Data)
         {
             Log.TraceBegin();
             if (<#= RecordCamel #>Data == null)
@@ -266,7 +266,7 @@ namespace <#= Record #>Service.DataProviders
                     <#= GenerateUpdateProcParams() #>
 
                     connection.Open();
-                    affectedRows = command.ExecuteNonQuery();
+                    affectedRows = await command.ExecuteNonQueryAsync();
                 }
             }
 
@@ -276,7 +276,7 @@ namespace <#= Record #>Service.DataProviders
 
         /// <summary>Deletes record with the given <#= PrimaryKey.FieldName #> from the <#= Table.TableName #> table.</summary>
         /// <param name="<#= PrimaryKey.GetCodeParamName() #>">The <#= PrimaryKey.FieldName #>.</param>
-        public int Delete(int <#= PrimaryKey.GetCodeParamName() #>)
+        public async Task<int> Delete(int <#= PrimaryKey.GetCodeParamName() #>)
         {
             Log.TraceBegin();
             if (<#=PrimaryKey.GetCodeParamName() #> <= 0)
@@ -296,7 +296,7 @@ namespace <#= Record #>Service.DataProviders
                     command.Parameters.AddWithValue("<#= PrimaryKey.GetParamName() #>", <#= PrimaryKey.GetCodeParamName() #>);
 
                     connection.Open();
-                    affectedRows = command.ExecuteNonQuery();
+                    affectedRows = await command.ExecuteNonQueryAsync();
                 }
             }
 
@@ -306,7 +306,7 @@ namespace <#= Record #>Service.DataProviders
 
         /// <summary>Deletes the records with the given <#= PrimaryKey.FieldName #>s from the <#= Table.TableName #> table.</summary>
         /// <param name="<#= PrimaryKey.GetCodeParamName() #>s">The <#= PrimaryKey.FieldName #>s.</param>
-        public int Delete(IEnumerable<int> <#= PrimaryKey.GetCodeParamName() #>s)
+        public async Task<int> Delete(IEnumerable<int> <#= PrimaryKey.GetCodeParamName() #>s)
         {
             Log.TraceBegin();
             if (<#= PrimaryKey.GetCodeParamName() #>s == null)
@@ -348,7 +348,7 @@ namespace <#= Record #>Service.DataProviders
                     idsParam.TypeName = "<#= PrimaryKeyIndex.GetBulkTypeIdTable() #>";
 
                     connection.Open();
-                    affectedRows = command.ExecuteNonQuery();
+                    affectedRows = await command.ExecuteNonQueryAsync();
                 }
             }
 

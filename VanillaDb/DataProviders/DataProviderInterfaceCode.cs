@@ -62,7 +62,7 @@ namespace VanillaDb.DataProviders
             $"/// <summary>Inserts the given {Record} data model into the {Record} table.</summary>{Environment.NewLine}" +
             $"{indent}/// <param name=\"{RecordCamel}Data\">The {RecordLower} data to insert.</param>{Environment.NewLine}" +
             $"{indent}/// <returns>The ID of the inserted {Record} record.</returns>{Environment.NewLine}" +
-            $"{indent}int Insert({Record}DataModel {RecordCamel}Data);";
+            $"{indent}Task<int> Insert({Record}DataModel {RecordCamel}Data);";
         }
 
         /// <summary>Generates the insert method for the data provider.</summary>
@@ -74,7 +74,7 @@ namespace VanillaDb.DataProviders
             $"/// <summary>Updates the given {Record} data model in the {Record} table.</summary>{Environment.NewLine}" +
             $"{indent}/// <param name=\"{RecordCamel}Data\">The {RecordLower} data to update.</param>{Environment.NewLine}" +
             $"{indent}/// <returns>The number of records affected by the update.</returns>{Environment.NewLine}" +
-            $"{indent}int Update({Record}DataModel {RecordCamel}Data);";
+            $"{indent}Task<int> Update({Record}DataModel {RecordCamel}Data);";
         }
     }
 }

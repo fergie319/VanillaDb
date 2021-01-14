@@ -112,7 +112,7 @@ namespace ");
             
             #line default
             #line hidden
-            this.Write(".</param>\r\n        int Delete(int ");
+            this.Write(".</param>\r\n        Task<int> Delete(int ");
             
             #line 34 "C:\git-scratch\vanilladb\VanillaDb\DataProviders\DataProviderInterface.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(PrimaryKey.GetCodeParamName()));
@@ -147,7 +147,7 @@ namespace ");
             
             #line default
             #line hidden
-            this.Write("s.</param>\r\n        int Delete(IEnumerable<int> ");
+            this.Write("s.</param>\r\n        Task<int> Delete(IEnumerable<int> ");
             
             #line 38 "C:\git-scratch\vanilladb\VanillaDb\DataProviders\DataProviderInterface.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(PrimaryKey.GetCodeParamName()));
