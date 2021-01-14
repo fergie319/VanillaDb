@@ -24,14 +24,18 @@ namespace <#= Record #>Service.DataProviders
     using System.Data;
     using System.Data.SqlClient;
     using System.Linq;
+    using log4net;
+    using log4net.Extensions;
 
     /// <summary>SQL implementation of data provider interface for <#= Record #> data.</summary>
     /// <seealso cref="<#= Record #>Service.DataProviders.I<#= Record #>DataProvider" />
     public partial class <#= GenerateName() #> : I<#= Record #>DataProvider
     {
+        private static readonly ILog Log = LogManager.GetLogger(typeof(<#=GenerateName() #>));
+
         /// <summary>Initializes a new instance of the <see cref="<#= GenerateName() #>"/> class.</summary>
         /// <param name="connectionString">The connection string.</param>
-        public <#= GenerateName() #>(string connectionString) // TODO: Add Logger and log statements
+        public <#= GenerateName() #>(string connectionString)
         {
             this.ConnectionString = connectionString;
         }
@@ -50,6 +54,7 @@ namespace <#= Record #>Service.DataProviders
         /// <returns><#= Record #> Data Model or null if not found</returns>
         public <#= index.GetByIndexReturnType() #> <#= index.GetByIndexMethodName() #>(<#= index.GetByIndexMethodParams() #>)
         {
+            Log.TraceBegin();
 <#
         foreach (FieldModel field in index.Fields.Where(f => !f.IsNullable))
         {
@@ -99,6 +104,7 @@ namespace <#= Record #>Service.DataProviders
                 }
             }
 
+            Log.TraceEnd();
 <#
             if (index.IsUnique)
             {
@@ -120,6 +126,7 @@ namespace <#= Record #>Service.DataProviders
         /// <returns><#= Record #> Data Model or null if not found.</returns>
         public IEnumerable<<#= Record #>DataModel> <#= index.GetByIndexMethodName() #>(<#= index.BulkGetByIndexMethodParams() #>)
         {
+            Log.TraceBegin();
 <#
         foreach (FieldModel field in index.Fields)
         {
@@ -166,6 +173,7 @@ namespace <#= Record #>Service.DataProviders
                 }
             }
 
+            Log.TraceEnd();
             return <#= RecordCamel #>Data;
         }
 
@@ -177,6 +185,7 @@ namespace <#= Record #>Service.DataProviders
         /// <returns>The ID of the inserted <#= Record #> record.</returns>
         public int Insert(<#= Record #>DataModel <#= RecordCamel #>Data)
         {
+            Log.TraceBegin();
             if (<#= RecordCamel #>Data == null)
             {
                 throw new ArgumentNullException(nameof(<#= RecordCamel #>Data));
@@ -213,6 +222,7 @@ namespace <#= Record #>Service.DataProviders
                 }
             }
 
+            Log.TraceEnd();
             return <#= PrimaryKey.GetCodeParamName() #>;
         }
 
@@ -221,6 +231,7 @@ namespace <#= Record #>Service.DataProviders
         /// <returns>The number of records affected by the update.</returns>
         public int Update(<#= Record #>DataModel <#= RecordCamel #>Data)
         {
+            Log.TraceBegin();
             if (<#= RecordCamel #>Data == null)
             {
                 throw new ArgumentNullException(nameof(<#= RecordCamel #>Data));
@@ -250,6 +261,7 @@ namespace <#= Record #>Service.DataProviders
                 }
             }
 
+            Log.TraceEnd();
             return affectedRows;
         }
 
@@ -257,6 +269,7 @@ namespace <#= Record #>Service.DataProviders
         /// <param name="<#= PrimaryKey.GetCodeParamName() #>">The <#= PrimaryKey.FieldName #>.</param>
         public int Delete(int <#= PrimaryKey.GetCodeParamName() #>)
         {
+            Log.TraceBegin();
             if (<#=PrimaryKey.GetCodeParamName() #> <= 0)
             {
                 throw new InvalidOperationException("A valid <#=PrimaryKey.FieldName #> must be provided to delete.");
@@ -276,6 +289,7 @@ namespace <#= Record #>Service.DataProviders
                 }
             }
 
+            Log.TraceEnd();
             return affectedRows;
         }
 
@@ -283,6 +297,7 @@ namespace <#= Record #>Service.DataProviders
         /// <param name="<#= PrimaryKey.GetCodeParamName() #>s">The <#= PrimaryKey.FieldName #>s.</param>
         public int Delete(IEnumerable<int> <#= PrimaryKey.GetCodeParamName() #>s)
         {
+            Log.TraceBegin();
             if (<#= PrimaryKey.GetCodeParamName() #>s == null)
             {
                 throw new ArgumentNullException(nameof(<#= PrimaryKey.GetCodeParamName() #>s));
@@ -324,6 +339,7 @@ namespace <#= Record #>Service.DataProviders
                 }
             }
 
+            Log.TraceEnd();
             return affectedRows;
         }
 
