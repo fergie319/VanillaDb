@@ -27,8 +27,7 @@ namespace VanillaDb.InsertProcs
         /// <returns></returns>
         public string GenerateProcParameters()
         {
-            var insertParams = Table.Fields
-                .Where(f => !f.IsIdentity)
+            var insertParams = Table.InsertFields
                 .Select(f => $"    @{f.FieldName.ToCamelCase()} {f.FieldType.SqlType}");
             return string.Join("," + Environment.NewLine, insertParams);
         }
@@ -37,9 +36,7 @@ namespace VanillaDb.InsertProcs
         /// <returns>Comma-separated list of non-identity fields.</returns>
         public string GenerateInsertParameters()
         {
-            var insertParams = Table.Fields
-                .Where(f => !f.IsIdentity)
-                .Select(f => f.FieldName);
+            var insertParams = Table.InsertFields.Select(f => f.FieldName);
             return string.Join(", ", insertParams);
         }
 
@@ -55,9 +52,7 @@ namespace VanillaDb.InsertProcs
         /// <returns></returns>
         public string GenerateValuesFields()
         {
-            var insertParams = Table.Fields
-                .Where(f => !f.IsIdentity)
-                .Select(f => "@" + f.FieldName.ToCamelCase());
+            var insertParams = Table.InsertFields.Select(f => "@" + f.FieldName.ToCamelCase());
             return string.Join(", ", insertParams);
         }
     }

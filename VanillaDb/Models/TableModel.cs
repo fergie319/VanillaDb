@@ -6,6 +6,13 @@ namespace VanillaDb.Models
     /// <summary>Contains details about a table - name and fields</summary>
     public class TableModel
     {
+        /// <summary>Gets the time stamp field names.</summary>
+        /// <value>The time stamp field names.</value>
+        public readonly IEnumerable<string> TimeStampFieldNames = new[] { "CreatedOnUtc", "UpdatedOnUtc" };
+
+        /// <summary>The update time stamp field names</summary>
+        public readonly IEnumerable<string> UpdateTimeStampFieldNames = new[] { "UpdatedOnUtc" };
+
         /// <summary>Gets or sets the table name.</summary>
         public string TableName { get; set; }
 
@@ -17,6 +24,27 @@ namespace VanillaDb.Models
         public FieldModel PrimaryKey
         {
             get { return Fields.Single(f => f.IsPrimaryKey); }
+        }
+
+        /// <summary>Gets the insert fields.</summary>
+        /// <value>The insert fields.</value>
+        public IEnumerable<FieldModel> InsertFields
+        {
+            get { return Fields.Where(f => !f.IsIdentity && !TimeStampFieldNames.Contains(f.FieldName)); }
+        }
+
+        /// <summary>Gets the update fields.</summary>
+        /// <value>The update fields.</value>
+        public IEnumerable<FieldModel> UpdateFields
+        {
+            get { return Fields.Where(f => !f.IsIdentity && !TimeStampFieldNames.Contains(f.FieldName)); }
+        }
+
+        /// <summary>Gets the update time stamp fields.</summary>
+        /// <value>The update time stamp fields.</value>
+        public IEnumerable<FieldModel> UpdateTimeStampFields
+        {
+            get { return Fields.Where(f => UpdateTimeStampFieldNames.Contains(f.FieldName)); }
         }
 
         /// <summary>Gets the name of the generated data model for this table.</summary>

@@ -24,14 +24,19 @@ namespace <#= Record #>Service.DataProviders
     using System.Data;
     using System.Data.SqlClient;
     using System.Linq;
+    using System.Threading.Tasks;
+    using log4net;
+    using log4net.Extensions;
 
     /// <summary>SQL implementation of data provider interface for <#= Record #> data.</summary>
     /// <seealso cref="<#= Record #>Service.DataProviders.I<#= Record #>DataProvider" />
     public partial class <#= GenerateName() #> : I<#= Record #>DataProvider
     {
+        private static readonly ILog Log = LogManager.GetLogger(typeof(<#=GenerateName() #>));
+
         /// <summary>Initializes a new instance of the <see cref="<#= GenerateName() #>"/> class.</summary>
         /// <param name="connectionString">The connection string.</param>
-        public <#= GenerateName() #>(string connectionString) // TODO: Add Logger and log statements
+        public <#= GenerateName() #>(string connectionString)
         {
             this.ConnectionString = connectionString;
         }
@@ -48,8 +53,9 @@ namespace <#= Record #>Service.DataProviders
         /// <summary>Gets the data for the <#= Record #> with the given <#= index.ReadableFields() #>.</summary>
         <#= index.GetByIndexParamsXmlComments() #>
         /// <returns><#= Record #> Data Model or null if not found</returns>
-        public <#= index.GetByIndexReturnType() #> <#= index.GetByIndexMethodName() #>(<#= index.GetByIndexMethodParams() #>)
+        public async Task<<#= index.GetByIndexReturnType() #>> <#= index.GetByIndexMethodName() #>(<#= index.GetByIndexMethodParams() #>)
         {
+            Log.TraceBegin();
 <#
         foreach (FieldModel field in index.Fields.Where(f => !f.IsNullable))
         {
@@ -80,14 +86,16 @@ namespace <#= Record #>Service.DataProviders
             var <#= RecordCamel #>Data = new List<<#= Record #>DataModel>();
             using (var connection = new SqlConnection(this.ConnectionString))
             {
-                using (var command = new SqlCommand("<#= GenerateGetByIndexStoredProcName(index) #>"))
+                var procName = "<#= GenerateGetByIndexStoredProcName(index) #>";
+                using (var command = new SqlCommand(procName))
                 {
+                    Log.InfoFormat("Invoking Stored Procedure {0}.", procName);
                     command.CommandType = CommandType.StoredProcedure;
                     command.Connection = connection;
                     <#= GenerateGetByIndexAddParametersCode(index.Fields) #>
 
                     connection.Open();
-                    var reader = command.ExecuteReader();
+                    var reader = await command.ExecuteReaderAsync();
                     if (reader.HasRows)
                     {
                         while (reader.Read())
@@ -99,6 +107,7 @@ namespace <#= Record #>Service.DataProviders
                 }
             }
 
+            Log.TraceEnd();
 <#
             if (index.IsUnique)
             {
@@ -118,8 +127,9 @@ namespace <#= Record #>Service.DataProviders
         /// <summary>Gets the data for the <#= Record #>(s) with the given collection of <#= index.ReadableFields() #>.</summary>
         <#= index.BulkGetByIndexParamsXmlComments() #>
         /// <returns><#= Record #> Data Model or null if not found.</returns>
-        public IEnumerable<<#= Record #>DataModel> <#= index.GetByIndexMethodName() #>(<#= index.BulkGetByIndexMethodParams() #>)
+        public async Task<IEnumerable<<#= Record #>DataModel>> <#= index.GetByIndexMethodName() #>(<#= index.BulkGetByIndexMethodParams() #>)
         {
+            Log.TraceBegin();
 <#
         foreach (FieldModel field in index.Fields)
         {
@@ -143,8 +153,10 @@ namespace <#= Record #>Service.DataProviders
             var <#= RecordCamel #>Data = new List<<#= Record #>DataModel>();
             using (var connection = new SqlConnection(this.ConnectionString))
             {
-                using (var command = new SqlCommand("<#= GenerateGetByIndexBulkStoredProcName(index) #>"))
+                var procName = "<#= GenerateGetByIndexBulkStoredProcName(index) #>";
+                using (var command = new SqlCommand(procName))
                 {
+                    Log.InfoFormat("Invoking Stored Procedure {0}.", procName);
                     command.CommandType = CommandType.StoredProcedure;
                     command.Connection = connection;
 
@@ -154,7 +166,7 @@ namespace <#= Record #>Service.DataProviders
                     idsParam.TypeName = "<#= index.GetBulkTypeIdTable() #>";
 
                     connection.Open();
-                    var reader = command.ExecuteReader();
+                    var reader = await command.ExecuteReaderAsync();
                     if (reader.HasRows)
                     {
                         while (reader.Read())
@@ -166,6 +178,7 @@ namespace <#= Record #>Service.DataProviders
                 }
             }
 
+            Log.TraceEnd();
             return <#= RecordCamel #>Data;
         }
 
@@ -175,8 +188,9 @@ namespace <#= Record #>Service.DataProviders
         /// <summary>Inserts the given <#= Record #> data model into the <#= Record #> table.</summary>
         /// <param name="<#= RecordCamel #>Data">The <#= RecordLower #> data to insert.</param>
         /// <returns>The ID of the inserted <#= Record #> record.</returns>
-        public int Insert(<#= Record #>DataModel <#= RecordCamel #>Data)
+        public async Task<int> Insert(<#= Record #>DataModel <#= RecordCamel #>Data)
         {
+            Log.TraceBegin();
             if (<#= RecordCamel #>Data == null)
             {
                 throw new ArgumentNullException(nameof(<#= RecordCamel #>Data));
@@ -195,14 +209,16 @@ namespace <#= Record #>Service.DataProviders
             var <#= PrimaryKey.GetCodeParamName() #> = -1;
             using (var connection = new SqlConnection(this.ConnectionString))
             {
-                using (var command = new SqlCommand("<#= Table.GetInsertProcName() #>"))
+                var procName = "<#= Table.GetInsertProcName() #>";
+                using (var command = new SqlCommand(procName))
                 {
+                    Log.InfoFormat("Invoking Stored Procedure {0}.", procName);
                     command.CommandType = CommandType.StoredProcedure;
                     command.Connection = connection;
                     <#= GenerateInsertProcParams() #>
 
                     connection.Open();
-                    var reader = command.ExecuteReader();
+                    var reader = await command.ExecuteReaderAsync();
                     if (reader.HasRows)
                     {
                         while (reader.Read())
@@ -213,14 +229,16 @@ namespace <#= Record #>Service.DataProviders
                 }
             }
 
+            Log.TraceEnd();
             return <#= PrimaryKey.GetCodeParamName() #>;
         }
 
         /// <summary>Updates the given <#= Record #> data model in the <#= Record #> table.</summary>
         /// <param name="<#= RecordCamel #>Data">The <#= RecordLower #> data to update.</param>
         /// <returns>The number of records affected by the update.</returns>
-        public int Update(<#= Record #>DataModel <#= RecordCamel #>Data)
+        public async Task<int> Update(<#= Record #>DataModel <#= RecordCamel #>Data)
         {
+            Log.TraceBegin();
             if (<#= RecordCamel #>Data == null)
             {
                 throw new ArgumentNullException(nameof(<#= RecordCamel #>Data));
@@ -239,24 +257,28 @@ namespace <#= Record #>Service.DataProviders
             var affectedRows = 0;
             using (var connection = new SqlConnection(this.ConnectionString))
             {
-                using (var command = new SqlCommand("<#= Table.GetUpdateProcName() #>"))
+                var procName = "<#= Table.GetUpdateProcName() #>";
+                using (var command = new SqlCommand(procName))
                 {
+                    Log.InfoFormat("Invoking Stored Procedure {0}.", procName);
                     command.CommandType = CommandType.StoredProcedure;
                     command.Connection = connection;
                     <#= GenerateUpdateProcParams() #>
 
                     connection.Open();
-                    affectedRows = command.ExecuteNonQuery();
+                    affectedRows = await command.ExecuteNonQueryAsync();
                 }
             }
 
+            Log.TraceEnd();
             return affectedRows;
         }
 
         /// <summary>Deletes record with the given <#= PrimaryKey.FieldName #> from the <#= Table.TableName #> table.</summary>
         /// <param name="<#= PrimaryKey.GetCodeParamName() #>">The <#= PrimaryKey.FieldName #>.</param>
-        public int Delete(int <#= PrimaryKey.GetCodeParamName() #>)
+        public async Task<int> Delete(int <#= PrimaryKey.GetCodeParamName() #>)
         {
+            Log.TraceBegin();
             if (<#=PrimaryKey.GetCodeParamName() #> <= 0)
             {
                 throw new InvalidOperationException("A valid <#=PrimaryKey.FieldName #> must be provided to delete.");
@@ -265,24 +287,28 @@ namespace <#= Record #>Service.DataProviders
             var affectedRows = 0;
             using (var connection = new SqlConnection(this.ConnectionString))
             {
-                using (var command = new SqlCommand("<#= Table.GetDeleteProcName() #>"))
+                var procName = "<#= Table.GetDeleteProcName() #>";
+                using (var command = new SqlCommand(procName))
                 {
+                    Log.InfoFormat("Invoking Stored Procedure {0}.", procName);
                     command.CommandType = CommandType.StoredProcedure;
                     command.Connection = connection;
                     command.Parameters.AddWithValue("<#= PrimaryKey.GetParamName() #>", <#= PrimaryKey.GetCodeParamName() #>);
 
                     connection.Open();
-                    affectedRows = command.ExecuteNonQuery();
+                    affectedRows = await command.ExecuteNonQueryAsync();
                 }
             }
 
+            Log.TraceEnd();
             return affectedRows;
         }
 
         /// <summary>Deletes the records with the given <#= PrimaryKey.FieldName #>s from the <#= Table.TableName #> table.</summary>
         /// <param name="<#= PrimaryKey.GetCodeParamName() #>s">The <#= PrimaryKey.FieldName #>s.</param>
-        public int Delete(IEnumerable<int> <#= PrimaryKey.GetCodeParamName() #>s)
+        public async Task<int> Delete(IEnumerable<int> <#= PrimaryKey.GetCodeParamName() #>s)
         {
+            Log.TraceBegin();
             if (<#= PrimaryKey.GetCodeParamName() #>s == null)
             {
                 throw new ArgumentNullException(nameof(<#= PrimaryKey.GetCodeParamName() #>s));
@@ -309,8 +335,10 @@ namespace <#= Record #>Service.DataProviders
             var affectedRows = 0;
             using (var connection = new SqlConnection(this.ConnectionString))
             {
-                using (var command = new SqlCommand("<#= Table.GetDeleteBulkProcName() #>"))
+                var procName = "<#= Table.GetDeleteBulkProcName() #>";
+                using (var command = new SqlCommand(procName))
                 {
+                    Log.InfoFormat("Invoking Stored Procedure {0}.", procName);
                     command.CommandType = CommandType.StoredProcedure;
                     command.Connection = connection;
 
@@ -320,10 +348,11 @@ namespace <#= Record #>Service.DataProviders
                     idsParam.TypeName = "<#= PrimaryKeyIndex.GetBulkTypeIdTable() #>";
 
                     connection.Open();
-                    affectedRows = command.ExecuteNonQuery();
+                    affectedRows = await command.ExecuteNonQueryAsync();
                 }
             }
 
+            Log.TraceEnd();
             return affectedRows;
         }
 

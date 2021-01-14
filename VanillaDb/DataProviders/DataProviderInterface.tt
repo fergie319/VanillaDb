@@ -20,6 +20,7 @@ namespace <#= Record #>Service.DataProviders
 {
     using System;
     using System.Collections.Generic;
+    using System.Threading.Tasks;
 
     /// <summary>Interface for <#= Record #> Data Providers.</summary>
     public interface <#= GenerateName() #>
@@ -30,11 +31,11 @@ namespace <#= Record #>Service.DataProviders
 
         /// <summary>Deletes record with the given <#= PrimaryKey.FieldName #> from the <#= Table.TableName #> table.</summary>
         /// <param name="<#= PrimaryKey.GetCodeParamName() #>">The <#= PrimaryKey.FieldName #>.</param>
-        int Delete(int <#= PrimaryKey.GetCodeParamName() #>);
+        Task<int> Delete(int <#= PrimaryKey.GetCodeParamName() #>);
 
         /// <summary>Deletes the records with the given <#= PrimaryKey.FieldName #>s from the <#= Table.TableName #> table.</summary>
         /// <param name="<#= PrimaryKey.GetCodeParamName() #>s">The <#= PrimaryKey.FieldName #>s.</param>
-        int Delete(IEnumerable<int> <#= PrimaryKey.GetCodeParamName() #>s);
+        Task<int> Delete(IEnumerable<int> <#= PrimaryKey.GetCodeParamName() #>s);
 <#
     // Generate the GetBy-Index and GetBy-Index-Bulk methods for each index
     foreach (IndexModel index in Indexes)
@@ -44,12 +45,12 @@ namespace <#= Record #>Service.DataProviders
         /// <summary>Gets the data for the <#= Record #> with the given <#= index.ReadableFields() #>.</summary>
         <#= index.GetByIndexParamsXmlComments() #>
         /// <returns><#= Record #> Data Model or null if not found</returns>
-        <#= index.GetByIndexReturnType() #> <#= index.GetByIndexMethodName() #>(<#= index.GetByIndexMethodParams() #>);
+        Task<<#= index.GetByIndexReturnType() #>> <#= index.GetByIndexMethodName() #>(<#= index.GetByIndexMethodParams() #>);
 
         /// <summary>Gets the data for the <#= Record #>(s) with the given collection of <#= index.ReadableFields() #>.</summary>
         <#= index.BulkGetByIndexParamsXmlComments() #>
         /// <returns><#= Record #> Data Model or null if not found.</returns>
-        IEnumerable<<#= Table.GetDataModelName() #>> <#= index.GetByIndexMethodName() #>(<#= index.BulkGetByIndexMethodParams() #>);
+        Task<IEnumerable<<#= Table.GetDataModelName() #>>> <#= index.GetByIndexMethodName() #>(<#= index.BulkGetByIndexMethodParams() #>);
 <#
     }
 #>
