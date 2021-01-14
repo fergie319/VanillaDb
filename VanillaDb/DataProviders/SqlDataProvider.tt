@@ -24,6 +24,7 @@ namespace <#= Record #>Service.DataProviders
     using System.Data;
     using System.Data.SqlClient;
     using System.Linq;
+    using System.Threading.Tasks;
     using log4net;
     using log4net.Extensions;
 
@@ -52,7 +53,7 @@ namespace <#= Record #>Service.DataProviders
         /// <summary>Gets the data for the <#= Record #> with the given <#= index.ReadableFields() #>.</summary>
         <#= index.GetByIndexParamsXmlComments() #>
         /// <returns><#= Record #> Data Model or null if not found</returns>
-        public <#= index.GetByIndexReturnType() #> <#= index.GetByIndexMethodName() #>(<#= index.GetByIndexMethodParams() #>)
+        public async Task<<#= index.GetByIndexReturnType() #>> <#= index.GetByIndexMethodName() #>(<#= index.GetByIndexMethodParams() #>)
         {
             Log.TraceBegin();
 <#
@@ -94,7 +95,7 @@ namespace <#= Record #>Service.DataProviders
                     <#= GenerateGetByIndexAddParametersCode(index.Fields) #>
 
                     connection.Open();
-                    var reader = command.ExecuteReader();
+                    var reader = await command.ExecuteReaderAsync();
                     if (reader.HasRows)
                     {
                         while (reader.Read())
@@ -126,7 +127,7 @@ namespace <#= Record #>Service.DataProviders
         /// <summary>Gets the data for the <#= Record #>(s) with the given collection of <#= index.ReadableFields() #>.</summary>
         <#= index.BulkGetByIndexParamsXmlComments() #>
         /// <returns><#= Record #> Data Model or null if not found.</returns>
-        public IEnumerable<<#= Record #>DataModel> <#= index.GetByIndexMethodName() #>(<#= index.BulkGetByIndexMethodParams() #>)
+        public async Task<IEnumerable<<#= Record #>DataModel>> <#= index.GetByIndexMethodName() #>(<#= index.BulkGetByIndexMethodParams() #>)
         {
             Log.TraceBegin();
 <#
@@ -165,7 +166,7 @@ namespace <#= Record #>Service.DataProviders
                     idsParam.TypeName = "<#= index.GetBulkTypeIdTable() #>";
 
                     connection.Open();
-                    var reader = command.ExecuteReader();
+                    var reader = await command.ExecuteReaderAsync();
                     if (reader.HasRows)
                     {
                         while (reader.Read())
