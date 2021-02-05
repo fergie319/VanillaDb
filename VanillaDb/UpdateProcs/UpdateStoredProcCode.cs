@@ -34,9 +34,13 @@ namespace VanillaDb.UpdateProcs
         /// <returns></returns>
         public string GenerateProcParameters()
         {
-            var updateParams = Table.UpdateFields
-                .Prepend(PrimaryKey)
-                .Select(f => $"    {f.GetParamName()} {f.FieldType.SqlType}");
+            var updateProcFields = Table.UpdateFields;
+            if (!Table.UpdateFields.Any(f => f.IsPrimaryKey))
+            {
+                updateProcFields = updateProcFields.Prepend(PrimaryKey);
+            }
+
+            var updateParams = updateProcFields.Select(f => $"    {f.GetParamName()} {f.FieldType.SqlType}");
             return string.Join("," + Environment.NewLine, updateParams);
         }
 
