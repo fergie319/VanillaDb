@@ -200,11 +200,18 @@ namespace <#= Record #>Service.DataProviders
             {
                 throw new InvalidOperationException("Connection String is null.  Insert operation cannot be performed.");
             }
+            <#
+            if (PrimaryKey.IsIdentity)
+            {
+            #>
 
             if (<#= RecordCamel #>Data.<#= PrimaryKey.FieldName #> > 0)
             {
                 throw new InvalidOperationException("Unable to insert <#= Record #> Data that already has a <#= PrimaryKey.FieldName #>.");
             }
+            <#
+            }
+            #>
 
             var <#= PrimaryKey.GetCodeParamName() #> = -1;
             using (var connection = new SqlConnection(this.ConnectionString))
