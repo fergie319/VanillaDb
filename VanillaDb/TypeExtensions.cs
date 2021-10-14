@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using VanillaDb.Models;
 
 namespace VanillaDb
 {
@@ -29,12 +30,15 @@ namespace VanillaDb
         /// <summary>Gets the alias of a type (e.g. int instead of Int32) or the type name if it has no alias</summary>
         /// <param name="type">The type.</param>
         /// <returns>Type name or alias.</returns>
-        public static string GetAliasOrName(this Type type)
+        public static string GetAliasOrName(this FieldTypeModel type)
         {
-            if (!_typeAlias.TryGetValue(type, out string alias))
+            if (!_typeAlias.TryGetValue(type.FieldType, out string alias))
             {
-                alias = type.Name;
+                alias = type.FieldType.Name;
             }
+
+            var nullableChar = (type.IsNullable && type.FieldType != typeof(string)) ? "?" : string.Empty;
+            alias += nullableChar;
 
             return alias;
         }

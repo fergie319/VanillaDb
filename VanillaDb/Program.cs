@@ -121,11 +121,11 @@ namespace VanillaDb
                     var newField = new FieldModel()
                     {
                         FieldName = splitFieldTokens[0],
-                        FieldType = ParseFieldType(splitFieldTokens[1]),
                         IsIdentity = splitFieldTokens.Any(s => string.Equals(s, "identity", StringComparison.InvariantCultureIgnoreCase)),
                         IsPrimaryKey = splitFieldTokens.Any(s => string.Equals(s, "primary", StringComparison.InvariantCultureIgnoreCase)),
                         IsNullable = fieldDef.IndexOf(" NOT NULL", StringComparison.InvariantCultureIgnoreCase) == -1,
                     };
+                    newField.FieldType = ParseFieldType(splitFieldTokens[1], newField.IsNullable);
                     table.Fields.Add(newField);
 
                     // If this field is the primary key, then add an index for it
@@ -284,14 +284,16 @@ namespace VanillaDb
 
         /// <summary>Parses the type of the field from the given SQL Type markup.</summary>
         /// <param name="sqlTypeMarkup">The SQL type markup.</param>
+        /// <param name="isNullable">Indicates whether the type is nullable</param>
         /// <returns>Field Type Model</returns>
-        private static FieldTypeModel ParseFieldType(string sqlTypeMarkup)
+        private static FieldTypeModel ParseFieldType(string sqlTypeMarkup, bool isNullable)
         {
             // Initialize the return object
             var fieldType = new FieldTypeModel()
             {
                 SqlType = sqlTypeMarkup,
                 MaxLength = -1,
+                IsNullable = isNullable
             };
 
             // Split the type into type+size for the char types that include size

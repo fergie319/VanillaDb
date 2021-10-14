@@ -57,8 +57,8 @@ namespace VanillaDb.Models
         {
             var fields = Fields
                 .Select(f => (f.IsNullable && f.FieldType.FieldType != typeof(string))
-                                ? $"{f.FieldType.FieldType.GetAliasOrName()}? {f.FieldName.ToCamelCase()}"
-                                : $"{f.FieldType.FieldType.GetAliasOrName()} {f.FieldName.ToCamelCase()}");
+                                ? $"{f.FieldType.GetAliasOrName()}? {f.FieldName.ToCamelCase()}"
+                                : $"{f.FieldType.GetAliasOrName()} {f.FieldName.ToCamelCase()}");
             return string.Join(", ", fields);
         }
 
@@ -75,7 +75,7 @@ namespace VanillaDb.Models
         /// <returns></returns>
         public string BulkGetByIndexMethodParams()
         {
-            return string.Join(", ", Fields.Select(f => $"IEnumerable<{f.FieldType.FieldType.GetAliasOrName()}> {f.FieldName.ToCamelCase()}s"));
+            return string.Join(", ", Fields.Select(f => $"IEnumerable<{f.FieldType.GetAliasOrName()}> {f.FieldName.ToCamelCase()}s"));
         }
 
         /// <summary>Generates the bulk type identifier table.</summary>

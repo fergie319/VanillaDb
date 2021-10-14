@@ -13,5 +13,8 @@ namespace VanillaDb.Models
 
         /// <summary>Gets or sets the maximum length of the field (only applicable to char fields).</summary>
         public int MaxLength { get; set; }
+
+        /// <summary>Gets or sets whether this field is nullable.</summary>
+        public bool IsNullable { get; set; }
     }
 }

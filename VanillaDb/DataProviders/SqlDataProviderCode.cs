@@ -112,8 +112,8 @@ namespace VanillaDb.DataProviders
             var readLines = Table.Fields.Select(f =>
             {
                 return (f.IsNullable)
-                    ? $"data.{f.FieldName} = (reader[\"{f.FieldName}\"] != DBNull.Value) ? ({f.FieldType.FieldType.GetAliasOrName()})reader[\"{f.FieldName}\"] : null;"
-                    : $"data.{f.FieldName} = ({f.FieldType.FieldType.GetAliasOrName()})reader[\"{f.FieldName}\"];";
+                    ? $"data.{f.FieldName} = (reader[\"{f.FieldName}\"] != DBNull.Value) ? ({f.FieldType.GetAliasOrName()})reader[\"{f.FieldName}\"] : null;"
+                    : $"data.{f.FieldName} = ({f.FieldType.GetAliasOrName()})reader[\"{f.FieldName}\"];";
             });
 
             return string.Join($"{Environment.NewLine}{indent}", readLines);
@@ -142,7 +142,7 @@ namespace VanillaDb.DataProviders
         public string GenerateInMemoryDataColumns(IEnumerable<FieldModel> fields)
         {
             var indent = "            ";
-            var columnCode = fields.Select(f => $"idDataTable.Columns.Add(new DataColumn(\"{f.FieldName}\", typeof({f.FieldType.FieldType.GetAliasOrName()})));");
+            var columnCode = fields.Select(f => $"idDataTable.Columns.Add(new DataColumn(\"{f.FieldName}\", typeof({f.FieldType.GetAliasOrName()})));");
             return string.Join($"{Environment.NewLine}{indent}", columnCode);
         }
 
