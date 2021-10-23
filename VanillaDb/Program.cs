@@ -260,7 +260,7 @@ namespace VanillaDb
             File.WriteAllText($"{storedProcDir}\\{deleteBulkStoredProc.GenerateName()}.sql", deleteBulkContent);
 
             // Create Data Provider directory
-            var dataProviderDir = Path.Combine(outputCodeDir, "DataProviders");
+            var dataProviderDir = Path.Combine(outputCodeDir, "");
             Directory.CreateDirectory(dataProviderDir);
 
             // Generate the DataModel class
