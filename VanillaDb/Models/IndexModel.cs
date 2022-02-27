@@ -19,6 +19,24 @@ namespace VanillaDb.Models
         /// <summary>Gets or sets whether this index is for the table's primary key.</summary>
         public bool IsPrimaryKey { get; set; }
 
+        /// <summary>Gets or sets the parameters for the fields</summary>
+        /// <remarks>
+        /// This list is different because we might have additional parameters for specifying the operator to use.
+        /// </remarks>
+        public IEnumerable<FieldModel> Parameters
+        {
+            get
+            {
+                foreach (var field in Fields)
+                {
+                    foreach (var parameter in field.GetParameters())
+                    {
+                        yield return parameter;
+                    }
+                }
+            }
+        }
+
         /// <summary>Creates a readable list of the indexes' field names (joined by 'and').</summary>
         /// <returns>Human readable list of fields.</returns>
         public string ReadableFields()
