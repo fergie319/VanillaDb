@@ -65,7 +65,7 @@ namespace VanillaDb.Models
                     FieldName = $"{this.FieldName}_Operator",
                     FieldType = new FieldTypeModel()
                     {
-                        FieldType = typeof(int),
+                        FieldType = typeof(QueryOperator),
                         IsNullable = false,
                         SqlType = "INT"
                     },
@@ -87,13 +87,32 @@ namespace VanillaDb.Models
             }
         }
 
+        /// <summary>Gets the method parameter declaration for this field.</summary>
+        public string GetMethodParamDeclaration()
+        {
+            var result = string.Empty;
+            if ((IsNullable && FieldType.FieldType != typeof(string)))
+            {
+                result = $"{FieldType.GetAliasOrName()}? {FieldName.ToCamelCase()}";
+            }
+            else
+            {
+
+                result = $"{FieldType.GetAliasOrName()} {FieldName.ToCamelCase()}";
+            }
+
+            if (FieldType.FieldType == typeof(QueryOperator))
+            {
+                result += " = QueryOperator.Equals";
+            }
+
+            return result;
+        }
+
         /// <summary>Gets the expression for this field in a where clause.</summary>
         /// <returns></returns>
         public string GetWhereExpression()
         {
-            var equals = 0;
-            var greaterThan = 1;
-            var lessThan = 2;
             var @operatorParam = OperatorField.GetParamName();
             var @fieldParam = this.GetParamName();
             string whereExpression;
@@ -101,9 +120,9 @@ namespace VanillaDb.Models
             {
                 // GREATER-0/LESS-1/EQUAL-2
                 whereExpression =
-                    $"(({@operatorParam} = {equals} AND {fieldParam} = {FieldName}) OR" +
-                    $" ({@operatorParam} = {greaterThan} AND {fieldParam} > {FieldName}) OR" +
-                    $" ({@operatorParam} = {lessThan} AND {fieldParam} < {FieldName}))";
+                    $"(({@operatorParam} = {(int)QueryOperator.Equals} AND {fieldParam} = {FieldName}) OR" +
+                    $" ({@operatorParam} = {(int)QueryOperator.GreaterThan} AND {fieldParam} > {FieldName}) OR" +
+                    $" ({@operatorParam} = {(int)QueryOperator.LessThan} AND {fieldParam} < {FieldName}))";
             }
             else
             {

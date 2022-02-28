@@ -27,6 +27,7 @@ namespace <#= Record #>Service.DataProviders
     using System.Threading.Tasks;
     using log4net;
     using log4net.Extensions;
+    using VanillaDb.Models;
 
     /// <summary>SQL implementation of data provider interface for <#= Record #> data.</summary>
     /// <seealso cref="<#= Record #>Service.DataProviders.I<#= Record #>DataProvider" />
@@ -92,7 +93,7 @@ namespace <#= Record #>Service.DataProviders
                     Log.InfoFormat("Invoking Stored Procedure {0}.", procName);
                     command.CommandType = CommandType.StoredProcedure;
                     command.Connection = connection;
-                    <#= GenerateGetByIndexAddParametersCode(index.Fields) #>
+                    <#= GenerateGetByIndexAddParametersCode(index.Parameters) #>
 
                     connection.Open();
                     var reader = await command.ExecuteReaderAsync();

@@ -27,13 +27,36 @@ namespace VanillaDb.Models
         {
             get
             {
+                var parameters = new List<FieldModel>();
                 foreach (var field in Fields)
                 {
                     foreach (var parameter in field.GetParameters())
                     {
-                        yield return parameter;
+                        parameters.Add(parameter);
                     }
                 }
+
+                parameters.Sort((p1, p2) =>
+                {
+                    var result = 0;
+                    var p1Type = p1.FieldType.FieldType;
+                    var p2Type = p2.FieldType.FieldType;
+                    if (p1Type != p2Type)
+                    {
+                        if (p1Type == typeof(QueryOperator))
+                        {
+                            result = 1;
+                        }
+                        else if (p2Type == typeof(QueryOperator))
+                        {
+                            result = -1;
+                        }
+                    }
+
+                    return result;
+                });
+
+                return parameters;
             }
         }
 
@@ -49,7 +72,7 @@ namespace VanillaDb.Models
         public string GetByIndexParamsXmlComments()
         {
             var indent = "        ";
-            var xmlParams = Fields.Select(f => $"/// <param name=\"{f.FieldName.ToCamelCase()}\">The {f.FieldName} value.</param>");
+            var xmlParams = Parameters.Select(f => $"/// <param name=\"{f.FieldName.ToCamelCase()}\">The {f.FieldName} value.</param>");
             return string.Join($"{Environment.NewLine}{indent}", xmlParams);
         }
 
@@ -73,10 +96,7 @@ namespace VanillaDb.Models
         /// <returns></returns>
         public string GetByIndexMethodParams()
         {
-            var fields = Fields
-                .Select(f => (f.IsNullable && f.FieldType.FieldType != typeof(string))
-                                ? $"{f.FieldType.GetAliasOrName()}? {f.FieldName.ToCamelCase()}"
-                                : $"{f.FieldType.GetAliasOrName()} {f.FieldName.ToCamelCase()}");
+            var fields = Parameters.Select(f => f.GetMethodParamDeclaration());
             return string.Join(", ", fields);
         }
 

@@ -4,6 +4,7 @@
     [ISBN10] NCHAR(10), 
     [ISBN13] NCHAR(13) NULL, 
     [ASIN10] NCHAR(10) NULL,
+    [UpdateDateUtc] DateTime NOT NULL
 )
 GO;
 
@@ -15,4 +16,8 @@ GO;
 CREATE UNIQUE NONCLUSTERED INDEX IDX_ASIN_NOTNULL
 ON [dbo].[Book]([ASIN10])
 WHERE [ASIN10] IS NOT NULL
+GO;
+
+CREATE NONCLUSTERED INDEX IDX_UpdateDateUtc_Asin
+ON [dbo].[Book]([UpdateDateUtc], [ASIN10])
 GO;

@@ -21,6 +21,7 @@ namespace <#= Record #>Service.DataProviders
     using System;
     using System.Collections.Generic;
     using System.Threading.Tasks;
+    using VanillaDb.Models;
 
     /// <summary>Interface for <#= Record #> Data Providers.</summary>
     public interface <#= GenerateName() #>
