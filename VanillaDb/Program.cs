@@ -347,12 +347,27 @@ namespace " + outputNamespace + @"
 
                     break;
                 case "INT":
+                case "TINYINT":
+                case "SMALLINT":
                     fieldType.FieldType = typeof(int);
+                    break;
+                case "BIGINT":
+                    fieldType.FieldType = typeof(long);
+                    break;
+                case "DECIMAL":
+                case "NUMERIC":
+                case "REAL":
+                case "FLOAT":
+                    fieldType.FieldType = typeof(double);
                     break;
                 case "BIT":
                     fieldType.FieldType = typeof(bool);
                     break;
+                case "DATE":
                 case "DATETIME":
+                case "DATETIME2":
+                case "TIME":
+                case "SMALLDATETIME":
                     fieldType.FieldType = typeof(DateTime);
                     break;
             }
