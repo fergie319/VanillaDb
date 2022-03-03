@@ -34,9 +34,9 @@ namespace VanillaDb
             Serilog.Log.Logger = Log;
 
             var result = 0;
-            if (args.Length != 3)
+            if (args.Length != 4)
             {
-                throw new ArgumentException("Required Arguments: <Table>.sql|<directory> <outSqlDir> <outCodeDir>.");
+                throw new ArgumentException("Required Arguments: <Table>.sql|<directory> <outSqlDir> <outCodeDir> <namespace>.");
             }
 
             // First param is the table file - expect *.sql - or directory containing *.sql table definition files
@@ -55,23 +55,24 @@ namespace VanillaDb
             // In other words, we're assuming the table is in a Tables folder and want our output next to that folder
             var outputSqlDir = args[1];
             var outputCodeDir = args[2];
+            var outputNamespace = args[3];
 
             if (sqlFileInfo.Exists)
             {
-                ProcessTableSql(sqlFileInfo, outputSqlDir, outputCodeDir);
+                ProcessTableSql(sqlFileInfo, outputSqlDir, outputCodeDir, outputNamespace);
             }
             else if (sqlDirectory.Exists)
             {
                 foreach (var fileInfo in sqlDirectory.EnumerateFiles("*.sql", SearchOption.AllDirectories))
                 {
-                    ProcessTableSql(fileInfo, outputSqlDir, outputCodeDir);
+                    ProcessTableSql(fileInfo, outputSqlDir, outputCodeDir, outputNamespace);
                 }
             }
 
             // Write out any static files
             File.WriteAllText($"{outputCodeDir}\\QueryOperator.cs",
 @"
-namespace VanillaDb.Models
+namespace " + outputNamespace + @"
 {
     /// <summary>Enumeration for the different query operators available to use.</summary>
     public enum QueryOperator
@@ -89,11 +90,12 @@ namespace VanillaDb.Models
             return result;
         }
 
-        private static void ProcessTableSql(FileInfo sqlFileInfo, string outputSqlDir, string outputCodeDir)
+        private static void ProcessTableSql(FileInfo sqlFileInfo, string outputSqlDir, string outputCodeDir, string outputNamespace)
         {
             // Open the file and start parsing
             var table = new TableModel()
             {
+                Namespace = outputNamespace,
                 Fields = new List<FieldModel>(),
             };
             var indexes = new List<IndexModel>();

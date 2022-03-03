@@ -14,7 +14,7 @@
 //     the code is regenerated.
 // </auto-generated>
 
-namespace <#= Table.TableName #>Service.DataProviders
+namespace <#= Table.Namespace #>
 {
     using System;
 

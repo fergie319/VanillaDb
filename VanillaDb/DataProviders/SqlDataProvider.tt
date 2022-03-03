@@ -17,7 +17,7 @@
 //     the code is regenerated.
 // </auto-generated>
 
-namespace <#= Record #>Service.DataProviders
+namespace <#= Table.Namespace #>
 {
     using System;
     using System.Collections.Generic;
@@ -27,10 +27,9 @@ namespace <#= Record #>Service.DataProviders
     using System.Threading.Tasks;
     using log4net;
     using log4net.Extensions;
-    using VanillaDb.Models;
 
     /// <summary>SQL implementation of data provider interface for <#= Record #> data.</summary>
-    /// <seealso cref="<#= Record #>Service.DataProviders.I<#= Record #>DataProvider" />
+    /// <seealso cref="<#= Table.Namespace #>.I<#= Record #>DataProvider" />
     public partial class <#= GenerateName() #> : I<#= Record #>DataProvider
     {
         private static readonly ILog Log = LogManager.GetLogger(typeof(<#=GenerateName() #>));
