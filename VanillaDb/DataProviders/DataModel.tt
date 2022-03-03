@@ -14,7 +14,7 @@
 //     the code is regenerated.
 // </auto-generated>
 
-namespace <#= Table.Namespace #>
+namespace <#= Table.Namespace #>.<#= Table.TableName #>
 {
     using System;
 

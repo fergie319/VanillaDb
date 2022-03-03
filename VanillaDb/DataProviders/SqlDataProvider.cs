@@ -55,6 +55,13 @@ namespace ");
             
             #line default
             #line hidden
+            this.Write(".");
+            
+            #line 20 "C:\git-scratch\vanilladb\VanillaDb\DataProviders\SqlDataProvider.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(Table.TableName));
+            
+            #line default
+            #line hidden
             this.Write(@"
 {
     using System;

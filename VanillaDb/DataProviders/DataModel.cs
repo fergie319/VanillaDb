@@ -53,6 +53,13 @@ namespace ");
             
             #line default
             #line hidden
+            this.Write(".");
+            
+            #line 17 "C:\git-scratch\vanilladb\VanillaDb\DataProviders\DataModel.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(Table.TableName));
+            
+            #line default
+            #line hidden
             this.Write("\r\n{\r\n    using System;\r\n\r\n    /// <summary>The ");
             
             #line 21 "C:\git-scratch\vanilladb\VanillaDb\DataProviders\DataModel.tt"

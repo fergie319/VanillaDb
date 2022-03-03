@@ -55,6 +55,13 @@ namespace ");
             
             #line default
             #line hidden
+            this.Write(".");
+            
+            #line 19 "C:\git-scratch\vanilladb\VanillaDb\DataProviders\DataProviderInterface.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(Table.TableName));
+            
+            #line default
+            #line hidden
             this.Write("\r\n{\r\n    using System;\r\n    using System.Collections.Generic;\r\n    using System.T" +
                     "hreading.Tasks;\r\n\r\n    /// <summary>Interface for ");
             
