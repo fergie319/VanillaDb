@@ -13,6 +13,9 @@ namespace VanillaDb.Models
         /// <summary>The update time stamp field names</summary>
         public readonly IEnumerable<string> UpdateTimeStampFieldNames = new[] { "UpdatedOnUtc" };
 
+        /// <summary>Gets or sets the company.</summary>
+        public string Company { get; set; }
+
         /// <summary>Gets or sets the namespace.</summary>
         public string Namespace { get; set; }
 

@@ -34,9 +34,9 @@ namespace VanillaDb
             Serilog.Log.Logger = Log;
 
             var result = 0;
-            if (args.Length != 4)
+            if (args.Length != 5)
             {
-                throw new ArgumentException("Required Arguments: <Table>.sql|<directory> <outSqlDir> <outCodeDir> <namespace>.");
+                throw new ArgumentException("Required Arguments: <Table>.sql|<directory> <outSqlDir> <outCodeDir> <namespace> <company-name>.");
             }
 
             // First param is the table file - expect *.sql - or directory containing *.sql table definition files
@@ -56,16 +56,17 @@ namespace VanillaDb
             var outputSqlDir = args[1];
             var outputCodeDir = args[2];
             var outputNamespace = args[3];
+            var companyName = args[4];
 
             if (sqlFileInfo.Exists)
             {
-                ProcessTableSql(sqlFileInfo, outputSqlDir, outputCodeDir, outputNamespace);
+                ProcessTableSql(sqlFileInfo, outputSqlDir, outputCodeDir, outputNamespace, companyName);
             }
             else if (sqlDirectory.Exists)
             {
                 foreach (var fileInfo in sqlDirectory.EnumerateFiles("*.sql", SearchOption.AllDirectories))
                 {
-                    ProcessTableSql(fileInfo, outputSqlDir, outputCodeDir, outputNamespace);
+                    ProcessTableSql(fileInfo, outputSqlDir, outputCodeDir, outputNamespace, companyName);
                 }
             }
 
@@ -90,11 +91,12 @@ namespace " + outputNamespace + @"
             return result;
         }
 
-        private static void ProcessTableSql(FileInfo sqlFileInfo, string outputSqlDir, string outputCodeDir, string outputNamespace)
+        private static void ProcessTableSql(FileInfo sqlFileInfo, string outputSqlDir, string outputCodeDir, string outputNamespace, string companyName)
         {
             // Open the file and start parsing
             var table = new TableModel()
             {
+                Company = companyName,
                 Namespace = outputNamespace,
                 Fields = new List<FieldModel>(),
             };
