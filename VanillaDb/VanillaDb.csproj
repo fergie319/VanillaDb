@@ -120,6 +120,7 @@
     <Compile Include="Models\FieldModel.cs" />
     <Compile Include="Models\FieldTypeModel.cs" />
     <Compile Include="Models\IndexModel.cs" />
+    <Compile Include="Models\QueryOperator.cs" />
     <Compile Include="Models\TableModel.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

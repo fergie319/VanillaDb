@@ -32,7 +32,7 @@ namespace VanillaDb.GetProcs
         /// <returns>Newline separated stored procedure parameters</returns>
         public string GenerateProcParameters()
         {
-            var procParams = Index.Fields
+            var procParams = Index.Parameters
                 .Select(f => $"    @{f.FieldName.ToCamelCase()} {f.FieldType.SqlType}");
             return string.Join("," + Environment.NewLine, procParams);
         }
@@ -49,7 +49,7 @@ namespace VanillaDb.GetProcs
         /// <returns>Where clause</returns>
         public string GenerateWhereClause()
         {
-            var indexFields = Index.Fields.Select(f => $"{f.FieldName} = @{f.FieldName.ToCamelCase()}");
+            var indexFields = Index.Fields.Select(f => f.GetWhereExpression());
             return string.Join(" AND ", indexFields);
         }
     }

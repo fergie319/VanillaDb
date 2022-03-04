@@ -34,9 +34,9 @@ namespace VanillaDb
             Serilog.Log.Logger = Log;
 
             var result = 0;
-            if (args.Length != 3)
+            if (args.Length != 5)
             {
-                throw new ArgumentException("Required Arguments: <Table>.sql|<directory> <outSqlDir> <outCodeDir>.");
+                throw new ArgumentException("Required Arguments: <Table>.sql|<directory> <outSqlDir> <outCodeDir> <namespace> <company-name>.");
             }
 
             // First param is the table file - expect *.sql - or directory containing *.sql table definition files
@@ -55,27 +55,49 @@ namespace VanillaDb
             // In other words, we're assuming the table is in a Tables folder and want our output next to that folder
             var outputSqlDir = args[1];
             var outputCodeDir = args[2];
+            var outputNamespace = args[3];
+            var companyName = args[4];
 
             if (sqlFileInfo.Exists)
             {
-                ProcessTableSql(sqlFileInfo, outputSqlDir, outputCodeDir);
+                ProcessTableSql(sqlFileInfo, outputSqlDir, outputCodeDir, outputNamespace, companyName);
             }
             else if (sqlDirectory.Exists)
             {
                 foreach (var fileInfo in sqlDirectory.EnumerateFiles("*.sql", SearchOption.AllDirectories))
                 {
-                    ProcessTableSql(fileInfo, outputSqlDir, outputCodeDir);
+                    ProcessTableSql(fileInfo, outputSqlDir, outputCodeDir, outputNamespace, companyName);
                 }
             }
+
+            // Write out any static files
+            File.WriteAllText($"{outputCodeDir}\\QueryOperator.cs",
+@"
+namespace " + outputNamespace + @"
+{
+    /// <summary>Enumeration for the different query operators available to use.</summary>
+    public enum QueryOperator
+    {
+        /// <summary>The equals operator</summary>
+        Equals = 0,
+        /// <summary>The greater-than operator</summary>
+        GreaterThan = 1,
+        /// <summary>The less-than operator</summary>
+        LessThan = 2
+    }
+}
+");
 
             return result;
         }
 
-        private static void ProcessTableSql(FileInfo sqlFileInfo, string outputSqlDir, string outputCodeDir)
+        private static void ProcessTableSql(FileInfo sqlFileInfo, string outputSqlDir, string outputCodeDir, string outputNamespace, string companyName)
         {
             // Open the file and start parsing
             var table = new TableModel()
             {
+                Company = companyName,
+                Namespace = outputNamespace,
                 Fields = new List<FieldModel>(),
             };
             var indexes = new List<IndexModel>();
@@ -260,7 +282,7 @@ namespace VanillaDb
             File.WriteAllText($"{storedProcDir}\\{deleteBulkStoredProc.GenerateName()}.sql", deleteBulkContent);
 
             // Create Data Provider directory
-            var dataProviderDir = Path.Combine(outputCodeDir, "");
+            var dataProviderDir = Path.Combine(outputCodeDir, table.TableName);
             Directory.CreateDirectory(dataProviderDir);
 
             // Generate the DataModel class
@@ -325,12 +347,27 @@ namespace VanillaDb
 
                     break;
                 case "INT":
+                case "TINYINT":
+                case "SMALLINT":
                     fieldType.FieldType = typeof(int);
+                    break;
+                case "BIGINT":
+                    fieldType.FieldType = typeof(long);
+                    break;
+                case "DECIMAL":
+                case "NUMERIC":
+                case "REAL":
+                case "FLOAT":
+                    fieldType.FieldType = typeof(double);
                     break;
                 case "BIT":
                     fieldType.FieldType = typeof(bool);
                     break;
+                case "DATE":
                 case "DATETIME":
+                case "DATETIME2":
+                case "TIME":
+                case "SMALLDATETIME":
                     fieldType.FieldType = typeof(DateTime);
                     break;
             }
