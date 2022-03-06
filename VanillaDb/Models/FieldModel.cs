@@ -42,13 +42,11 @@ namespace VanillaDb.Models
         {
             get
             {
-                var isRangeField = false;
-                switch (FieldType.SqlType.ToUpperInvariant())
+                var isRangeField = true;
+                if (FieldType.FieldType == typeof(string) ||
+                    FieldType.FieldType == typeof(bool))
                 {
-                    case "INT":
-                    case "DATETIME":
-                        isRangeField = true;
-                        break;
+                    isRangeField = false;
                 }
 
                 return isRangeField;
@@ -90,17 +88,7 @@ namespace VanillaDb.Models
         /// <summary>Gets the method parameter declaration for this field.</summary>
         public string GetMethodParamDeclaration()
         {
-            var result = string.Empty;
-            if ((IsNullable && FieldType.FieldType != typeof(string)))
-            {
-                result = $"{FieldType.GetAliasOrName()}? {FieldName.ToCamelCase()}";
-            }
-            else
-            {
-
-                result = $"{FieldType.GetAliasOrName()} {FieldName.ToCamelCase()}";
-            }
-
+            var result = $"{FieldType.GetAliasOrName()} {FieldName.ToCamelCase()}";
             if (FieldType.FieldType == typeof(QueryOperator))
             {
                 result += " = QueryOperator.Equals";

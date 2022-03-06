@@ -29,7 +29,7 @@ namespace VanillaDb.Models
         /// <value>The primary key.</value>
         public FieldModel PrimaryKey
         {
-            get { return Fields.Single(f => f.IsPrimaryKey); }
+            get { return Fields.SingleOrDefault(f => f.IsPrimaryKey); }
         }
 
         /// <summary>Gets the insert fields.</summary>

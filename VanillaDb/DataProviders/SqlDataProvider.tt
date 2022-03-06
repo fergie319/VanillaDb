@@ -26,10 +26,9 @@ namespace <#= Table.Namespace #>.<#= Table.TableName #>
     using System.Linq;
     using System.Threading.Tasks;
     using log4net;
-    using log4net.Extensions;
 
     /// <summary>SQL implementation of data provider interface for <#= Record #> data.</summary>
-    /// <seealso cref="<#= Table.Namespace #>.I<#= Record #>DataProvider" />
+    /// <seealso cref="<#= Table.Namespace #>.<#= Table.TableName #>.I<#= Record #>DataProvider" />
     public partial class <#= GenerateName() #> : I<#= Record #>DataProvider
     {
         private static readonly ILog Log = LogManager.GetLogger(typeof(<#=GenerateName() #>));
@@ -55,7 +54,6 @@ namespace <#= Table.Namespace #>.<#= Table.TableName #>
         /// <returns><#= Record #> Data Model or null if not found</returns>
         public async Task<<#= index.GetByIndexReturnType() #>> <#= index.GetByIndexMethodName() #>(<#= index.GetByIndexMethodParams() #>)
         {
-            Log.TraceBegin();
 <#
         foreach (FieldModel field in index.Fields.Where(f => !f.IsNullable))
         {
@@ -107,7 +105,6 @@ namespace <#= Table.Namespace #>.<#= Table.TableName #>
                 }
             }
 
-            Log.TraceEnd();
 <#
             if (index.IsUnique)
             {
@@ -129,7 +126,6 @@ namespace <#= Table.Namespace #>.<#= Table.TableName #>
         /// <returns><#= Record #> Data Model or null if not found.</returns>
         public async Task<IEnumerable<<#= Record #>DataModel>> <#= index.GetByIndexMethodName() #>(<#= index.BulkGetByIndexMethodParams() #>)
         {
-            Log.TraceBegin();
 <#
         foreach (FieldModel field in index.Fields)
         {
@@ -178,7 +174,6 @@ namespace <#= Table.Namespace #>.<#= Table.TableName #>
                 }
             }
 
-            Log.TraceEnd();
             return <#= RecordCamel #>Data;
         }
 
@@ -190,7 +185,6 @@ namespace <#= Table.Namespace #>.<#= Table.TableName #>
         /// <returns>The ID of the inserted <#= Record #> record.</returns>
         public async Task<int> Insert(<#= Record #>DataModel <#= RecordCamel #>Data)
         {
-            Log.TraceBegin();
             if (<#= RecordCamel #>Data == null)
             {
                 throw new ArgumentNullException(nameof(<#= RecordCamel #>Data));
@@ -236,7 +230,6 @@ namespace <#= Table.Namespace #>.<#= Table.TableName #>
                 }
             }
 
-            Log.TraceEnd();
             return <#= PrimaryKey.GetCodeParamName() #>;
         }
 
@@ -245,7 +238,6 @@ namespace <#= Table.Namespace #>.<#= Table.TableName #>
         /// <returns>The number of records affected by the update.</returns>
         public async Task<int> Update(<#= Record #>DataModel <#= RecordCamel #>Data)
         {
-            Log.TraceBegin();
             if (<#= RecordCamel #>Data == null)
             {
                 throw new ArgumentNullException(nameof(<#= RecordCamel #>Data));
@@ -277,7 +269,6 @@ namespace <#= Table.Namespace #>.<#= Table.TableName #>
                 }
             }
 
-            Log.TraceEnd();
             return affectedRows;
         }
 
@@ -285,7 +276,6 @@ namespace <#= Table.Namespace #>.<#= Table.TableName #>
         /// <param name="<#= PrimaryKey.GetCodeParamName() #>">The <#= PrimaryKey.FieldName #>.</param>
         public async Task<int> Delete(int <#= PrimaryKey.GetCodeParamName() #>)
         {
-            Log.TraceBegin();
             if (<#=PrimaryKey.GetCodeParamName() #> <= 0)
             {
                 throw new InvalidOperationException("A valid <#=PrimaryKey.FieldName #> must be provided to delete.");
@@ -307,7 +297,6 @@ namespace <#= Table.Namespace #>.<#= Table.TableName #>
                 }
             }
 
-            Log.TraceEnd();
             return affectedRows;
         }
 
@@ -315,7 +304,6 @@ namespace <#= Table.Namespace #>.<#= Table.TableName #>
         /// <param name="<#= PrimaryKey.GetCodeParamName() #>s">The <#= PrimaryKey.FieldName #>s.</param>
         public async Task<int> Delete(IEnumerable<int> <#= PrimaryKey.GetCodeParamName() #>s)
         {
-            Log.TraceBegin();
             if (<#= PrimaryKey.GetCodeParamName() #>s == null)
             {
                 throw new ArgumentNullException(nameof(<#= PrimaryKey.GetCodeParamName() #>s));
@@ -359,7 +347,6 @@ namespace <#= Table.Namespace #>.<#= Table.TableName #>
                 }
             }
 
-            Log.TraceEnd();
             return affectedRows;
         }
 
