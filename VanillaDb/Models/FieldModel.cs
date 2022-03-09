@@ -107,10 +107,12 @@ namespace VanillaDb.Models
             if (IsRangeField)
             {
                 // GREATER-0/LESS-1/EQUAL-2
+                // Note: GreaterThan means we want all values Greater Than the field parameter,
+                //       so they appear reversed in the implementation.
                 whereExpression =
                     $"(({@operatorParam} = {(int)QueryOperator.Equals} AND {fieldParam} = {FieldName}) OR" +
-                    $" ({@operatorParam} = {(int)QueryOperator.GreaterThan} AND {fieldParam} > {FieldName}) OR" +
-                    $" ({@operatorParam} = {(int)QueryOperator.LessThan} AND {fieldParam} < {FieldName}))";
+                    $" ({@operatorParam} = {(int)QueryOperator.GreaterThan} AND {fieldParam} <= {FieldName}) OR" +
+                    $" ({@operatorParam} = {(int)QueryOperator.LessThan} AND {fieldParam} >= {FieldName}))";
             }
             else
             {

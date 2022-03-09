@@ -145,7 +145,7 @@ namespace " + outputNamespace + @"
                     var newField = new FieldModel()
                     {
                         FieldName = fieldName,
-                        IsIdentity = splitFieldTokens.Any(s => string.Equals(s, "identity", StringComparison.InvariantCultureIgnoreCase)),
+                        IsIdentity = splitFieldTokens.Any(s => (s.StartsWith("identity", StringComparison.InvariantCultureIgnoreCase))),
                         IsPrimaryKey = splitFieldTokens.Any(s => string.Equals(s, "primary", StringComparison.InvariantCultureIgnoreCase)),
                         IsNullable = fieldDef.IndexOf(" NOT NULL", StringComparison.InvariantCultureIgnoreCase) == -1,
                     };
