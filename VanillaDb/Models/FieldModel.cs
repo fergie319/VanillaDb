@@ -42,13 +42,11 @@ namespace VanillaDb.Models
         {
             get
             {
-                var isRangeField = false;
-                switch (FieldType.SqlType.ToUpperInvariant())
+                var isRangeField = true;
+                if (FieldType.FieldType == typeof(string) ||
+                    FieldType.FieldType == typeof(bool))
                 {
-                    case "INT":
-                    case "DATETIME":
-                        isRangeField = true;
-                        break;
+                    isRangeField = false;
                 }
 
                 return isRangeField;
@@ -90,17 +88,7 @@ namespace VanillaDb.Models
         /// <summary>Gets the method parameter declaration for this field.</summary>
         public string GetMethodParamDeclaration()
         {
-            var result = string.Empty;
-            if ((IsNullable && FieldType.FieldType != typeof(string)))
-            {
-                result = $"{FieldType.GetAliasOrName()}? {FieldName.ToCamelCase()}";
-            }
-            else
-            {
-
-                result = $"{FieldType.GetAliasOrName()} {FieldName.ToCamelCase()}";
-            }
-
+            var result = $"{FieldType.GetAliasOrName()} {FieldName.ToCamelCase()}";
             if (FieldType.FieldType == typeof(QueryOperator))
             {
                 result += " = QueryOperator.Equals";
@@ -119,10 +107,12 @@ namespace VanillaDb.Models
             if (IsRangeField)
             {
                 // GREATER-0/LESS-1/EQUAL-2
+                // Note: GreaterThan means we want all values Greater Than the field parameter,
+                //       so they appear reversed in the implementation.
                 whereExpression =
                     $"(({@operatorParam} = {(int)QueryOperator.Equals} AND {fieldParam} = {FieldName}) OR" +
-                    $" ({@operatorParam} = {(int)QueryOperator.GreaterThan} AND {fieldParam} > {FieldName}) OR" +
-                    $" ({@operatorParam} = {(int)QueryOperator.LessThan} AND {fieldParam} < {FieldName}))";
+                    $" ({@operatorParam} = {(int)QueryOperator.GreaterThan} AND {fieldParam} <= {FieldName}) OR" +
+                    $" ({@operatorParam} = {(int)QueryOperator.LessThan} AND {fieldParam} >= {FieldName}))";
             }
             else
             {
@@ -131,6 +121,19 @@ namespace VanillaDb.Models
             }
 
             return whereExpression;
+        }
+
+        /// <summary>Gets the line of code for adding the parameter to the sql command.</summary>
+        /// <returns>code string</returns>
+        public string GetAddParamCode()
+        {
+            var paramName = this.GetParamName();
+            var codeName = this.GetCodeParamName();
+            var castType = (this.FieldType.FieldType == typeof(QueryOperator))
+                            ? "(int)"
+                            : string.Empty;
+            var addParamCode = $"command.Parameters.AddWithValue(\"{paramName}\", {castType}{codeName});";
+            return addParamCode;
         }
     }
 }

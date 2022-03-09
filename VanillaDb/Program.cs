@@ -1,9 +1,9 @@
-﻿using System;
+﻿using Serilog;
+using Serilog.Sinks.SystemConsole.Themes;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using Serilog;
-using Serilog.Sinks.SystemConsole.Themes;
 using VanillaDb.DataProviders;
 using VanillaDb.DeleteProcs;
 using VanillaDb.GetProcs;
@@ -118,7 +118,7 @@ namespace " + outputNamespace + @"
                 var splitTableTokens = createTable.Split(new[] { "[", "]", ".", " ", "\t" }, StringSplitOptions.RemoveEmptyEntries);
                 if (splitTableTokens.Length < 3)
                 {
-                    throw new InvalidOperationException("Create Table line should at least split into 3 parts: Create Table [name].");
+                    throw new InvalidOperationException("The first line must be the Create Table command, and it must split into a minimum of 3 parts: Create Table [name].");
                 }
 
                 // Start building the table model - starting with the name
@@ -134,16 +134,18 @@ namespace " + outputNamespace + @"
                 var fieldDef = reader.ReadLine();
                 while (!fieldDef.StartsWith(")"))
                 {
-                    var splitFieldTokens = fieldDef.Split(new[] { " ", "[", "]", ",", "\t" }, StringSplitOptions.RemoveEmptyEntries);
+                    var splitFieldTokens = fieldDef.Split(new[] { " ", ",", "\t" }, StringSplitOptions.RemoveEmptyEntries);
                     if (splitFieldTokens.Length < 2)
                     {
                         throw new InvalidOperationException("Field definition line in Create Table statement should split into at least [FieldName] Type.");
                     }
 
+                    // Make sure to remove any [ and ] characters for the field name
+                    var fieldName = splitFieldTokens[0].Replace("[", string.Empty).Replace("]", string.Empty);
                     var newField = new FieldModel()
                     {
-                        FieldName = splitFieldTokens[0],
-                        IsIdentity = splitFieldTokens.Any(s => string.Equals(s, "identity", StringComparison.InvariantCultureIgnoreCase)),
+                        FieldName = fieldName,
+                        IsIdentity = splitFieldTokens.Any(s => (s.StartsWith("identity", StringComparison.InvariantCultureIgnoreCase))),
                         IsPrimaryKey = splitFieldTokens.Any(s => string.Equals(s, "primary", StringComparison.InvariantCultureIgnoreCase)),
                         IsNullable = fieldDef.IndexOf(" NOT NULL", StringComparison.InvariantCultureIgnoreCase) == -1,
                     };
@@ -224,6 +226,12 @@ namespace " + outputNamespace + @"
                 }
             }
 
+            // Throw an error if the table has no primary key - no excuses!
+            if (table.PrimaryKey == null)
+            {
+                throw new InvalidOperationException($"The table {table.TableName} doesn't have a primary key!  Fix this, you monster!");
+            }
+
             // TODO: First verify we're getting the models filled out.
             Log.Debug("Table: {@Table}", table);
             Log.Debug("Indexes: {@Indexes}", indexes);
@@ -231,7 +239,7 @@ namespace " + outputNamespace + @"
             // Create the output directories for all of the different files
             var typeTableDir = Path.Combine(outputSqlDir, "Types");
             Directory.CreateDirectory(typeTableDir);
-            var storedProcDir = Path.Combine(outputSqlDir, "Stored Procedures");
+            var storedProcDir = Path.Combine(outputSqlDir, $"Stored Procedures\\{table.TableName}");
             Directory.CreateDirectory(storedProcDir);
 
             // Generate the stored procedures using our parsed table information
@@ -313,13 +321,13 @@ namespace " + outputNamespace + @"
             // Initialize the return object
             var fieldType = new FieldTypeModel()
             {
-                SqlType = sqlTypeMarkup,
+                SqlType = sqlTypeMarkup.Replace("[", string.Empty).Replace("]", string.Empty),
                 MaxLength = -1,
                 IsNullable = isNullable
             };
 
             // Split the type into type+size for the char types that include size
-            var splitFieldType = sqlTypeMarkup.Split(new[] { "(", ")", ",", "\t", " " }, StringSplitOptions.RemoveEmptyEntries);
+            var splitFieldType = sqlTypeMarkup.Split(new[] { "[", "]", "(", ")", ",", "\t", " " }, StringSplitOptions.RemoveEmptyEntries);
             switch (splitFieldType[0].ToUpperInvariant())
             {
                 case "VARCHAR":
@@ -354,11 +362,14 @@ namespace " + outputNamespace + @"
                 case "BIGINT":
                     fieldType.FieldType = typeof(long);
                     break;
-                case "DECIMAL":
                 case "NUMERIC":
                 case "REAL":
                 case "FLOAT":
                     fieldType.FieldType = typeof(double);
+                    break;
+                case "DECIMAL":
+                case "MONEY":
+                    fieldType.FieldType = typeof(decimal);
                     break;
                 case "BIT":
                     fieldType.FieldType = typeof(bool);
