@@ -132,7 +132,7 @@ namespace VanillaDb.DataProviders
         public string GenerateGetByIndexAddParametersCode(IEnumerable<FieldModel> fields)
         {
             var indent = "                    ";
-            var addParamsLines = fields.Select(f => $"command.Parameters.AddWithValue(\"@{f.FieldName.ToCamelCase()}\", {f.FieldName.ToCamelCase()});");
+            var addParamsLines = fields.Select(f => f.GetAddParamCode());
             return string.Join($"{Environment.NewLine}{indent}", addParamsLines);
         }
 

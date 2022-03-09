@@ -120,5 +120,18 @@ namespace VanillaDb.Models
 
             return whereExpression;
         }
+
+        /// <summary>Gets the line of code for adding the parameter to the sql command.</summary>
+        /// <returns>code string</returns>
+        public string GetAddParamCode()
+        {
+            var paramName = this.GetParamName();
+            var codeName = this.GetCodeParamName();
+            var castType = (this.FieldType.FieldType == typeof(QueryOperator))
+                            ? "(int)"
+                            : string.Empty;
+            var addParamCode = $"command.Parameters.AddWithValue(\"{paramName}\", {castType}{codeName});";
+            return addParamCode;
+        }
     }
 }

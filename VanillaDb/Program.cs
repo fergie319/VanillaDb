@@ -362,12 +362,14 @@ namespace " + outputNamespace + @"
                 case "BIGINT":
                     fieldType.FieldType = typeof(long);
                     break;
-                case "DECIMAL":
                 case "NUMERIC":
                 case "REAL":
                 case "FLOAT":
-                case "MONEY":
                     fieldType.FieldType = typeof(double);
+                    break;
+                case "DECIMAL":
+                case "MONEY":
+                    fieldType.FieldType = typeof(decimal);
                     break;
                 case "BIT":
                     fieldType.FieldType = typeof(bool);
