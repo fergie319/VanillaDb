@@ -43,6 +43,7 @@ namespace VanillaDb
             var sqlFileName = args[0];
             var sqlFileInfo = new FileInfo(sqlFileName);
             var sqlDirectory = new DirectoryInfo(sqlFileName);
+
             if (!sqlFileInfo.Exists)
             {
                 if (!sqlDirectory.Exists)
@@ -149,6 +150,13 @@ namespace " + outputNamespace + @"
                         IsPrimaryKey = splitFieldTokens.Any(s => string.Equals(s, "primary", StringComparison.InvariantCultureIgnoreCase)),
                         IsNullable = fieldDef.IndexOf(" NOT NULL", StringComparison.InvariantCultureIgnoreCase) == -1,
                     };
+
+                    // special case: handle types like decimal and numeric which have an extra comma
+                    if (splitFieldTokens.Length > 2)
+                    {
+                        splitFieldTokens[1] += "," + splitFieldTokens[2];
+                    }
+
                     newField.FieldType = ParseFieldType(splitFieldTokens[1], newField.IsNullable);
                     table.Fields.Add(newField);
 
