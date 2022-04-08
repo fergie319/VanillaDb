@@ -135,7 +135,9 @@ namespace " + outputNamespace + @"
                 var fieldDef = reader.ReadLine();
                 while (!fieldDef.StartsWith(")"))
                 {
-                    var splitFieldTokens = fieldDef.Split(new[] { " ", ",", "\t" }, StringSplitOptions.RemoveEmptyEntries);
+                    // Remove all trailing commas, as they are useless and will only confuse further parsing
+                    fieldDef = fieldDef.TrimEnd(new[] { ',' });
+                    var splitFieldTokens = fieldDef.Split(new[] { " ", "\t" }, StringSplitOptions.RemoveEmptyEntries);
                     if (splitFieldTokens.Length < 2)
                     {
                         throw new InvalidOperationException("Field definition line in Create Table statement should split into at least [FieldName] Type.");
@@ -150,12 +152,6 @@ namespace " + outputNamespace + @"
                         IsPrimaryKey = splitFieldTokens.Any(s => string.Equals(s, "primary", StringComparison.InvariantCultureIgnoreCase)),
                         IsNullable = fieldDef.IndexOf(" NOT NULL", StringComparison.InvariantCultureIgnoreCase) == -1,
                     };
-
-                    // special case: handle types like decimal and numeric which have an extra comma
-                    if (splitFieldTokens.Length > 2)
-                    {
-                        splitFieldTokens[1] += "," + splitFieldTokens[2];
-                    }
 
                     newField.FieldType = ParseFieldType(splitFieldTokens[1], newField.IsNullable);
                     table.Fields.Add(newField);
