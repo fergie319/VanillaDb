@@ -1,9 +1,9 @@
-﻿using Serilog;
-using Serilog.Sinks.SystemConsole.Themes;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Serilog;
+using Serilog.Sinks.SystemConsole.Themes;
 using VanillaDb.DataProviders;
 using VanillaDb.DeleteProcs;
 using VanillaDb.GetProcs;
@@ -33,48 +33,56 @@ namespace VanillaDb
                 .CreateLogger();
             Serilog.Log.Logger = Log;
 
+            // If no arguments, walk up parent directories looking for a vanillaDb.config file
+
+            // If 5 arguments, then assume all arguments were provided
+
+            // If 6 arguments, then check for --generate-config
+
             var result = 0;
             if (args.Length != 5)
             {
                 throw new ArgumentException("Required Arguments: <Table>.sql|<directory> <outSqlDir> <outCodeDir> <namespace> <company-name>.");
             }
 
+            var config = new VanillaConfig()
+            {
+                TableSqlPath = args[0],
+                OutputSqlPath = args[1],
+                OutputCodePath = args[2],
+                CodeNamespace = args[3],
+                CompanyName = args[4]
+            };
+
             // First param is the table file - expect *.sql - or directory containing *.sql table definition files
-            var sqlFileName = args[0];
-            var sqlFileInfo = new FileInfo(sqlFileName);
-            var sqlDirectory = new DirectoryInfo(sqlFileName);
+            var sqlFileInfo = new FileInfo(config.TableSqlPath);
+            var sqlDirectory = new DirectoryInfo(config.TableSqlPath);
 
             if (!sqlFileInfo.Exists)
             {
                 if (!sqlDirectory.Exists)
                 {
-                    throw new InvalidOperationException($"{sqlFileName} does not exist.");
+                    throw new InvalidOperationException($"{config.TableSqlPath} does not exist.");
                 }
             }
 
-            // Generate output in subdirectories of the table file directory's parent
-            // In other words, we're assuming the table is in a Tables folder and want our output next to that folder
-            var outputSqlDir = args[1];
-            var outputCodeDir = args[2];
-            var outputNamespace = args[3];
-            var companyName = args[4];
-
+            // Process just the table file, or all files in the folder depending on what was configured
             if (sqlFileInfo.Exists)
             {
-                ProcessTableSql(sqlFileInfo, outputSqlDir, outputCodeDir, outputNamespace, companyName);
+                ProcessTableSql(sqlFileInfo, config);
             }
             else if (sqlDirectory.Exists)
             {
                 foreach (var fileInfo in sqlDirectory.EnumerateFiles("*.sql", SearchOption.AllDirectories))
                 {
-                    ProcessTableSql(fileInfo, outputSqlDir, outputCodeDir, outputNamespace, companyName);
+                    ProcessTableSql(fileInfo, config);
                 }
             }
 
             // Write out any static files
-            File.WriteAllText($"{outputCodeDir}\\QueryOperator.cs",
+            File.WriteAllText($"{config.OutputCodePath}\\QueryOperator.cs",
 @"
-namespace " + outputNamespace + @"
+namespace " + config.CodeNamespace + @"
 {
     /// <summary>Enumeration for the different query operators available to use.</summary>
     public enum QueryOperator
@@ -92,13 +100,13 @@ namespace " + outputNamespace + @"
             return result;
         }
 
-        private static void ProcessTableSql(FileInfo sqlFileInfo, string outputSqlDir, string outputCodeDir, string outputNamespace, string companyName)
+        private static void ProcessTableSql(FileInfo sqlFileInfo, VanillaConfig config)
         {
             // Open the file and start parsing
             var table = new TableModel()
             {
-                Company = companyName,
-                Namespace = outputNamespace,
+                Company = config.CompanyName,
+                Namespace = config.CodeNamespace,
                 Fields = new List<FieldModel>(),
             };
             var indexes = new List<IndexModel>();
@@ -241,9 +249,9 @@ namespace " + outputNamespace + @"
             Log.Debug("Indexes: {@Indexes}", indexes);
 
             // Create the output directories for all of the different files
-            var typeTableDir = Path.Combine(outputSqlDir, "Types");
+            var typeTableDir = Path.Combine(config.OutputSqlPath, "Types");
             Directory.CreateDirectory(typeTableDir);
-            var storedProcDir = Path.Combine(outputSqlDir, $"Stored Procedures\\{table.TableName}");
+            var storedProcDir = Path.Combine(config.OutputSqlPath, $"Stored Procedures\\{table.TableName}");
             Directory.CreateDirectory(storedProcDir);
 
             // Generate the stored procedures using our parsed table information
@@ -294,7 +302,7 @@ namespace " + outputNamespace + @"
             File.WriteAllText($"{storedProcDir}\\{deleteBulkStoredProc.GenerateName()}.sql", deleteBulkContent);
 
             // Create Data Provider directory
-            var dataProviderDir = Path.Combine(outputCodeDir, table.TableName);
+            var dataProviderDir = Path.Combine(config.OutputCodePath, table.TableName);
             Directory.CreateDirectory(dataProviderDir);
 
             // Generate the DataModel class
