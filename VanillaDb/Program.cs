@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Newtonsoft.Json;
 using Serilog;
 using Serilog.Sinks.SystemConsole.Themes;
 using VanillaDb.DataProviders;
@@ -17,6 +18,9 @@ namespace VanillaDb
     /// <summary>Main Program Class</summary>
     public class Program
     {
+        /// <summary>The configuration file name</summary>
+        public const string ConfigFileName = "vanillaDb.config";
+
         private static ILogger Log { get; set; }
 
         /// <summary>
@@ -33,26 +37,64 @@ namespace VanillaDb
                 .CreateLogger();
             Serilog.Log.Logger = Log;
 
-            // If no arguments, walk up parent directories looking for a vanillaDb.config file
-
-            // If 5 arguments, then assume all arguments were provided
-
-            // If 6 arguments, then check for --generate-config
-
             var result = 0;
-            if (args.Length != 5)
+            var currentDirectory = new DirectoryInfo(Environment.CurrentDirectory);
+            VanillaConfig config = null;
+            if (args.Length == 0)
             {
-                throw new ArgumentException("Required Arguments: <Table>.sql|<directory> <outSqlDir> <outCodeDir> <namespace> <company-name>.");
-            }
+                // If no arguments, walk up parent directories looking for a vanillaDb.config file
+                var configFileInfo = new FileInfo(Path.Combine(currentDirectory.FullName, ConfigFileName));
+                while (configFileInfo != null && !configFileInfo.Exists)
+                {
+                    var parentDirectory = configFileInfo.Directory.Parent;
+                    if (parentDirectory != null)
+                    {
+                        configFileInfo = new FileInfo(Path.Combine(configFileInfo.Directory.Parent.FullName, ConfigFileName));
+                    }
+                    else
+                    {
+                        configFileInfo = null;
+                    }
+                }
 
-            var config = new VanillaConfig()
+                if (configFileInfo == null)
+                {
+                    throw new InvalidOperationException(
+                        $"{ConfigFileName} is required in folder hierarchy, or all required arguments must be provided." +
+                        "Required Arguments: <Table>.sql|<directory> <outSqlDir> <outCodeDir> <namespace> <company-name> (optional)--generate-config <config-path>.");
+                }
+                else
+                {
+                    var configString = File.ReadAllText(configFileInfo.FullName);
+                    config = JsonConvert.DeserializeObject<VanillaConfig>(configString);
+                }
+            }
+            else if (args.Length == 5 || args.Length == 7)
             {
-                TableSqlPath = args[0],
-                OutputSqlPath = args[1],
-                OutputCodePath = args[2],
-                CodeNamespace = args[3],
-                CompanyName = args[4]
-            };
+                config = new VanillaConfig()
+                {
+                    TableSqlPath = args[0],
+                    OutputSqlPath = args[1],
+                    OutputCodePath = args[2],
+                    CodeNamespace = args[3],
+                    CompanyName = args[4]
+                };
+
+                // If 6 arguments, then check for --generate-config
+                if (args.Length == 7 && string.Equals(args[5], "--generate-config", StringComparison.InvariantCultureIgnoreCase))
+                {
+                    var outputLocation = args[6];
+                    var outputContents = JsonConvert.SerializeObject(config, Formatting.Indented);
+                    File.WriteAllText(Path.Combine(outputLocation, ConfigFileName), outputContents);
+                }
+            }
+            else if (args.Length != 5)
+            {
+                // If 5 arguments, then assume all arguments were provided
+                throw new ArgumentException(
+                        $"{ConfigFileName} is required in folder hierarchy, or all required arguments must be provided." +
+                        "Required Arguments: <Table>.sql|<directory> <outSqlDir> <outCodeDir> <namespace> <company-name> (optional)--generate-config <config-path>.");
+            }
 
             // First param is the table file - expect *.sql - or directory containing *.sql table definition files
             var sqlFileInfo = new FileInfo(config.TableSqlPath);
@@ -119,8 +161,6 @@ namespace " + config.CodeNamespace + @"
                 // NOTE: Parsing is inflexible, any deviation from expectations results in error
 
                 // TODO: Add more detailed logging along the way.
-
-                // TODO: Add C# namespace input argument
 
                 // First line should be table creation - extract table name (last parameter)
                 var createTable = reader.ReadLine();
