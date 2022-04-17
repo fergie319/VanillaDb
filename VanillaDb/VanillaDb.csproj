@@ -64,6 +64,7 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -108,11 +109,17 @@
       <DependentUpon>GetByBulkStoredProc.tt</DependentUpon>
     </Compile>
     <Compile Include="GetProcs\GetByBulkStoredProcCode.cs" />
+    <Compile Include="GetProcs\GetAllStoredProc.cs">
+      <DependentUpon>GetAllStoredProc.tt</DependentUpon>
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+    </Compile>
     <Compile Include="GetProcs\GetBySingleStoredProc.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>GetBySingleStoredProc.tt</DependentUpon>
     </Compile>
+    <Compile Include="GetProcs\GetAllStoredProcCode.cs" />
     <Compile Include="GetProcs\GetBySingleStoredProcCode.cs" />
     <Compile Include="InsertProcs\InsertStoredProc.cs">
       <AutoGen>True</AutoGen>
@@ -160,6 +167,10 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="GetProcs\GetAllStoredProc.tt">
+      <Generator>TextTemplatingFilePreprocessor</Generator>
+      <LastGenOutput>GetAllStoredProc.cs</LastGenOutput>
+    </Content>
     <Content Include="UpdateProcs\UpdateStoredProc.tt">
       <Generator>TextTemplatingFilePreprocessor</Generator>
       <LastGenOutput>UpdateStoredProc.cs</LastGenOutput>

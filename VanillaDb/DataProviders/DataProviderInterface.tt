@@ -36,6 +36,18 @@ namespace <#= Table.Namespace #>.<#= Table.TableName #>
         /// <summary>Deletes the records with the given <#= PrimaryKey.FieldName #>s from the <#= Table.TableName #> table.</summary>
         /// <param name="<#= PrimaryKey.GetCodeParamName() #>s">The <#= PrimaryKey.FieldName #>s.</param>
         Task<int> Delete(IEnumerable<int> <#= PrimaryKey.GetCodeParamName() #>s);
+
+<#
+    // Generate the GetAll method if configured
+    if (Table.Config.GetAll)
+    {
+#>
+        /// <summary>Gets the data for all <#= Record #>(s) from the <#= Table.TableName #> table.</summary>
+        /// <returns>Enumerable of <#= Record #> Data Model or null if not found.</returns>
+        Task<IEnumerable<<#= Table.GetDataModelName() #>>> GetAll();
+<#
+    }
+#>
 <#
     // Generate the GetBy-Index and GetBy-Index-Bulk methods for each index
     foreach (IndexModel index in Indexes)
@@ -49,7 +61,7 @@ namespace <#= Table.Namespace #>.<#= Table.TableName #>
 
         /// <summary>Gets the data for the <#= Record #>(s) with the given collection of <#= index.ReadableFields() #>.</summary>
         <#= index.BulkGetByIndexParamsXmlComments() #>
-        /// <returns><#= Record #> Data Model or null if not found.</returns>
+        /// <returns>Enumerable of <#= Record #> Data Model or null if not found.</returns>
         Task<IEnumerable<<#= Table.GetDataModelName() #>>> <#= index.GetByIndexMethodName() #>(<#= index.BulkGetByIndexMethodParams() #>);
 <#
     }

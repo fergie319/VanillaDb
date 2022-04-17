@@ -45,6 +45,44 @@ namespace <#= Table.Namespace #>.<#= Table.TableName #>
         private string ConnectionString { get; set; }
 
 <#
+    // Generate the GetAll method if configured
+    if (Table.Config.GetAll)
+    {
+#>
+        /// <summary>Gets the data for all <#= Record #>(s) from the <#= Table.TableName #> table.</summary>
+        /// <returns>Enumerable of <#= Record #> Data Model or null if not found.</returns>
+        public async Task<IEnumerable<<#= Table.GetDataModelName() #>>> GetAll()
+        {
+            var <#= RecordCamel #>Data = new List<<#= Record #>DataModel>();
+            using (var connection = new SqlConnection(this.ConnectionString))
+            {
+                var procName = "<#= Table.GetGetAllProcName() #>";
+                using (var command = new SqlCommand(procName))
+                {
+                    Log.InfoFormat("Invoking Stored Procedure {0}.", procName);
+                    command.CommandType = CommandType.StoredProcedure;
+                    command.Connection = connection;
+
+                    connection.Open();
+                    var reader = await command.ExecuteReaderAsync();
+                    if (reader.HasRows)
+                    {
+                        while (reader.Read())
+                        {
+                            var data = Parse<#= Record #>DataModel(reader);
+                            <#= RecordCamel #>Data.Add(data);
+                        }
+                    }
+                }
+            }
+
+            return <#= RecordCamel #>Data;
+        }
+<#
+    }
+#>
+
+<#
     // Generate the GetBy-Index and GetBy-Index-Bulk methods for each index
     foreach (IndexModel index in Indexes)
     {

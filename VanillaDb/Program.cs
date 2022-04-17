@@ -5,6 +5,7 @@ using System.Linq;
 using Newtonsoft.Json;
 using Serilog;
 using Serilog.Sinks.SystemConsole.Themes;
+using VanillaDb.Configuration;
 using VanillaDb.DataProviders;
 using VanillaDb.DeleteProcs;
 using VanillaDb.GetProcs;
@@ -150,6 +151,13 @@ namespace " + config.CodeNamespace + @"
                 Company = config.CompanyName,
                 Namespace = config.CodeNamespace,
                 Fields = new List<FieldModel>(),
+                Config = new TableConfig()
+                {
+                    GetAll = true,
+                    Insert = true,
+                    Update = true,
+                    Delete = true
+                }
             };
             var indexes = new List<IndexModel>();
             using (var stream = sqlFileInfo.OpenRead())
@@ -295,7 +303,16 @@ namespace " + config.CodeNamespace + @"
             Directory.CreateDirectory(storedProcDir);
 
             // Generate the stored procedures using our parsed table information
-            // First generate type tables for all fields participating in indexes
+            if (table.Config.GetAll)
+            {
+                // Generate the single-select stored procedures
+                var getByAll = new GetAllStoredProc(table);
+                var sqlContent = getByAll.TransformText();
+                Log.Debug($"Content: {sqlContent}");
+                File.WriteAllText($"{storedProcDir}\\{getByAll.GenerateName()}.sql", sqlContent);
+            }
+
+            // First generate type tables for all fields participating in indexes and then the GetBy procs
             foreach (var index in indexes)
             {
                 var typeTable = new TypeTable(index);
