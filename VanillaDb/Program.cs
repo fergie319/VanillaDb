@@ -416,6 +416,37 @@ namespace " + config.CodeNamespace + @"
             content = sqlDataProviderGen.TransformText();
             Log.Debug($"Content: {content}");
             File.WriteAllText($"{dataProviderDir}\\{sqlDataProviderGen.GenerateName()}.cs", content);
+
+            // Overwrite the table.sql file to include the table config at the beginning
+            var fileContent = string.Empty;
+            using (var stream = sqlFileInfo.OpenRead())
+            using (var reader = new StreamReader(stream))
+            {
+                fileContent = reader.ReadLine();
+                var createTable = string.Empty;
+                if (fileContent.Trim() == "/*")
+                {
+                    // Read all the contents of the block comment to build the table config JSON
+                    var line = reader.ReadLine();
+                    while (line.Trim() != "*/")
+                    {
+                        line = reader.ReadLine();
+                    }
+
+                    // Read the next line (should be Create Table)
+                    fileContent = reader.ReadLine();
+                }
+
+                // Read the remainder of the file
+                fileContent += Environment.NewLine + reader.ReadToEnd();
+
+                // Serialize the TableConfig JSON into a comment block
+                var newLine = Environment.NewLine;
+                var tableConfigJson = JsonConvert.SerializeObject(table.Config, Formatting.Indented);
+                fileContent = $"/*{newLine}{tableConfigJson}{newLine}*/{newLine}{fileContent}";
+            }
+
+            File.WriteAllText(sqlFileInfo.FullName, fileContent);
         }
 
         /// <summary>Parses the type of the field from the given SQL Type markup.</summary>
