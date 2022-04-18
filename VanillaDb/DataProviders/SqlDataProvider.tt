@@ -43,12 +43,12 @@ namespace <#= Table.Namespace #>.<#= Table.TableName #>
         /// <summary>Gets or sets the connection string.</summary>
         /// <value>The connection string.</value>
         private string ConnectionString { get; set; }
-
 <#
     // Generate the GetAll method if configured
     if (Table.Config.GetAll)
     {
 #>
+
         /// <summary>Gets the data for all <#= Record #>(s) from the <#= Table.TableName #> table.</summary>
         /// <returns>Enumerable of <#= Record #> Data Model or null if not found.</returns>
         public async Task<IEnumerable<<#= Table.GetDataModelName() #>>> GetAll()
@@ -218,6 +218,11 @@ namespace <#= Table.Namespace #>.<#= Table.TableName #>
 <#
     }
 #>
+<#
+    // Generate the Insert method if configured
+    if (Table.Config.Insert)
+    {
+#>
         /// <summary>Inserts the given <#= Record #> data model into the <#= Record #> table.</summary>
         /// <param name="<#= RecordCamel #>Data">The <#= RecordLower #> data to insert.</param>
         /// <returns>The ID of the inserted <#= Record #> record.</returns>
@@ -271,6 +276,14 @@ namespace <#= Table.Namespace #>.<#= Table.TableName #>
             return <#= PrimaryKey.GetCodeParamName() #>;
         }
 
+<#
+    }
+#>
+<#
+    // Generate the Update method if configured
+    if (Table.Config.Update)
+    {
+#>
         /// <summary>Updates the given <#= Record #> data model in the <#= Record #> table.</summary>
         /// <param name="<#= RecordCamel #>Data">The <#= RecordLower #> data to update.</param>
         /// <returns>The number of records affected by the update.</returns>
@@ -310,6 +323,14 @@ namespace <#= Table.Namespace #>.<#= Table.TableName #>
             return affectedRows;
         }
 
+<#
+    }
+#>
+<#
+    // Generate the Delete method if configured
+    if (Table.Config.Delete)
+    {
+#>
         /// <summary>Deletes record with the given <#= PrimaryKey.FieldName #> from the <#= Table.TableName #> table.</summary>
         /// <param name="<#= PrimaryKey.GetCodeParamName() #>">The <#= PrimaryKey.FieldName #>.</param>
         public async Task<int> Delete(int <#= PrimaryKey.GetCodeParamName() #>)
@@ -388,6 +409,9 @@ namespace <#= Table.Namespace #>.<#= Table.TableName #>
             return affectedRows;
         }
 
+<#
+    }
+#>
         /// <summary>Parses the <#= Record #> data model out of the reader.</summary>
         /// <param name="reader">The reader.</param>
         /// <returns>Populated <#= Record #> Data Model</returns>

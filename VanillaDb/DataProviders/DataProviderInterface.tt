@@ -25,10 +25,31 @@ namespace <#= Table.Namespace #>.<#= Table.TableName #>
     /// <summary>Interface for <#= Record #> Data Providers.</summary>
     public interface <#= GenerateName() #>
     {
+<#
+    // Generate the Insert method if configured
+    if (Table.Config.Insert)
+    {
+#>
         <#= GenerateInsertMethod() #>
 
+<#
+    }
+#>
+<#
+    // Generate the Update method if configured
+    if (Table.Config.Update)
+    {
+#>
         <#= GenerateUpdateMethod() #>
 
+<#
+    }
+#>
+<#
+    // Generate the Delete method if configured
+    if (Table.Config.Delete)
+    {
+#>
         /// <summary>Deletes record with the given <#= PrimaryKey.FieldName #> from the <#= Table.TableName #> table.</summary>
         /// <param name="<#= PrimaryKey.GetCodeParamName() #>">The <#= PrimaryKey.FieldName #>.</param>
         Task<int> Delete(int <#= PrimaryKey.GetCodeParamName() #>);
@@ -38,6 +59,9 @@ namespace <#= Table.Namespace #>.<#= Table.TableName #>
         Task<int> Delete(IEnumerable<int> <#= PrimaryKey.GetCodeParamName() #>s);
 
 <#
+    }
+#>
+<#
     // Generate the GetAll method if configured
     if (Table.Config.GetAll)
     {
@@ -45,6 +69,7 @@ namespace <#= Table.Namespace #>.<#= Table.TableName #>
         /// <summary>Gets the data for all <#= Record #>(s) from the <#= Table.TableName #> table.</summary>
         /// <returns>Enumerable of <#= Record #> Data Model or null if not found.</returns>
         Task<IEnumerable<<#= Table.GetDataModelName() #>>> GetAll();
+
 <#
     }
 #>
@@ -53,7 +78,6 @@ namespace <#= Table.Namespace #>.<#= Table.TableName #>
     foreach (IndexModel index in Indexes)
     {
 #>
-
         /// <summary>Gets the data for the <#= Record #> with the given <#= index.ReadableFields() #>.</summary>
         <#= index.GetByIndexParamsXmlComments() #>
         /// <returns><#= Record #> Data Model or null if not found</returns>
@@ -63,6 +87,7 @@ namespace <#= Table.Namespace #>.<#= Table.TableName #>
         <#= index.BulkGetByIndexParamsXmlComments() #>
         /// <returns>Enumerable of <#= Record #> Data Model or null if not found.</returns>
         Task<IEnumerable<<#= Table.GetDataModelName() #>>> <#= index.GetByIndexMethodName() #>(<#= index.BulkGetByIndexMethodParams() #>);
+
 <#
     }
 #>

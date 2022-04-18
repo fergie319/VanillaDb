@@ -170,8 +170,36 @@ namespace " + config.CodeNamespace + @"
 
                 // TODO: Add more detailed logging along the way.
 
-                // First line should be table creation - extract table name (last parameter)
-                var createTable = reader.ReadLine();
+                // Check first line for /* and grab every line until encountering */ to parse as table configuration
+                var firstLine = reader.ReadLine();
+                var createTable = string.Empty;
+                if (firstLine.Trim() == "/*")
+                {
+                    // Read all the contents of the block comment to build the table config JSON
+                    var line = reader.ReadLine();
+                    var tableConfigJson = string.Empty;
+                    while (line.Trim() != "*/")
+                    {
+                        tableConfigJson += line;
+                        line = reader.ReadLine();
+                    }
+
+                    // Deserialize the table config and then read the next line (should be Create Table)
+                    table.Config = JsonConvert.DeserializeObject<TableConfig>(tableConfigJson);
+                    createTable = reader.ReadLine();
+                }
+                else
+                {
+                    createTable = firstLine;
+                }
+
+                // Ignore any blank lines before encountering the Create Table method
+                while (string.IsNullOrEmpty(createTable.Trim()))
+                {
+                    createTable = reader.ReadLine();
+                }
+
+                // extract table name from the createTable line (last parameter)
                 var splitTableTokens = createTable.Split(new[] { "[", "]", ".", " ", "\t" }, StringSplitOptions.RemoveEmptyEntries);
                 if (splitTableTokens.Length < 3)
                 {
@@ -335,28 +363,37 @@ namespace " + config.CodeNamespace + @"
             }
 
             // Generate the Insert stored procedure
-            var insertStoredProc = new InsertStoredProc(table);
-            var insertContent = insertStoredProc.TransformText();
-            Log.Debug($"Content: {insertContent}");
-            File.WriteAllText($"{storedProcDir}\\{insertStoredProc.GenerateName()}.sql", insertContent);
+            if (table.Config.Insert)
+            {
+                var insertStoredProc = new InsertStoredProc(table);
+                var insertContent = insertStoredProc.TransformText();
+                Log.Debug($"Content: {insertContent}");
+                File.WriteAllText($"{storedProcDir}\\{insertStoredProc.GenerateName()}.sql", insertContent);
+            }
 
             // Generate the Update stored procedure
-            var updateStoredProc = new UpdateStoredProc(table);
-            var updateContent = updateStoredProc.TransformText();
-            Log.Debug($"Content: {updateContent}");
-            File.WriteAllText($"{storedProcDir}\\{updateStoredProc.GenerateName()}.sql", updateContent);
+            if (table.Config.Update)
+            {
+                var updateStoredProc = new UpdateStoredProc(table);
+                var updateContent = updateStoredProc.TransformText();
+                Log.Debug($"Content: {updateContent}");
+                File.WriteAllText($"{storedProcDir}\\{updateStoredProc.GenerateName()}.sql", updateContent);
+            }
 
-            // Generate the Delete stored procedure
-            var deleteStoredProc = new DeleteStoredProc(table);
-            var deleteContent = deleteStoredProc.TransformText();
-            Log.Debug($"Content: {deleteContent}");
-            File.WriteAllText($"{storedProcDir}\\{deleteStoredProc.GenerateName()}.sql", deleteContent);
+            if (table.Config.Delete)
+            {
+                // Generate the Delete stored procedure
+                var deleteStoredProc = new DeleteStoredProc(table);
+                var deleteContent = deleteStoredProc.TransformText();
+                Log.Debug($"Content: {deleteContent}");
+                File.WriteAllText($"{storedProcDir}\\{deleteStoredProc.GenerateName()}.sql", deleteContent);
 
-            // Generate the Bulk Delete stored procedure
-            var deleteBulkStoredProc = new DeleteBulkStoredProc(table, indexes.First(i => i.IsPrimaryKey));
-            var deleteBulkContent = deleteBulkStoredProc.TransformText();
-            Log.Debug($"Content: {deleteBulkContent}");
-            File.WriteAllText($"{storedProcDir}\\{deleteBulkStoredProc.GenerateName()}.sql", deleteBulkContent);
+                // Generate the Bulk Delete stored procedure
+                var deleteBulkStoredProc = new DeleteBulkStoredProc(table, indexes.First(i => i.IsPrimaryKey));
+                var deleteBulkContent = deleteBulkStoredProc.TransformText();
+                Log.Debug($"Content: {deleteBulkContent}");
+                File.WriteAllText($"{storedProcDir}\\{deleteBulkStoredProc.GenerateName()}.sql", deleteBulkContent);
+            }
 
             // Create Data Provider directory
             var dataProviderDir = Path.Combine(config.OutputCodePath, table.TableName);
