@@ -206,8 +206,9 @@ namespace " + config.CodeNamespace + @"
                     throw new InvalidOperationException("The first line must be the Create Table command, and it must split into a minimum of 3 parts: Create Table [name].");
                 }
 
-                // Start building the table model - starting with the name
+                // Start building the table model - starting with the name and the schema
                 table.TableName = splitTableTokens.Last();
+                table.Schema = splitTableTokens.Reverse().Skip(1).Take(1).FirstOrDefault() ?? throw new InvalidOperationException("Missing Schema from Table Name");
 
                 // Second line should be just the parenthesis start
                 if (reader.ReadLine() != "(")

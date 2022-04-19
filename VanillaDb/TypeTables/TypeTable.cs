@@ -29,7 +29,14 @@ namespace VanillaDb.TypeTables
         /// </summary>
         public virtual string TransformText()
         {
-            this.Write("CREATE TYPE [dbo].[");
+            this.Write("CREATE TYPE [");
+            
+            #line 7 "C:\git-scratch\vanilladb\VanillaDb\TypeTables\TypeTable.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(Index.Table.Schema));
+            
+            #line default
+            #line hidden
+            this.Write("].[");
             
             #line 7 "C:\git-scratch\vanilladb\VanillaDb\TypeTables\TypeTable.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(GenerateName()));

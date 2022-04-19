@@ -28,7 +28,14 @@ namespace VanillaDb.GetProcs
         /// </summary>
         public virtual string TransformText()
         {
-            this.Write("CREATE PROCEDURE [dbo].[");
+            this.Write("CREATE PROCEDURE [");
+            
+            #line 6 "C:\git-scratch\vanilladb\VanillaDb\GetProcs\GetAllStoredProc.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(Table.Schema));
+            
+            #line default
+            #line hidden
+            this.Write("].[");
             
             #line 6 "C:\git-scratch\vanilladb\VanillaDb\GetProcs\GetAllStoredProc.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(GenerateName()));

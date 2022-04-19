@@ -26,6 +26,9 @@ namespace VanillaDb.Models
         /// <summary>Gets or sets the table name.</summary>
         public string TableName { get; set; }
 
+        /// <summary>Gets or sets the schema.</summary>
+        public string Schema { get; set; }
+
         /// <summary>Gets or sets the fields.</summary>
         public IList<FieldModel> Fields { get; set; }
 

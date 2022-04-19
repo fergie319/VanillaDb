@@ -3,7 +3,7 @@
 <#@ import namespace="System.Linq" #>
 <#@ import namespace="System.Text" #>
 <#@ import namespace="System.Collections.Generic" #>
-CREATE PROCEDURE [dbo].[<#= GenerateName() #>]
+CREATE PROCEDURE [<#= Table.Schema #>].[<#= GenerateName() #>]
 AS
 Begin
     SET NOCOUNT ON
