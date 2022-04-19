@@ -56,7 +56,7 @@ namespace <#= Table.Namespace #>.<#= Table.TableName #>
             var <#= RecordCamel #>Data = new List<<#= Record #>DataModel>();
             using (var connection = new SqlConnection(this.ConnectionString))
             {
-                var procName = "<#= Table.GetGetAllProcName() #>";
+                var procName = "[<#= Table.Schema #>].[<#= Table.GetGetAllProcName() #>]";
                 using (var command = new SqlCommand(procName))
                 {
                     Log.InfoFormat("Invoking Stored Procedure {0}.", procName);
@@ -122,7 +122,7 @@ namespace <#= Table.Namespace #>.<#= Table.TableName #>
             var <#= RecordCamel #>Data = new List<<#= Record #>DataModel>();
             using (var connection = new SqlConnection(this.ConnectionString))
             {
-                var procName = "<#= GenerateGetByIndexStoredProcName(index) #>";
+                var procName = "[<#= Table.Schema #>].[<#= GenerateGetByIndexStoredProcName(index) #>]";
                 using (var command = new SqlCommand(procName))
                 {
                     Log.InfoFormat("Invoking Stored Procedure {0}.", procName);
@@ -187,7 +187,7 @@ namespace <#= Table.Namespace #>.<#= Table.TableName #>
             var <#= RecordCamel #>Data = new List<<#= Record #>DataModel>();
             using (var connection = new SqlConnection(this.ConnectionString))
             {
-                var procName = "<#= GenerateGetByIndexBulkStoredProcName(index) #>";
+                var procName = "[<#= Table.Schema #>].[<#= GenerateGetByIndexBulkStoredProcName(index) #>]";
                 using (var command = new SqlCommand(procName))
                 {
                     Log.InfoFormat("Invoking Stored Procedure {0}.", procName);
@@ -253,7 +253,7 @@ namespace <#= Table.Namespace #>.<#= Table.TableName #>
             var <#= PrimaryKey.GetCodeParamName() #> = -1;
             using (var connection = new SqlConnection(this.ConnectionString))
             {
-                var procName = "<#= Table.GetInsertProcName() #>";
+                var procName = "[<#= Table.Schema #>].[<#= Table.GetInsertProcName() #>]";
                 using (var command = new SqlCommand(procName))
                 {
                     Log.InfoFormat("Invoking Stored Procedure {0}.", procName);
@@ -307,7 +307,7 @@ namespace <#= Table.Namespace #>.<#= Table.TableName #>
             var affectedRows = 0;
             using (var connection = new SqlConnection(this.ConnectionString))
             {
-                var procName = "<#= Table.GetUpdateProcName() #>";
+                var procName = "[<#= Table.Schema #>].[<#= Table.GetUpdateProcName() #>]";
                 using (var command = new SqlCommand(procName))
                 {
                     Log.InfoFormat("Invoking Stored Procedure {0}.", procName);
@@ -343,7 +343,7 @@ namespace <#= Table.Namespace #>.<#= Table.TableName #>
             var affectedRows = 0;
             using (var connection = new SqlConnection(this.ConnectionString))
             {
-                var procName = "<#= Table.GetDeleteProcName() #>";
+                var procName = "[<#= Table.Schema #>].[<#= Table.GetDeleteProcName() #>]";
                 using (var command = new SqlCommand(procName))
                 {
                     Log.InfoFormat("Invoking Stored Procedure {0}.", procName);
@@ -380,7 +380,7 @@ namespace <#= Table.Namespace #>.<#= Table.TableName #>
 
             // Create an in-memory datatable with the primary key values
             var idDataTable = new DataTable();
-            idDataTable.Columns.Add(new DataColumn("<#=PrimaryKey.FieldName #>"));
+            idDataTable.Columns.Add(new DataColumn("<#= PrimaryKey.FieldName #>"));
             for (var i = 0; i < <#= PrimaryKey.GetCodeParamName() #>s.Count(); i++)
             {
                 idDataTable.Rows.Add(<#= PrimaryKey.GetCodeParamName() #>s.ElementAt(i));
@@ -389,7 +389,7 @@ namespace <#= Table.Namespace #>.<#= Table.TableName #>
             var affectedRows = 0;
             using (var connection = new SqlConnection(this.ConnectionString))
             {
-                var procName = "<#= Table.GetDeleteBulkProcName() #>";
+                var procName = "[<#= Table.Schema #>].[<#= Table.GetDeleteBulkProcName() #>]";
                 using (var command = new SqlCommand(procName))
                 {
                     Log.InfoFormat("Invoking Stored Procedure {0}.", procName);
