@@ -500,11 +500,11 @@ namespace " + config.CodeNamespace + @"
                 case "BIGINT":
                     fieldType.FieldType = typeof(long);
                     break;
-                case "NUMERIC":
                 case "REAL":
                 case "FLOAT":
                     fieldType.FieldType = typeof(double);
                     break;
+                case "NUMERIC":
                 case "DECIMAL":
                 case "MONEY":
                     fieldType.FieldType = typeof(decimal);
