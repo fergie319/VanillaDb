@@ -1,10 +1,10 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using Serilog;
+using Serilog.Sinks.SystemConsole.Themes;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using Newtonsoft.Json;
-using Serilog;
-using Serilog.Sinks.SystemConsole.Themes;
 using VanillaDb.Configuration;
 using VanillaDb.DataProviders;
 using VanillaDb.DeleteProcs;
@@ -211,7 +211,7 @@ namespace " + config.CodeNamespace + @"
                 table.Schema = splitTableTokens.Reverse().Skip(1).Take(1).FirstOrDefault() ?? throw new InvalidOperationException("Missing Schema from Table Name");
 
                 // Second line should be just the parenthesis start
-                if (reader.ReadLine() != "(")
+                if (reader.ReadLine().Trim() != "(")
                 {
                     throw new InvalidOperationException("First line after Create Table statement should be just (");
                 }
