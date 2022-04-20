@@ -124,7 +124,7 @@ namespace VanillaDb.DataProviders
         public string GenerateGetByIndexStoredProcName(IndexModel index)
         {
             var procNameFields = index.Fields.Select(f => f.FieldName);
-            return $"{Table.Schema}.USP_{Table.TableName}_GetBy{string.Join("_", procNameFields)}";
+            return $"USP_{Table.TableName}_GetBy{string.Join("_", procNameFields)}";
         }
 
         /// <summary>Generates the code to add parameters for the get by index procedure.</summary>
@@ -162,7 +162,7 @@ namespace VanillaDb.DataProviders
         public string GenerateGetByIndexBulkStoredProcName(IndexModel index)
         {
             var fieldNames = index.Fields.Select(f => f.FieldName);
-            return $"{Table.Schema}.USP_{Table.TableName}_GetBy{string.Join("_", fieldNames)}_Bulk";
+            return $"USP_{Table.TableName}_GetBy{string.Join("_", fieldNames)}_Bulk";
         }
 
         /// <summary>Generates the GetBy(Bulk) stored procedure's parameter name.</summary>
