@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using VanillaDb.Configuration;
 
 namespace VanillaDb.Models
 {
@@ -13,6 +14,9 @@ namespace VanillaDb.Models
         /// <summary>The update time stamp field names</summary>
         public readonly IEnumerable<string> UpdateTimeStampFieldNames = new[] { "UpdatedOnUtc" };
 
+        /// <summary>Gets or sets the configuration settings for this table.</summary>
+        public TableConfig Config { get; set; }
+
         /// <summary>Gets or sets the company.</summary>
         public string Company { get; set; }
 
@@ -21,6 +25,9 @@ namespace VanillaDb.Models
 
         /// <summary>Gets or sets the table name.</summary>
         public string TableName { get; set; }
+
+        /// <summary>Gets or sets the schema.</summary>
+        public string Schema { get; set; }
 
         /// <summary>Gets or sets the fields.</summary>
         public IList<FieldModel> Fields { get; set; }
@@ -58,6 +65,13 @@ namespace VanillaDb.Models
         public string GetDataModelName()
         {
             return $"{TableName}DataModel";
+        }
+
+        /// <summary>Generates the name of the GetAll stored proc.</summary>
+        /// <returns>Insert Stored proc name</returns>
+        public string GetGetAllProcName()
+        {
+            return $"USP_{TableName}_GetAll";
         }
 
         /// <summary>Generates the name of the insert stored proc.</summary>

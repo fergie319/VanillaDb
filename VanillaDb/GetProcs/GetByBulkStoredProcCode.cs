@@ -1,5 +1,4 @@
-﻿using Microsoft.SqlServer.Management.SqlParser.SqlCodeDom;
-using System;
+﻿using System;
 using System.Linq;
 using VanillaDb.Models;
 using VanillaDb.TypeTables;
@@ -48,7 +47,7 @@ namespace VanillaDb.GetProcs
         {
             var typeTable = new TypeTable(Index);
             var fieldNames = Index.Fields.Select(f => f.FieldName.ToCamelCase());
-            return $"    {GenerateBulkProcParameter(Index)} dbo.{typeTable.GenerateName()} READONLY";
+            return $"    {GenerateBulkProcParameter(Index)} {Table.Schema}.{typeTable.GenerateName()} READONLY";
         }
 
         /// <summary>Generates the fields for the SELECT clause.</summary>

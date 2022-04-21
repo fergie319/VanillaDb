@@ -158,10 +158,122 @@ namespace ");
         /// <summary>Gets or sets the connection string.</summary>
         /// <value>The connection string.</value>
         private string ConnectionString { get; set; }
-
 ");
             
-            #line 47 "C:\git\VanillaDb\VanillaDb\DataProviders\SqlDataProvider.tt"
+            #line 46 "C:\git\VanillaDb\VanillaDb\DataProviders\SqlDataProvider.tt"
+
+    // Generate the GetAll method if configured
+    if (Table.Config.GetAll)
+    {
+
+            
+            #line default
+            #line hidden
+            this.Write("\r\n        /// <summary>Gets the data for all ");
+            
+            #line 52 "C:\git\VanillaDb\VanillaDb\DataProviders\SqlDataProvider.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(Record));
+            
+            #line default
+            #line hidden
+            this.Write("(s) from the ");
+            
+            #line 52 "C:\git\VanillaDb\VanillaDb\DataProviders\SqlDataProvider.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(Table.TableName));
+            
+            #line default
+            #line hidden
+            this.Write(" table.</summary>\r\n        /// <returns>Enumerable of ");
+            
+            #line 53 "C:\git\VanillaDb\VanillaDb\DataProviders\SqlDataProvider.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(Record));
+            
+            #line default
+            #line hidden
+            this.Write(" Data Model or null if not found.</returns>\r\n        public async Task<IEnumerabl" +
+                    "e<");
+            
+            #line 54 "C:\git\VanillaDb\VanillaDb\DataProviders\SqlDataProvider.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(Table.GetDataModelName()));
+            
+            #line default
+            #line hidden
+            this.Write(">> GetAll()\r\n        {\r\n            var ");
+            
+            #line 56 "C:\git\VanillaDb\VanillaDb\DataProviders\SqlDataProvider.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(RecordCamel));
+            
+            #line default
+            #line hidden
+            this.Write("Data = new List<");
+            
+            #line 56 "C:\git\VanillaDb\VanillaDb\DataProviders\SqlDataProvider.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(Record));
+            
+            #line default
+            #line hidden
+            this.Write("DataModel>();\r\n            using (var connection = new SqlConnection(this.Connect" +
+                    "ionString))\r\n            {\r\n                var procName = \"[");
+            
+            #line 59 "C:\git\VanillaDb\VanillaDb\DataProviders\SqlDataProvider.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(Table.Schema));
+            
+            #line default
+            #line hidden
+            this.Write("].[");
+            
+            #line 59 "C:\git\VanillaDb\VanillaDb\DataProviders\SqlDataProvider.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(Table.GetGetAllProcName()));
+            
+            #line default
+            #line hidden
+            this.Write(@"]"";
+                using (var command = new SqlCommand(procName))
+                {
+                    Log.InfoFormat(""Invoking Stored Procedure {0}."", procName);
+                    command.CommandType = CommandType.StoredProcedure;
+                    command.Connection = connection;
+
+                    connection.Open();
+                    var reader = await command.ExecuteReaderAsync();
+                    if (reader.HasRows)
+                    {
+                        while (reader.Read())
+                        {
+                            var data = Parse");
+            
+            #line 72 "C:\git\VanillaDb\VanillaDb\DataProviders\SqlDataProvider.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(Record));
+            
+            #line default
+            #line hidden
+            this.Write("DataModel(reader);\r\n                            ");
+            
+            #line 73 "C:\git\VanillaDb\VanillaDb\DataProviders\SqlDataProvider.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(RecordCamel));
+            
+            #line default
+            #line hidden
+            this.Write("Data.Add(data);\r\n                        }\r\n                    }\r\n              " +
+                    "  }\r\n            }\r\n\r\n            return ");
+            
+            #line 79 "C:\git\VanillaDb\VanillaDb\DataProviders\SqlDataProvider.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(RecordCamel));
+            
+            #line default
+            #line hidden
+            this.Write("Data;\r\n        }\r\n");
+            
+            #line 81 "C:\git\VanillaDb\VanillaDb\DataProviders\SqlDataProvider.tt"
+
+    }
+
+            
+            #line default
+            #line hidden
+            this.Write("\r\n");
+            
+            #line 85 "C:\git\VanillaDb\VanillaDb\DataProviders\SqlDataProvider.tt"
 
     // Generate the GetBy-Index and GetBy-Index-Bulk methods for each index
     foreach (IndexModel index in Indexes)
@@ -172,56 +284,56 @@ namespace ");
             #line hidden
             this.Write("        /// <summary>Gets the data for the ");
             
-            #line 52 "C:\git\VanillaDb\VanillaDb\DataProviders\SqlDataProvider.tt"
+            #line 90 "C:\git\VanillaDb\VanillaDb\DataProviders\SqlDataProvider.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(Record));
             
             #line default
             #line hidden
             this.Write(" with the given ");
             
-            #line 52 "C:\git\VanillaDb\VanillaDb\DataProviders\SqlDataProvider.tt"
+            #line 90 "C:\git\VanillaDb\VanillaDb\DataProviders\SqlDataProvider.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(index.ReadableFields()));
             
             #line default
             #line hidden
             this.Write(".</summary>\r\n        ");
             
-            #line 53 "C:\git\VanillaDb\VanillaDb\DataProviders\SqlDataProvider.tt"
+            #line 91 "C:\git\VanillaDb\VanillaDb\DataProviders\SqlDataProvider.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(index.GetByIndexParamsXmlComments()));
             
             #line default
             #line hidden
             this.Write("\r\n        /// <returns>");
             
-            #line 54 "C:\git\VanillaDb\VanillaDb\DataProviders\SqlDataProvider.tt"
+            #line 92 "C:\git\VanillaDb\VanillaDb\DataProviders\SqlDataProvider.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(Record));
             
             #line default
             #line hidden
             this.Write(" Data Model or null if not found</returns>\r\n        public async Task<");
             
-            #line 55 "C:\git\VanillaDb\VanillaDb\DataProviders\SqlDataProvider.tt"
+            #line 93 "C:\git\VanillaDb\VanillaDb\DataProviders\SqlDataProvider.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(index.GetByIndexReturnType()));
             
             #line default
             #line hidden
             this.Write("> ");
             
-            #line 55 "C:\git\VanillaDb\VanillaDb\DataProviders\SqlDataProvider.tt"
+            #line 93 "C:\git\VanillaDb\VanillaDb\DataProviders\SqlDataProvider.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(index.GetByIndexMethodName()));
             
             #line default
             #line hidden
             this.Write("(");
             
-            #line 55 "C:\git\VanillaDb\VanillaDb\DataProviders\SqlDataProvider.tt"
+            #line 93 "C:\git\VanillaDb\VanillaDb\DataProviders\SqlDataProvider.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(index.GetByIndexMethodParams()));
             
             #line default
             #line hidden
             this.Write(")\r\n        {\r\n");
             
-            #line 57 "C:\git\VanillaDb\VanillaDb\DataProviders\SqlDataProvider.tt"
+            #line 95 "C:\git\VanillaDb\VanillaDb\DataProviders\SqlDataProvider.tt"
 
         foreach (FieldModel field in index.Fields.Where(f => !f.IsNullable))
         {
@@ -233,21 +345,21 @@ namespace ");
             #line hidden
             this.Write("            if (string.IsNullOrWhiteSpace(");
             
-            #line 63 "C:\git\VanillaDb\VanillaDb\DataProviders\SqlDataProvider.tt"
+            #line 101 "C:\git\VanillaDb\VanillaDb\DataProviders\SqlDataProvider.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(field.FieldName.ToCamelCase()));
             
             #line default
             #line hidden
             this.Write("))\r\n            {\r\n                throw new ArgumentNullException(nameof(");
             
-            #line 65 "C:\git\VanillaDb\VanillaDb\DataProviders\SqlDataProvider.tt"
+            #line 103 "C:\git\VanillaDb\VanillaDb\DataProviders\SqlDataProvider.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(field.FieldName.ToCamelCase()));
             
             #line default
             #line hidden
             this.Write("));\r\n            }\r\n\r\n");
             
-            #line 68 "C:\git\VanillaDb\VanillaDb\DataProviders\SqlDataProvider.tt"
+            #line 106 "C:\git\VanillaDb\VanillaDb\DataProviders\SqlDataProvider.tt"
 
             }
 
@@ -255,7 +367,7 @@ namespace ");
             #line default
             #line hidden
             
-            #line 71 "C:\git\VanillaDb\VanillaDb\DataProviders\SqlDataProvider.tt"
+            #line 109 "C:\git\VanillaDb\VanillaDb\DataProviders\SqlDataProvider.tt"
 
             if (field.IsIdentity && field.FieldType.FieldType == typeof(int))
             {
@@ -265,28 +377,28 @@ namespace ");
             #line hidden
             this.Write("            if (");
             
-            #line 75 "C:\git\VanillaDb\VanillaDb\DataProviders\SqlDataProvider.tt"
+            #line 113 "C:\git\VanillaDb\VanillaDb\DataProviders\SqlDataProvider.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(field.FieldName.ToCamelCase()));
             
             #line default
             #line hidden
             this.Write(" < 1)\r\n            {\r\n                throw new InvalidOperationException($\"{");
             
-            #line 77 "C:\git\VanillaDb\VanillaDb\DataProviders\SqlDataProvider.tt"
+            #line 115 "C:\git\VanillaDb\VanillaDb\DataProviders\SqlDataProvider.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(field.FieldName.ToCamelCase()));
             
             #line default
             #line hidden
             this.Write("} is not a valid ");
             
-            #line 77 "C:\git\VanillaDb\VanillaDb\DataProviders\SqlDataProvider.tt"
+            #line 115 "C:\git\VanillaDb\VanillaDb\DataProviders\SqlDataProvider.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(field.FieldName));
             
             #line default
             #line hidden
             this.Write("\");\r\n            }\r\n\r\n");
             
-            #line 80 "C:\git\VanillaDb\VanillaDb\DataProviders\SqlDataProvider.tt"
+            #line 118 "C:\git\VanillaDb\VanillaDb\DataProviders\SqlDataProvider.tt"
 
             }
         }
@@ -296,27 +408,34 @@ namespace ");
             #line hidden
             this.Write("            var ");
             
-            #line 84 "C:\git\VanillaDb\VanillaDb\DataProviders\SqlDataProvider.tt"
+            #line 122 "C:\git\VanillaDb\VanillaDb\DataProviders\SqlDataProvider.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(RecordCamel));
             
             #line default
             #line hidden
             this.Write("Data = new List<");
             
-            #line 84 "C:\git\VanillaDb\VanillaDb\DataProviders\SqlDataProvider.tt"
+            #line 122 "C:\git\VanillaDb\VanillaDb\DataProviders\SqlDataProvider.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(Record));
             
             #line default
             #line hidden
             this.Write("DataModel>();\r\n            using (var connection = new SqlConnection(this.Connect" +
-                    "ionString))\r\n            {\r\n                var procName = \"");
+                    "ionString))\r\n            {\r\n                var procName = \"[");
             
-            #line 87 "C:\git\VanillaDb\VanillaDb\DataProviders\SqlDataProvider.tt"
+            #line 125 "C:\git\VanillaDb\VanillaDb\DataProviders\SqlDataProvider.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(Table.Schema));
+            
+            #line default
+            #line hidden
+            this.Write("].[");
+            
+            #line 125 "C:\git\VanillaDb\VanillaDb\DataProviders\SqlDataProvider.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(GenerateGetByIndexStoredProcName(index)));
             
             #line default
             #line hidden
-            this.Write(@""";
+            this.Write(@"]"";
                 using (var command = new SqlCommand(procName))
                 {
                     Log.InfoFormat(""Invoking Stored Procedure {0}."", procName);
@@ -324,7 +443,7 @@ namespace ");
                     command.Connection = connection;
                     ");
             
-            #line 93 "C:\git\VanillaDb\VanillaDb\DataProviders\SqlDataProvider.tt"
+            #line 131 "C:\git\VanillaDb\VanillaDb\DataProviders\SqlDataProvider.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(GenerateGetByIndexAddParametersCode(index.Parameters)));
             
             #line default
@@ -339,14 +458,14 @@ namespace ");
                         {
                             var data = Parse");
             
-            #line 101 "C:\git\VanillaDb\VanillaDb\DataProviders\SqlDataProvider.tt"
+            #line 139 "C:\git\VanillaDb\VanillaDb\DataProviders\SqlDataProvider.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(Record));
             
             #line default
             #line hidden
             this.Write("DataModel(reader);\r\n                            ");
             
-            #line 102 "C:\git\VanillaDb\VanillaDb\DataProviders\SqlDataProvider.tt"
+            #line 140 "C:\git\VanillaDb\VanillaDb\DataProviders\SqlDataProvider.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(RecordCamel));
             
             #line default
@@ -354,7 +473,7 @@ namespace ");
             this.Write("Data.Add(data);\r\n                        }\r\n                    }\r\n              " +
                     "  }\r\n            }\r\n\r\n");
             
-            #line 108 "C:\git\VanillaDb\VanillaDb\DataProviders\SqlDataProvider.tt"
+            #line 146 "C:\git\VanillaDb\VanillaDb\DataProviders\SqlDataProvider.tt"
 
             if (index.IsUnique)
             {
@@ -364,14 +483,14 @@ namespace ");
             #line hidden
             this.Write("            return ");
             
-            #line 112 "C:\git\VanillaDb\VanillaDb\DataProviders\SqlDataProvider.tt"
+            #line 150 "C:\git\VanillaDb\VanillaDb\DataProviders\SqlDataProvider.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(RecordCamel));
             
             #line default
             #line hidden
             this.Write("Data.FirstOrDefault();\r\n");
             
-            #line 113 "C:\git\VanillaDb\VanillaDb\DataProviders\SqlDataProvider.tt"
+            #line 151 "C:\git\VanillaDb\VanillaDb\DataProviders\SqlDataProvider.tt"
 
             }
             else
@@ -382,14 +501,14 @@ namespace ");
             #line hidden
             this.Write("            return ");
             
-            #line 118 "C:\git\VanillaDb\VanillaDb\DataProviders\SqlDataProvider.tt"
+            #line 156 "C:\git\VanillaDb\VanillaDb\DataProviders\SqlDataProvider.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(RecordCamel));
             
             #line default
             #line hidden
             this.Write("Data;\r\n");
             
-            #line 119 "C:\git\VanillaDb\VanillaDb\DataProviders\SqlDataProvider.tt"
+            #line 157 "C:\git\VanillaDb\VanillaDb\DataProviders\SqlDataProvider.tt"
 
             }
 
@@ -398,28 +517,28 @@ namespace ");
             #line hidden
             this.Write("        }\r\n\r\n        /// <summary>Gets the data for the ");
             
-            #line 124 "C:\git\VanillaDb\VanillaDb\DataProviders\SqlDataProvider.tt"
+            #line 162 "C:\git\VanillaDb\VanillaDb\DataProviders\SqlDataProvider.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(Record));
             
             #line default
             #line hidden
             this.Write("(s) with the given collection of ");
             
-            #line 124 "C:\git\VanillaDb\VanillaDb\DataProviders\SqlDataProvider.tt"
+            #line 162 "C:\git\VanillaDb\VanillaDb\DataProviders\SqlDataProvider.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(index.ReadableFields()));
             
             #line default
             #line hidden
             this.Write(".</summary>\r\n        ");
             
-            #line 125 "C:\git\VanillaDb\VanillaDb\DataProviders\SqlDataProvider.tt"
+            #line 163 "C:\git\VanillaDb\VanillaDb\DataProviders\SqlDataProvider.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(index.BulkGetByIndexParamsXmlComments()));
             
             #line default
             #line hidden
             this.Write("\r\n        /// <returns>");
             
-            #line 126 "C:\git\VanillaDb\VanillaDb\DataProviders\SqlDataProvider.tt"
+            #line 164 "C:\git\VanillaDb\VanillaDb\DataProviders\SqlDataProvider.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(Record));
             
             #line default
@@ -427,28 +546,28 @@ namespace ");
             this.Write(" Data Model or null if not found.</returns>\r\n        public async Task<IEnumerabl" +
                     "e<");
             
-            #line 127 "C:\git\VanillaDb\VanillaDb\DataProviders\SqlDataProvider.tt"
+            #line 165 "C:\git\VanillaDb\VanillaDb\DataProviders\SqlDataProvider.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(Record));
             
             #line default
             #line hidden
             this.Write("DataModel>> ");
             
-            #line 127 "C:\git\VanillaDb\VanillaDb\DataProviders\SqlDataProvider.tt"
+            #line 165 "C:\git\VanillaDb\VanillaDb\DataProviders\SqlDataProvider.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(index.GetByIndexMethodName()));
             
             #line default
             #line hidden
             this.Write("(");
             
-            #line 127 "C:\git\VanillaDb\VanillaDb\DataProviders\SqlDataProvider.tt"
+            #line 165 "C:\git\VanillaDb\VanillaDb\DataProviders\SqlDataProvider.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(index.BulkGetByIndexMethodParams()));
             
             #line default
             #line hidden
             this.Write(")\r\n        {\r\n");
             
-            #line 129 "C:\git\VanillaDb\VanillaDb\DataProviders\SqlDataProvider.tt"
+            #line 167 "C:\git\VanillaDb\VanillaDb\DataProviders\SqlDataProvider.tt"
 
         foreach (FieldModel field in index.Fields)
         {
@@ -458,28 +577,28 @@ namespace ");
             #line hidden
             this.Write("            if (");
             
-            #line 133 "C:\git\VanillaDb\VanillaDb\DataProviders\SqlDataProvider.tt"
+            #line 171 "C:\git\VanillaDb\VanillaDb\DataProviders\SqlDataProvider.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(field.FieldName.ToCamelCase()));
             
             #line default
             #line hidden
             this.Write("s == null || !");
             
-            #line 133 "C:\git\VanillaDb\VanillaDb\DataProviders\SqlDataProvider.tt"
+            #line 171 "C:\git\VanillaDb\VanillaDb\DataProviders\SqlDataProvider.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(field.FieldName.ToCamelCase()));
             
             #line default
             #line hidden
             this.Write("s.Any())\r\n            {\r\n                throw new ArgumentNullException(nameof(");
             
-            #line 135 "C:\git\VanillaDb\VanillaDb\DataProviders\SqlDataProvider.tt"
+            #line 173 "C:\git\VanillaDb\VanillaDb\DataProviders\SqlDataProvider.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(field.FieldName.ToCamelCase()));
             
             #line default
             #line hidden
             this.Write("s));\r\n            }\r\n\r\n");
             
-            #line 138 "C:\git\VanillaDb\VanillaDb\DataProviders\SqlDataProvider.tt"
+            #line 176 "C:\git\VanillaDb\VanillaDb\DataProviders\SqlDataProvider.tt"
 
         }
 
@@ -489,48 +608,55 @@ namespace ");
             this.Write("            // Create an in-memory datatable with all of the field values\r\n      " +
                     "      var idDataTable = new DataTable();\r\n            ");
             
-            #line 143 "C:\git\VanillaDb\VanillaDb\DataProviders\SqlDataProvider.tt"
+            #line 181 "C:\git\VanillaDb\VanillaDb\DataProviders\SqlDataProvider.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(GenerateInMemoryDataColumns(index.Fields)));
             
             #line default
             #line hidden
             this.Write("\r\n            for (var i = 0; i < ");
             
-            #line 144 "C:\git\VanillaDb\VanillaDb\DataProviders\SqlDataProvider.tt"
+            #line 182 "C:\git\VanillaDb\VanillaDb\DataProviders\SqlDataProvider.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(index.Fields.ElementAt(0).FieldName.ToCamelCase()));
             
             #line default
             #line hidden
             this.Write("s.Count(); i++)\r\n            {\r\n                ");
             
-            #line 146 "C:\git\VanillaDb\VanillaDb\DataProviders\SqlDataProvider.tt"
+            #line 184 "C:\git\VanillaDb\VanillaDb\DataProviders\SqlDataProvider.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(GenerateInMemoryRowCreation(index.Fields)));
             
             #line default
             #line hidden
             this.Write("\r\n            }\r\n\r\n            var ");
             
-            #line 149 "C:\git\VanillaDb\VanillaDb\DataProviders\SqlDataProvider.tt"
+            #line 187 "C:\git\VanillaDb\VanillaDb\DataProviders\SqlDataProvider.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(RecordCamel));
             
             #line default
             #line hidden
             this.Write("Data = new List<");
             
-            #line 149 "C:\git\VanillaDb\VanillaDb\DataProviders\SqlDataProvider.tt"
+            #line 187 "C:\git\VanillaDb\VanillaDb\DataProviders\SqlDataProvider.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(Record));
             
             #line default
             #line hidden
             this.Write("DataModel>();\r\n            using (var connection = new SqlConnection(this.Connect" +
-                    "ionString))\r\n            {\r\n                var procName = \"");
+                    "ionString))\r\n            {\r\n                var procName = \"[");
             
-            #line 152 "C:\git\VanillaDb\VanillaDb\DataProviders\SqlDataProvider.tt"
+            #line 190 "C:\git\VanillaDb\VanillaDb\DataProviders\SqlDataProvider.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(Table.Schema));
+            
+            #line default
+            #line hidden
+            this.Write("].[");
+            
+            #line 190 "C:\git\VanillaDb\VanillaDb\DataProviders\SqlDataProvider.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(GenerateGetByIndexBulkStoredProcName(index)));
             
             #line default
             #line hidden
-            this.Write(@""";
+            this.Write(@"]"";
                 using (var command = new SqlCommand(procName))
                 {
                     Log.InfoFormat(""Invoking Stored Procedure {0}."", procName);
@@ -540,7 +666,7 @@ namespace ");
                     // Create the Stored Procedure Parameter and set to Type_IdTable
                     var idsParam = command.Parameters.AddWithValue(""");
             
-            #line 160 "C:\git\VanillaDb\VanillaDb\DataProviders\SqlDataProvider.tt"
+            #line 198 "C:\git\VanillaDb\VanillaDb\DataProviders\SqlDataProvider.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(GenerateBulkProcParameter(index)));
             
             #line default
@@ -548,7 +674,7 @@ namespace ");
             this.Write("\", idDataTable);\r\n                    idsParam.SqlDbType = SqlDbType.Structured;\r" +
                     "\n                    idsParam.TypeName = \"");
             
-            #line 162 "C:\git\VanillaDb\VanillaDb\DataProviders\SqlDataProvider.tt"
+            #line 200 "C:\git\VanillaDb\VanillaDb\DataProviders\SqlDataProvider.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(index.GetBulkTypeIdTable()));
             
             #line default
@@ -563,14 +689,14 @@ namespace ");
                         {
                             var data = Parse");
             
-            #line 170 "C:\git\VanillaDb\VanillaDb\DataProviders\SqlDataProvider.tt"
+            #line 208 "C:\git\VanillaDb\VanillaDb\DataProviders\SqlDataProvider.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(Record));
             
             #line default
             #line hidden
             this.Write("DataModel(reader);\r\n                            ");
             
-            #line 171 "C:\git\VanillaDb\VanillaDb\DataProviders\SqlDataProvider.tt"
+            #line 209 "C:\git\VanillaDb\VanillaDb\DataProviders\SqlDataProvider.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(RecordCamel));
             
             #line default
@@ -578,72 +704,82 @@ namespace ");
             this.Write("Data.Add(data);\r\n                        }\r\n                    }\r\n              " +
                     "  }\r\n            }\r\n\r\n            return ");
             
-            #line 177 "C:\git\VanillaDb\VanillaDb\DataProviders\SqlDataProvider.tt"
+            #line 215 "C:\git\VanillaDb\VanillaDb\DataProviders\SqlDataProvider.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(RecordCamel));
             
             #line default
             #line hidden
             this.Write("Data;\r\n        }\r\n\r\n");
             
-            #line 180 "C:\git\VanillaDb\VanillaDb\DataProviders\SqlDataProvider.tt"
+            #line 218 "C:\git\VanillaDb\VanillaDb\DataProviders\SqlDataProvider.tt"
 
     }
 
             
             #line default
             #line hidden
+            
+            #line 221 "C:\git\VanillaDb\VanillaDb\DataProviders\SqlDataProvider.tt"
+
+    // Generate the Insert method if configured
+    if (Table.Config.Insert)
+    {
+
+            
+            #line default
+            #line hidden
             this.Write("        /// <summary>Inserts the given ");
             
-            #line 183 "C:\git\VanillaDb\VanillaDb\DataProviders\SqlDataProvider.tt"
+            #line 226 "C:\git\VanillaDb\VanillaDb\DataProviders\SqlDataProvider.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(Record));
             
             #line default
             #line hidden
             this.Write(" data model into the ");
             
-            #line 183 "C:\git\VanillaDb\VanillaDb\DataProviders\SqlDataProvider.tt"
+            #line 226 "C:\git\VanillaDb\VanillaDb\DataProviders\SqlDataProvider.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(Record));
             
             #line default
             #line hidden
             this.Write(" table.</summary>\r\n        /// <param name=\"");
             
-            #line 184 "C:\git\VanillaDb\VanillaDb\DataProviders\SqlDataProvider.tt"
+            #line 227 "C:\git\VanillaDb\VanillaDb\DataProviders\SqlDataProvider.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(RecordCamel));
             
             #line default
             #line hidden
             this.Write("Data\">The ");
             
-            #line 184 "C:\git\VanillaDb\VanillaDb\DataProviders\SqlDataProvider.tt"
+            #line 227 "C:\git\VanillaDb\VanillaDb\DataProviders\SqlDataProvider.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(RecordLower));
             
             #line default
             #line hidden
             this.Write(" data to insert.</param>\r\n        /// <returns>The ID of the inserted ");
             
-            #line 185 "C:\git\VanillaDb\VanillaDb\DataProviders\SqlDataProvider.tt"
+            #line 228 "C:\git\VanillaDb\VanillaDb\DataProviders\SqlDataProvider.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(Record));
             
             #line default
             #line hidden
             this.Write(" record.</returns>\r\n        public async Task<int> Insert(");
             
-            #line 186 "C:\git\VanillaDb\VanillaDb\DataProviders\SqlDataProvider.tt"
+            #line 229 "C:\git\VanillaDb\VanillaDb\DataProviders\SqlDataProvider.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(Record));
             
             #line default
             #line hidden
             this.Write("DataModel ");
             
-            #line 186 "C:\git\VanillaDb\VanillaDb\DataProviders\SqlDataProvider.tt"
+            #line 229 "C:\git\VanillaDb\VanillaDb\DataProviders\SqlDataProvider.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(RecordCamel));
             
             #line default
             #line hidden
             this.Write("Data)\r\n        {\r\n            if (");
             
-            #line 188 "C:\git\VanillaDb\VanillaDb\DataProviders\SqlDataProvider.tt"
+            #line 231 "C:\git\VanillaDb\VanillaDb\DataProviders\SqlDataProvider.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(RecordCamel));
             
             #line default
@@ -651,7 +787,7 @@ namespace ");
             this.Write("Data == null)\r\n            {\r\n                throw new ArgumentNullException(nam" +
                     "eof(");
             
-            #line 190 "C:\git\VanillaDb\VanillaDb\DataProviders\SqlDataProvider.tt"
+            #line 233 "C:\git\VanillaDb\VanillaDb\DataProviders\SqlDataProvider.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(RecordCamel));
             
             #line default
@@ -665,7 +801,7 @@ namespace ");
             }
             ");
             
-            #line 197 "C:\git\VanillaDb\VanillaDb\DataProviders\SqlDataProvider.tt"
+            #line 240 "C:\git\VanillaDb\VanillaDb\DataProviders\SqlDataProvider.tt"
 
             if (PrimaryKey.IsIdentity)
             {
@@ -675,14 +811,14 @@ namespace ");
             #line hidden
             this.Write("\r\n            if (");
             
-            #line 202 "C:\git\VanillaDb\VanillaDb\DataProviders\SqlDataProvider.tt"
+            #line 245 "C:\git\VanillaDb\VanillaDb\DataProviders\SqlDataProvider.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(RecordCamel));
             
             #line default
             #line hidden
             this.Write("Data.");
             
-            #line 202 "C:\git\VanillaDb\VanillaDb\DataProviders\SqlDataProvider.tt"
+            #line 245 "C:\git\VanillaDb\VanillaDb\DataProviders\SqlDataProvider.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(PrimaryKey.FieldName));
             
             #line default
@@ -690,21 +826,21 @@ namespace ");
             this.Write(" > 0)\r\n            {\r\n                throw new InvalidOperationException(\"Unable" +
                     " to insert ");
             
-            #line 204 "C:\git\VanillaDb\VanillaDb\DataProviders\SqlDataProvider.tt"
+            #line 247 "C:\git\VanillaDb\VanillaDb\DataProviders\SqlDataProvider.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(Record));
             
             #line default
             #line hidden
             this.Write(" Data that already has a ");
             
-            #line 204 "C:\git\VanillaDb\VanillaDb\DataProviders\SqlDataProvider.tt"
+            #line 247 "C:\git\VanillaDb\VanillaDb\DataProviders\SqlDataProvider.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(PrimaryKey.FieldName));
             
             #line default
             #line hidden
             this.Write(".\");\r\n            }\r\n            ");
             
-            #line 206 "C:\git\VanillaDb\VanillaDb\DataProviders\SqlDataProvider.tt"
+            #line 249 "C:\git\VanillaDb\VanillaDb\DataProviders\SqlDataProvider.tt"
 
             }
             
@@ -713,20 +849,27 @@ namespace ");
             #line hidden
             this.Write("\r\n            var ");
             
-            #line 210 "C:\git\VanillaDb\VanillaDb\DataProviders\SqlDataProvider.tt"
+            #line 253 "C:\git\VanillaDb\VanillaDb\DataProviders\SqlDataProvider.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(PrimaryKey.GetCodeParamName()));
             
             #line default
             #line hidden
             this.Write(" = -1;\r\n            using (var connection = new SqlConnection(this.ConnectionStri" +
-                    "ng))\r\n            {\r\n                var procName = \"");
+                    "ng))\r\n            {\r\n                var procName = \"[");
             
-            #line 213 "C:\git\VanillaDb\VanillaDb\DataProviders\SqlDataProvider.tt"
+            #line 256 "C:\git\VanillaDb\VanillaDb\DataProviders\SqlDataProvider.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(Table.Schema));
+            
+            #line default
+            #line hidden
+            this.Write("].[");
+            
+            #line 256 "C:\git\VanillaDb\VanillaDb\DataProviders\SqlDataProvider.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(Table.GetInsertProcName()));
             
             #line default
             #line hidden
-            this.Write(@""";
+            this.Write(@"]"";
                 using (var command = new SqlCommand(procName))
                 {
                     Log.InfoFormat(""Invoking Stored Procedure {0}."", procName);
@@ -734,7 +877,7 @@ namespace ");
                     command.Connection = connection;
                     ");
             
-            #line 219 "C:\git\VanillaDb\VanillaDb\DataProviders\SqlDataProvider.tt"
+            #line 262 "C:\git\VanillaDb\VanillaDb\DataProviders\SqlDataProvider.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(GenerateInsertProcParams()));
             
             #line default
@@ -749,14 +892,14 @@ namespace ");
                         {
                             ");
             
-            #line 227 "C:\git\VanillaDb\VanillaDb\DataProviders\SqlDataProvider.tt"
+            #line 270 "C:\git\VanillaDb\VanillaDb\DataProviders\SqlDataProvider.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(PrimaryKey.GetCodeParamName()));
             
             #line default
             #line hidden
             this.Write(" = (int)reader[\"");
             
-            #line 227 "C:\git\VanillaDb\VanillaDb\DataProviders\SqlDataProvider.tt"
+            #line 270 "C:\git\VanillaDb\VanillaDb\DataProviders\SqlDataProvider.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(PrimaryKey.FieldName));
             
             #line default
@@ -764,35 +907,54 @@ namespace ");
             this.Write("\"];\r\n                        }\r\n                    }\r\n                }\r\n       " +
                     "     }\r\n\r\n            return ");
             
-            #line 233 "C:\git\VanillaDb\VanillaDb\DataProviders\SqlDataProvider.tt"
+            #line 276 "C:\git\VanillaDb\VanillaDb\DataProviders\SqlDataProvider.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(PrimaryKey.GetCodeParamName()));
             
             #line default
             #line hidden
-            this.Write(";\r\n        }\r\n\r\n        /// <summary>Updates the given ");
+            this.Write(";\r\n        }\r\n\r\n");
             
-            #line 236 "C:\git\VanillaDb\VanillaDb\DataProviders\SqlDataProvider.tt"
+            #line 279 "C:\git\VanillaDb\VanillaDb\DataProviders\SqlDataProvider.tt"
+
+    }
+
+            
+            #line default
+            #line hidden
+            
+            #line 282 "C:\git\VanillaDb\VanillaDb\DataProviders\SqlDataProvider.tt"
+
+    // Generate the Update method if configured
+    if (Table.Config.Update)
+    {
+
+            
+            #line default
+            #line hidden
+            this.Write("        /// <summary>Updates the given ");
+            
+            #line 287 "C:\git\VanillaDb\VanillaDb\DataProviders\SqlDataProvider.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(Record));
             
             #line default
             #line hidden
             this.Write(" data model in the ");
             
-            #line 236 "C:\git\VanillaDb\VanillaDb\DataProviders\SqlDataProvider.tt"
+            #line 287 "C:\git\VanillaDb\VanillaDb\DataProviders\SqlDataProvider.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(Record));
             
             #line default
             #line hidden
             this.Write(" table.</summary>\r\n        /// <param name=\"");
             
-            #line 237 "C:\git\VanillaDb\VanillaDb\DataProviders\SqlDataProvider.tt"
+            #line 288 "C:\git\VanillaDb\VanillaDb\DataProviders\SqlDataProvider.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(RecordCamel));
             
             #line default
             #line hidden
             this.Write("Data\">The ");
             
-            #line 237 "C:\git\VanillaDb\VanillaDb\DataProviders\SqlDataProvider.tt"
+            #line 288 "C:\git\VanillaDb\VanillaDb\DataProviders\SqlDataProvider.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(RecordLower));
             
             #line default
@@ -800,21 +962,21 @@ namespace ");
             this.Write(" data to update.</param>\r\n        /// <returns>The number of records affected by " +
                     "the update.</returns>\r\n        public async Task<int> Update(");
             
-            #line 239 "C:\git\VanillaDb\VanillaDb\DataProviders\SqlDataProvider.tt"
+            #line 290 "C:\git\VanillaDb\VanillaDb\DataProviders\SqlDataProvider.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(Record));
             
             #line default
             #line hidden
             this.Write("DataModel ");
             
-            #line 239 "C:\git\VanillaDb\VanillaDb\DataProviders\SqlDataProvider.tt"
+            #line 290 "C:\git\VanillaDb\VanillaDb\DataProviders\SqlDataProvider.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(RecordCamel));
             
             #line default
             #line hidden
             this.Write("Data)\r\n        {\r\n            if (");
             
-            #line 241 "C:\git\VanillaDb\VanillaDb\DataProviders\SqlDataProvider.tt"
+            #line 292 "C:\git\VanillaDb\VanillaDb\DataProviders\SqlDataProvider.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(RecordCamel));
             
             #line default
@@ -822,7 +984,7 @@ namespace ");
             this.Write("Data == null)\r\n            {\r\n                throw new ArgumentNullException(nam" +
                     "eof(");
             
-            #line 243 "C:\git\VanillaDb\VanillaDb\DataProviders\SqlDataProvider.tt"
+            #line 294 "C:\git\VanillaDb\VanillaDb\DataProviders\SqlDataProvider.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(RecordCamel));
             
             #line default
@@ -837,14 +999,14 @@ namespace ");
 
             if (");
             
-            #line 251 "C:\git\VanillaDb\VanillaDb\DataProviders\SqlDataProvider.tt"
+            #line 302 "C:\git\VanillaDb\VanillaDb\DataProviders\SqlDataProvider.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(RecordCamel));
             
             #line default
             #line hidden
             this.Write("Data.");
             
-            #line 251 "C:\git\VanillaDb\VanillaDb\DataProviders\SqlDataProvider.tt"
+            #line 302 "C:\git\VanillaDb\VanillaDb\DataProviders\SqlDataProvider.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(PrimaryKey.FieldName));
             
             #line default
@@ -852,21 +1014,28 @@ namespace ");
             this.Write(" <= 0)\r\n            {\r\n                throw new InvalidOperationException(\"A val" +
                     "id ");
             
-            #line 253 "C:\git\VanillaDb\VanillaDb\DataProviders\SqlDataProvider.tt"
+            #line 304 "C:\git\VanillaDb\VanillaDb\DataProviders\SqlDataProvider.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(PrimaryKey.FieldName));
             
             #line default
             #line hidden
             this.Write(" must be provided to update.\");\r\n            }\r\n\r\n            var affectedRows = " +
                     "0;\r\n            using (var connection = new SqlConnection(this.ConnectionString)" +
-                    ")\r\n            {\r\n                var procName = \"");
+                    ")\r\n            {\r\n                var procName = \"[");
             
-            #line 259 "C:\git\VanillaDb\VanillaDb\DataProviders\SqlDataProvider.tt"
+            #line 310 "C:\git\VanillaDb\VanillaDb\DataProviders\SqlDataProvider.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(Table.Schema));
+            
+            #line default
+            #line hidden
+            this.Write("].[");
+            
+            #line 310 "C:\git\VanillaDb\VanillaDb\DataProviders\SqlDataProvider.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(Table.GetUpdateProcName()));
             
             #line default
             #line hidden
-            this.Write(@""";
+            this.Write(@"]"";
                 using (var command = new SqlCommand(procName))
                 {
                     Log.InfoFormat(""Invoking Stored Procedure {0}."", procName);
@@ -874,52 +1043,70 @@ namespace ");
                     command.Connection = connection;
                     ");
             
-            #line 265 "C:\git\VanillaDb\VanillaDb\DataProviders\SqlDataProvider.tt"
+            #line 316 "C:\git\VanillaDb\VanillaDb\DataProviders\SqlDataProvider.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(GenerateUpdateProcParams()));
             
             #line default
             #line hidden
             this.Write("\r\n\r\n                    connection.Open();\r\n                    affectedRows = aw" +
                     "ait command.ExecuteNonQueryAsync();\r\n                }\r\n            }\r\n\r\n       " +
-                    "     return affectedRows;\r\n        }\r\n\r\n        /// <summary>Deletes record with" +
-                    " the given ");
+                    "     return affectedRows;\r\n        }\r\n\r\n");
             
-            #line 275 "C:\git\VanillaDb\VanillaDb\DataProviders\SqlDataProvider.tt"
+            #line 326 "C:\git\VanillaDb\VanillaDb\DataProviders\SqlDataProvider.tt"
+
+    }
+
+            
+            #line default
+            #line hidden
+            
+            #line 329 "C:\git\VanillaDb\VanillaDb\DataProviders\SqlDataProvider.tt"
+
+    // Generate the Delete method if configured
+    if (Table.Config.Delete)
+    {
+
+            
+            #line default
+            #line hidden
+            this.Write("        /// <summary>Deletes record with the given ");
+            
+            #line 334 "C:\git\VanillaDb\VanillaDb\DataProviders\SqlDataProvider.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(PrimaryKey.FieldName));
             
             #line default
             #line hidden
             this.Write(" from the ");
             
-            #line 275 "C:\git\VanillaDb\VanillaDb\DataProviders\SqlDataProvider.tt"
+            #line 334 "C:\git\VanillaDb\VanillaDb\DataProviders\SqlDataProvider.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(Table.TableName));
             
             #line default
             #line hidden
             this.Write(" table.</summary>\r\n        /// <param name=\"");
             
-            #line 276 "C:\git\VanillaDb\VanillaDb\DataProviders\SqlDataProvider.tt"
+            #line 335 "C:\git\VanillaDb\VanillaDb\DataProviders\SqlDataProvider.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(PrimaryKey.GetCodeParamName()));
             
             #line default
             #line hidden
             this.Write("\">The ");
             
-            #line 276 "C:\git\VanillaDb\VanillaDb\DataProviders\SqlDataProvider.tt"
+            #line 335 "C:\git\VanillaDb\VanillaDb\DataProviders\SqlDataProvider.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(PrimaryKey.FieldName));
             
             #line default
             #line hidden
             this.Write(".</param>\r\n        public async Task<int> Delete(int ");
             
-            #line 277 "C:\git\VanillaDb\VanillaDb\DataProviders\SqlDataProvider.tt"
+            #line 336 "C:\git\VanillaDb\VanillaDb\DataProviders\SqlDataProvider.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(PrimaryKey.GetCodeParamName()));
             
             #line default
             #line hidden
             this.Write(")\r\n        {\r\n            if (");
             
-            #line 279 "C:\git\VanillaDb\VanillaDb\DataProviders\SqlDataProvider.tt"
+            #line 338 "C:\git\VanillaDb\VanillaDb\DataProviders\SqlDataProvider.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(PrimaryKey.GetCodeParamName()));
             
             #line default
@@ -927,21 +1114,28 @@ namespace ");
             this.Write(" <= 0)\r\n            {\r\n                throw new InvalidOperationException(\"A val" +
                     "id ");
             
-            #line 281 "C:\git\VanillaDb\VanillaDb\DataProviders\SqlDataProvider.tt"
+            #line 340 "C:\git\VanillaDb\VanillaDb\DataProviders\SqlDataProvider.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(PrimaryKey.FieldName));
             
             #line default
             #line hidden
             this.Write(" must be provided to delete.\");\r\n            }\r\n\r\n            var affectedRows = " +
                     "0;\r\n            using (var connection = new SqlConnection(this.ConnectionString)" +
-                    ")\r\n            {\r\n                var procName = \"");
+                    ")\r\n            {\r\n                var procName = \"[");
             
-            #line 287 "C:\git\VanillaDb\VanillaDb\DataProviders\SqlDataProvider.tt"
+            #line 346 "C:\git\VanillaDb\VanillaDb\DataProviders\SqlDataProvider.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(Table.Schema));
+            
+            #line default
+            #line hidden
+            this.Write("].[");
+            
+            #line 346 "C:\git\VanillaDb\VanillaDb\DataProviders\SqlDataProvider.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(Table.GetDeleteProcName()));
             
             #line default
             #line hidden
-            this.Write(@""";
+            this.Write(@"]"";
                 using (var command = new SqlCommand(procName))
                 {
                     Log.InfoFormat(""Invoking Stored Procedure {0}."", procName);
@@ -949,14 +1143,14 @@ namespace ");
                     command.Connection = connection;
                     command.Parameters.AddWithValue(""");
             
-            #line 293 "C:\git\VanillaDb\VanillaDb\DataProviders\SqlDataProvider.tt"
+            #line 352 "C:\git\VanillaDb\VanillaDb\DataProviders\SqlDataProvider.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(PrimaryKey.GetParamName()));
             
             #line default
             #line hidden
             this.Write("\", ");
             
-            #line 293 "C:\git\VanillaDb\VanillaDb\DataProviders\SqlDataProvider.tt"
+            #line 352 "C:\git\VanillaDb\VanillaDb\DataProviders\SqlDataProvider.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(PrimaryKey.GetCodeParamName()));
             
             #line default
@@ -973,42 +1167,42 @@ namespace ");
 
         /// <summary>Deletes the records with the given ");
             
-            #line 303 "C:\git\VanillaDb\VanillaDb\DataProviders\SqlDataProvider.tt"
+            #line 362 "C:\git\VanillaDb\VanillaDb\DataProviders\SqlDataProvider.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(PrimaryKey.FieldName));
             
             #line default
             #line hidden
             this.Write("s from the ");
             
-            #line 303 "C:\git\VanillaDb\VanillaDb\DataProviders\SqlDataProvider.tt"
+            #line 362 "C:\git\VanillaDb\VanillaDb\DataProviders\SqlDataProvider.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(Table.TableName));
             
             #line default
             #line hidden
             this.Write(" table.</summary>\r\n        /// <param name=\"");
             
-            #line 304 "C:\git\VanillaDb\VanillaDb\DataProviders\SqlDataProvider.tt"
+            #line 363 "C:\git\VanillaDb\VanillaDb\DataProviders\SqlDataProvider.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(PrimaryKey.GetCodeParamName()));
             
             #line default
             #line hidden
             this.Write("s\">The ");
             
-            #line 304 "C:\git\VanillaDb\VanillaDb\DataProviders\SqlDataProvider.tt"
+            #line 363 "C:\git\VanillaDb\VanillaDb\DataProviders\SqlDataProvider.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(PrimaryKey.FieldName));
             
             #line default
             #line hidden
             this.Write("s.</param>\r\n        public async Task<int> Delete(IEnumerable<int> ");
             
-            #line 305 "C:\git\VanillaDb\VanillaDb\DataProviders\SqlDataProvider.tt"
+            #line 364 "C:\git\VanillaDb\VanillaDb\DataProviders\SqlDataProvider.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(PrimaryKey.GetCodeParamName()));
             
             #line default
             #line hidden
             this.Write("s)\r\n        {\r\n            if (");
             
-            #line 307 "C:\git\VanillaDb\VanillaDb\DataProviders\SqlDataProvider.tt"
+            #line 366 "C:\git\VanillaDb\VanillaDb\DataProviders\SqlDataProvider.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(PrimaryKey.GetCodeParamName()));
             
             #line default
@@ -1016,14 +1210,14 @@ namespace ");
             this.Write("s == null)\r\n            {\r\n                throw new ArgumentNullException(nameof" +
                     "(");
             
-            #line 309 "C:\git\VanillaDb\VanillaDb\DataProviders\SqlDataProvider.tt"
+            #line 368 "C:\git\VanillaDb\VanillaDb\DataProviders\SqlDataProvider.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(PrimaryKey.GetCodeParamName()));
             
             #line default
             #line hidden
             this.Write("s));\r\n            }\r\n\r\n            if (!");
             
-            #line 312 "C:\git\VanillaDb\VanillaDb\DataProviders\SqlDataProvider.tt"
+            #line 371 "C:\git\VanillaDb\VanillaDb\DataProviders\SqlDataProvider.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(PrimaryKey.GetCodeParamName()));
             
             #line default
@@ -1031,21 +1225,21 @@ namespace ");
             this.Write("s.Any())\r\n            {\r\n                throw new ArgumentException(\"At least on" +
                     "e ");
             
-            #line 314 "C:\git\VanillaDb\VanillaDb\DataProviders\SqlDataProvider.tt"
+            #line 373 "C:\git\VanillaDb\VanillaDb\DataProviders\SqlDataProvider.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(PrimaryKey.FieldName));
             
             #line default
             #line hidden
             this.Write(" must be provided to delete.\", nameof(");
             
-            #line 314 "C:\git\VanillaDb\VanillaDb\DataProviders\SqlDataProvider.tt"
+            #line 373 "C:\git\VanillaDb\VanillaDb\DataProviders\SqlDataProvider.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(PrimaryKey.GetCodeParamName()));
             
             #line default
             #line hidden
             this.Write("s));\r\n            }\r\n\r\n            if (");
             
-            #line 317 "C:\git\VanillaDb\VanillaDb\DataProviders\SqlDataProvider.tt"
+            #line 376 "C:\git\VanillaDb\VanillaDb\DataProviders\SqlDataProvider.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(PrimaryKey.GetCodeParamName()));
             
             #line default
@@ -1053,7 +1247,7 @@ namespace ");
             this.Write("s.Any(i => i <= 0))\r\n            {\r\n                throw new InvalidOperationExc" +
                     "eption(\"All ");
             
-            #line 319 "C:\git\VanillaDb\VanillaDb\DataProviders\SqlDataProvider.tt"
+            #line 378 "C:\git\VanillaDb\VanillaDb\DataProviders\SqlDataProvider.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(PrimaryKey.FieldName));
             
             #line default
@@ -1062,35 +1256,42 @@ namespace ");
                     "y datatable with the primary key values\r\n            var idDataTable = new DataT" +
                     "able();\r\n            idDataTable.Columns.Add(new DataColumn(\"");
             
-            #line 324 "C:\git\VanillaDb\VanillaDb\DataProviders\SqlDataProvider.tt"
+            #line 383 "C:\git\VanillaDb\VanillaDb\DataProviders\SqlDataProvider.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(PrimaryKey.FieldName));
             
             #line default
             #line hidden
             this.Write("\"));\r\n            for (var i = 0; i < ");
             
-            #line 325 "C:\git\VanillaDb\VanillaDb\DataProviders\SqlDataProvider.tt"
+            #line 384 "C:\git\VanillaDb\VanillaDb\DataProviders\SqlDataProvider.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(PrimaryKey.GetCodeParamName()));
             
             #line default
             #line hidden
             this.Write("s.Count(); i++)\r\n            {\r\n                idDataTable.Rows.Add(");
             
-            #line 327 "C:\git\VanillaDb\VanillaDb\DataProviders\SqlDataProvider.tt"
+            #line 386 "C:\git\VanillaDb\VanillaDb\DataProviders\SqlDataProvider.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(PrimaryKey.GetCodeParamName()));
             
             #line default
             #line hidden
             this.Write("s.ElementAt(i));\r\n            }\r\n\r\n            var affectedRows = 0;\r\n           " +
                     " using (var connection = new SqlConnection(this.ConnectionString))\r\n            " +
-                    "{\r\n                var procName = \"");
+                    "{\r\n                var procName = \"[");
             
-            #line 333 "C:\git\VanillaDb\VanillaDb\DataProviders\SqlDataProvider.tt"
+            #line 392 "C:\git\VanillaDb\VanillaDb\DataProviders\SqlDataProvider.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(Table.Schema));
+            
+            #line default
+            #line hidden
+            this.Write("].[");
+            
+            #line 392 "C:\git\VanillaDb\VanillaDb\DataProviders\SqlDataProvider.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(Table.GetDeleteBulkProcName()));
             
             #line default
             #line hidden
-            this.Write(@""";
+            this.Write(@"]"";
                 using (var command = new SqlCommand(procName))
                 {
                     Log.InfoFormat(""Invoking Stored Procedure {0}."", procName);
@@ -1100,7 +1301,7 @@ namespace ");
                     // Create the Stored Procedure Parameter and set to the Type table
                     var idsParam = command.Parameters.AddWithValue(""");
             
-            #line 341 "C:\git\VanillaDb\VanillaDb\DataProviders\SqlDataProvider.tt"
+            #line 400 "C:\git\VanillaDb\VanillaDb\DataProviders\SqlDataProvider.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(PrimaryKey.GetParamName()));
             
             #line default
@@ -1108,16 +1309,25 @@ namespace ");
             this.Write("s\", idDataTable);\r\n                    idsParam.SqlDbType = SqlDbType.Structured;" +
                     "\r\n                    idsParam.TypeName = \"");
             
-            #line 343 "C:\git\VanillaDb\VanillaDb\DataProviders\SqlDataProvider.tt"
+            #line 402 "C:\git\VanillaDb\VanillaDb\DataProviders\SqlDataProvider.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(PrimaryKeyIndex.GetBulkTypeIdTable()));
             
             #line default
             #line hidden
             this.Write("\";\r\n\r\n                    connection.Open();\r\n                    affectedRows = " +
                     "await command.ExecuteNonQueryAsync();\r\n                }\r\n            }\r\n\r\n     " +
-                    "       return affectedRows;\r\n        }\r\n\r\n        /// <summary>Parses the ");
+                    "       return affectedRows;\r\n        }\r\n\r\n");
             
-            #line 353 "C:\git\VanillaDb\VanillaDb\DataProviders\SqlDataProvider.tt"
+            #line 412 "C:\git\VanillaDb\VanillaDb\DataProviders\SqlDataProvider.tt"
+
+    }
+
+            
+            #line default
+            #line hidden
+            this.Write("        /// <summary>Parses the ");
+            
+            #line 415 "C:\git\VanillaDb\VanillaDb\DataProviders\SqlDataProvider.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(Record));
             
             #line default
@@ -1125,35 +1335,35 @@ namespace ");
             this.Write(" data model out of the reader.</summary>\r\n        /// <param name=\"reader\">The re" +
                     "ader.</param>\r\n        /// <returns>Populated ");
             
-            #line 355 "C:\git\VanillaDb\VanillaDb\DataProviders\SqlDataProvider.tt"
+            #line 417 "C:\git\VanillaDb\VanillaDb\DataProviders\SqlDataProvider.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(Record));
             
             #line default
             #line hidden
             this.Write(" Data Model</returns>\r\n        private ");
             
-            #line 356 "C:\git\VanillaDb\VanillaDb\DataProviders\SqlDataProvider.tt"
+            #line 418 "C:\git\VanillaDb\VanillaDb\DataProviders\SqlDataProvider.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(Record));
             
             #line default
             #line hidden
             this.Write("DataModel Parse");
             
-            #line 356 "C:\git\VanillaDb\VanillaDb\DataProviders\SqlDataProvider.tt"
+            #line 418 "C:\git\VanillaDb\VanillaDb\DataProviders\SqlDataProvider.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(Record));
             
             #line default
             #line hidden
             this.Write("DataModel(IDataReader reader)\r\n        {\r\n            var data = new ");
             
-            #line 358 "C:\git\VanillaDb\VanillaDb\DataProviders\SqlDataProvider.tt"
+            #line 420 "C:\git\VanillaDb\VanillaDb\DataProviders\SqlDataProvider.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(Record));
             
             #line default
             #line hidden
             this.Write("DataModel();\r\n            ");
             
-            #line 359 "C:\git\VanillaDb\VanillaDb\DataProviders\SqlDataProvider.tt"
+            #line 421 "C:\git\VanillaDb\VanillaDb\DataProviders\SqlDataProvider.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(GenerateReadFields()));
             
             #line default

@@ -1,9 +1,11 @@
-﻿using Serilog;
+﻿using Newtonsoft.Json;
+using Serilog;
 using Serilog.Sinks.SystemConsole.Themes;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using VanillaDb.Configuration;
 using VanillaDb.DataProviders;
 using VanillaDb.DeleteProcs;
 using VanillaDb.GetProcs;
@@ -17,6 +19,9 @@ namespace VanillaDb
     /// <summary>Main Program Class</summary>
     public class Program
     {
+        /// <summary>The configuration file name</summary>
+        public const string ConfigFileName = "vanillaDb.config";
+
         private static ILogger Log { get; set; }
 
         /// <summary>
@@ -34,47 +39,93 @@ namespace VanillaDb
             Serilog.Log.Logger = Log;
 
             var result = 0;
-            if (args.Length != 5)
+            var currentDirectory = new DirectoryInfo(Environment.CurrentDirectory);
+            VanillaConfig config = null;
+            if (args.Length == 0)
             {
-                throw new ArgumentException("Required Arguments: <Table>.sql|<directory> <outSqlDir> <outCodeDir> <namespace> <company-name>.");
+                // If no arguments, walk up parent directories looking for a vanillaDb.config file
+                var configFileInfo = new FileInfo(Path.Combine(currentDirectory.FullName, ConfigFileName));
+                while (configFileInfo != null && !configFileInfo.Exists)
+                {
+                    var parentDirectory = configFileInfo.Directory.Parent;
+                    if (parentDirectory != null)
+                    {
+                        configFileInfo = new FileInfo(Path.Combine(configFileInfo.Directory.Parent.FullName, ConfigFileName));
+                    }
+                    else
+                    {
+                        configFileInfo = null;
+                    }
+                }
+
+                if (configFileInfo == null)
+                {
+                    throw new InvalidOperationException(
+                        $"{ConfigFileName} is required in folder hierarchy, or all required arguments must be provided." +
+                        "Required Arguments: <Table>.sql|<directory> <outSqlDir> <outCodeDir> <namespace> <company-name> (optional)--generate-config <config-path>.");
+                }
+                else
+                {
+                    var configString = File.ReadAllText(configFileInfo.FullName);
+                    config = JsonConvert.DeserializeObject<VanillaConfig>(configString);
+                }
+            }
+            else if (args.Length == 5 || args.Length == 7)
+            {
+                config = new VanillaConfig()
+                {
+                    TableSqlPath = args[0],
+                    OutputSqlPath = args[1],
+                    OutputCodePath = args[2],
+                    CodeNamespace = args[3],
+                    CompanyName = args[4]
+                };
+
+                // If 6 arguments, then check for --generate-config
+                if (args.Length == 7 && string.Equals(args[5], "--generate-config", StringComparison.InvariantCultureIgnoreCase))
+                {
+                    var outputLocation = args[6];
+                    var outputContents = JsonConvert.SerializeObject(config, Formatting.Indented);
+                    File.WriteAllText(Path.Combine(outputLocation, ConfigFileName), outputContents);
+                }
+            }
+            else if (args.Length != 5)
+            {
+                // If 5 arguments, then assume all arguments were provided
+                throw new ArgumentException(
+                        $"{ConfigFileName} is required in folder hierarchy, or all required arguments must be provided." +
+                        "Required Arguments: <Table>.sql|<directory> <outSqlDir> <outCodeDir> <namespace> <company-name> (optional)--generate-config <config-path>.");
             }
 
             // First param is the table file - expect *.sql - or directory containing *.sql table definition files
-            var sqlFileName = args[0];
-            var sqlFileInfo = new FileInfo(sqlFileName);
-            var sqlDirectory = new DirectoryInfo(sqlFileName);
+            var sqlFileInfo = new FileInfo(config.TableSqlPath);
+            var sqlDirectory = new DirectoryInfo(config.TableSqlPath);
 
             if (!sqlFileInfo.Exists)
             {
                 if (!sqlDirectory.Exists)
                 {
-                    throw new InvalidOperationException($"{sqlFileName} does not exist.");
+                    throw new InvalidOperationException($"{config.TableSqlPath} does not exist.");
                 }
             }
 
-            // Generate output in subdirectories of the table file directory's parent
-            // In other words, we're assuming the table is in a Tables folder and want our output next to that folder
-            var outputSqlDir = args[1];
-            var outputCodeDir = args[2];
-            var outputNamespace = args[3];
-            var companyName = args[4];
-
+            // Process just the table file, or all files in the folder depending on what was configured
             if (sqlFileInfo.Exists)
             {
-                ProcessTableSql(sqlFileInfo, outputSqlDir, outputCodeDir, outputNamespace, companyName);
+                ProcessTableSql(sqlFileInfo, config);
             }
             else if (sqlDirectory.Exists)
             {
                 foreach (var fileInfo in sqlDirectory.EnumerateFiles("*.sql", SearchOption.AllDirectories))
                 {
-                    ProcessTableSql(fileInfo, outputSqlDir, outputCodeDir, outputNamespace, companyName);
+                    ProcessTableSql(fileInfo, config);
                 }
             }
 
             // Write out any static files
-            File.WriteAllText($"{outputCodeDir}\\QueryOperator.cs",
+            File.WriteAllText($"{config.OutputCodePath}\\QueryOperator.cs",
 @"
-namespace " + outputNamespace + @"
+namespace " + config.CodeNamespace + @"
 {
     /// <summary>Enumeration for the different query operators available to use.</summary>
     public enum QueryOperator
@@ -92,14 +143,21 @@ namespace " + outputNamespace + @"
             return result;
         }
 
-        private static void ProcessTableSql(FileInfo sqlFileInfo, string outputSqlDir, string outputCodeDir, string outputNamespace, string companyName)
+        private static void ProcessTableSql(FileInfo sqlFileInfo, VanillaConfig config)
         {
             // Open the file and start parsing
             var table = new TableModel()
             {
-                Company = companyName,
-                Namespace = outputNamespace,
+                Company = config.CompanyName,
+                Namespace = config.CodeNamespace,
                 Fields = new List<FieldModel>(),
+                Config = new TableConfig()
+                {
+                    GetAll = true,
+                    Insert = true,
+                    Update = true,
+                    Delete = true
+                }
             };
             var indexes = new List<IndexModel>();
             using (var stream = sqlFileInfo.OpenRead())
@@ -112,21 +170,48 @@ namespace " + outputNamespace + @"
 
                 // TODO: Add more detailed logging along the way.
 
-                // TODO: Add C# namespace input argument
+                // Check first line for /* and grab every line until encountering */ to parse as table configuration
+                var firstLine = reader.ReadLine();
+                var createTable = string.Empty;
+                if (firstLine.Trim() == "/*")
+                {
+                    // Read all the contents of the block comment to build the table config JSON
+                    var line = reader.ReadLine();
+                    var tableConfigJson = string.Empty;
+                    while (line.Trim() != "*/")
+                    {
+                        tableConfigJson += line;
+                        line = reader.ReadLine();
+                    }
 
-                // First line should be table creation - extract table name (last parameter)
-                var createTable = reader.ReadLine();
+                    // Deserialize the table config and then read the next line (should be Create Table)
+                    table.Config = JsonConvert.DeserializeObject<TableConfig>(tableConfigJson);
+                    createTable = reader.ReadLine();
+                }
+                else
+                {
+                    createTable = firstLine;
+                }
+
+                // Ignore any blank lines before encountering the Create Table method
+                while (string.IsNullOrEmpty(createTable.Trim()))
+                {
+                    createTable = reader.ReadLine();
+                }
+
+                // extract table name from the createTable line (last parameter)
                 var splitTableTokens = createTable.Split(new[] { "[", "]", ".", " ", "\t" }, StringSplitOptions.RemoveEmptyEntries);
                 if (splitTableTokens.Length < 3)
                 {
                     throw new InvalidOperationException("The first line must be the Create Table command, and it must split into a minimum of 3 parts: Create Table [name].");
                 }
 
-                // Start building the table model - starting with the name
+                // Start building the table model - starting with the name and the schema
                 table.TableName = splitTableTokens.Last();
+                table.Schema = splitTableTokens.Reverse().Skip(1).Take(1).FirstOrDefault() ?? throw new InvalidOperationException("Missing Schema from Table Name");
 
                 // Second line should be just the parenthesis start
-                if (reader.ReadLine() != "(")
+                if (reader.ReadLine().Trim() != "(")
                 {
                     throw new InvalidOperationException("First line after Create Table statement should be just (");
                 }
@@ -241,13 +326,22 @@ namespace " + outputNamespace + @"
             Log.Debug("Indexes: {@Indexes}", indexes);
 
             // Create the output directories for all of the different files
-            var typeTableDir = Path.Combine(outputSqlDir, "Types");
+            var typeTableDir = Path.Combine(config.OutputSqlPath, "Types");
             Directory.CreateDirectory(typeTableDir);
-            var storedProcDir = Path.Combine(outputSqlDir, $"Stored Procedures\\{table.TableName}");
+            var storedProcDir = Path.Combine(config.OutputSqlPath, $"Stored Procedures\\{table.TableName}");
             Directory.CreateDirectory(storedProcDir);
 
             // Generate the stored procedures using our parsed table information
-            // First generate type tables for all fields participating in indexes
+            if (table.Config.GetAll)
+            {
+                // Generate the single-select stored procedures
+                var getByAll = new GetAllStoredProc(table);
+                var sqlContent = getByAll.TransformText();
+                Log.Debug($"Content: {sqlContent}");
+                File.WriteAllText($"{storedProcDir}\\{getByAll.GenerateName()}.sql", sqlContent);
+            }
+
+            // First generate type tables for all fields participating in indexes and then the GetBy procs
             foreach (var index in indexes)
             {
                 var typeTable = new TypeTable(index);
@@ -270,31 +364,40 @@ namespace " + outputNamespace + @"
             }
 
             // Generate the Insert stored procedure
-            var insertStoredProc = new InsertStoredProc(table);
-            var insertContent = insertStoredProc.TransformText();
-            Log.Debug($"Content: {insertContent}");
-            File.WriteAllText($"{storedProcDir}\\{insertStoredProc.GenerateName()}.sql", insertContent);
+            if (table.Config.Insert)
+            {
+                var insertStoredProc = new InsertStoredProc(table);
+                var insertContent = insertStoredProc.TransformText();
+                Log.Debug($"Content: {insertContent}");
+                File.WriteAllText($"{storedProcDir}\\{insertStoredProc.GenerateName()}.sql", insertContent);
+            }
 
             // Generate the Update stored procedure
-            var updateStoredProc = new UpdateStoredProc(table);
-            var updateContent = updateStoredProc.TransformText();
-            Log.Debug($"Content: {updateContent}");
-            File.WriteAllText($"{storedProcDir}\\{updateStoredProc.GenerateName()}.sql", updateContent);
+            if (table.Config.Update)
+            {
+                var updateStoredProc = new UpdateStoredProc(table);
+                var updateContent = updateStoredProc.TransformText();
+                Log.Debug($"Content: {updateContent}");
+                File.WriteAllText($"{storedProcDir}\\{updateStoredProc.GenerateName()}.sql", updateContent);
+            }
 
-            // Generate the Delete stored procedure
-            var deleteStoredProc = new DeleteStoredProc(table);
-            var deleteContent = deleteStoredProc.TransformText();
-            Log.Debug($"Content: {deleteContent}");
-            File.WriteAllText($"{storedProcDir}\\{deleteStoredProc.GenerateName()}.sql", deleteContent);
+            if (table.Config.Delete)
+            {
+                // Generate the Delete stored procedure
+                var deleteStoredProc = new DeleteStoredProc(table);
+                var deleteContent = deleteStoredProc.TransformText();
+                Log.Debug($"Content: {deleteContent}");
+                File.WriteAllText($"{storedProcDir}\\{deleteStoredProc.GenerateName()}.sql", deleteContent);
 
-            // Generate the Bulk Delete stored procedure
-            var deleteBulkStoredProc = new DeleteBulkStoredProc(table, indexes.First(i => i.IsPrimaryKey));
-            var deleteBulkContent = deleteBulkStoredProc.TransformText();
-            Log.Debug($"Content: {deleteBulkContent}");
-            File.WriteAllText($"{storedProcDir}\\{deleteBulkStoredProc.GenerateName()}.sql", deleteBulkContent);
+                // Generate the Bulk Delete stored procedure
+                var deleteBulkStoredProc = new DeleteBulkStoredProc(table, indexes.First(i => i.IsPrimaryKey));
+                var deleteBulkContent = deleteBulkStoredProc.TransformText();
+                Log.Debug($"Content: {deleteBulkContent}");
+                File.WriteAllText($"{storedProcDir}\\{deleteBulkStoredProc.GenerateName()}.sql", deleteBulkContent);
+            }
 
             // Create Data Provider directory
-            var dataProviderDir = Path.Combine(outputCodeDir, table.TableName);
+            var dataProviderDir = Path.Combine(config.OutputCodePath, table.TableName);
             Directory.CreateDirectory(dataProviderDir);
 
             // Generate the DataModel class
@@ -314,6 +417,37 @@ namespace " + outputNamespace + @"
             content = sqlDataProviderGen.TransformText();
             Log.Debug($"Content: {content}");
             File.WriteAllText($"{dataProviderDir}\\{sqlDataProviderGen.GenerateName()}.cs", content);
+
+            // Overwrite the table.sql file to include the table config at the beginning
+            var fileContent = string.Empty;
+            using (var stream = sqlFileInfo.OpenRead())
+            using (var reader = new StreamReader(stream))
+            {
+                fileContent = reader.ReadLine();
+                var createTable = string.Empty;
+                if (fileContent.Trim() == "/*")
+                {
+                    // Read all the contents of the block comment to build the table config JSON
+                    var line = reader.ReadLine();
+                    while (line.Trim() != "*/")
+                    {
+                        line = reader.ReadLine();
+                    }
+
+                    // Read the next line (should be Create Table)
+                    fileContent = reader.ReadLine();
+                }
+
+                // Read the remainder of the file
+                fileContent += Environment.NewLine + reader.ReadToEnd();
+
+                // Serialize the TableConfig JSON into a comment block
+                var newLine = Environment.NewLine;
+                var tableConfigJson = JsonConvert.SerializeObject(table.Config, Formatting.Indented);
+                fileContent = $"/*{newLine}{tableConfigJson}{newLine}*/{newLine}{fileContent}";
+            }
+
+            File.WriteAllText(sqlFileInfo.FullName, fileContent);
         }
 
         /// <summary>Parses the type of the field from the given SQL Type markup.</summary>
@@ -366,11 +500,11 @@ namespace " + outputNamespace + @"
                 case "BIGINT":
                     fieldType.FieldType = typeof(long);
                     break;
-                case "NUMERIC":
                 case "REAL":
                 case "FLOAT":
                     fieldType.FieldType = typeof(double);
                     break;
+                case "NUMERIC":
                 case "DECIMAL":
                 case "MONEY":
                     fieldType.FieldType = typeof(decimal);

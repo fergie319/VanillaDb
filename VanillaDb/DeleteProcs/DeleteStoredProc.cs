@@ -29,7 +29,14 @@ namespace VanillaDb.DeleteProcs
         /// </summary>
         public virtual string TransformText()
         {
-            this.Write("CREATE PROCEDURE [dbo].[");
+            this.Write("CREATE PROCEDURE [");
+            
+            #line 7 "C:\git-scratch\vanilladb\VanillaDb\DeleteProcs\DeleteStoredProc.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(Table.Schema));
+            
+            #line default
+            #line hidden
+            this.Write("].[");
             
             #line 7 "C:\git-scratch\vanilladb\VanillaDb\DeleteProcs\DeleteStoredProc.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(GenerateName()));
