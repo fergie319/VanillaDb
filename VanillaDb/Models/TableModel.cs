@@ -46,14 +46,14 @@ namespace VanillaDb.Models
         /// <value>The insert fields.</value>
         public IEnumerable<FieldModel> InsertFields
         {
-            get { return Fields.Where(f => !f.IsIdentity && !TimeStampFieldNames.Contains(f.FieldName)); }
+            get { return Fields.Where(f => !f.IsIdentity && !f.IsTemporalField && !TimeStampFieldNames.Contains(f.FieldName)); }
         }
 
         /// <summary>Gets the update fields.</summary>
         /// <value>The update fields.</value>
         public IEnumerable<FieldModel> UpdateFields
         {
-            get { return Fields.Where(f => !f.IsIdentity && !TimeStampFieldNames.Contains(f.FieldName)); }
+            get { return Fields.Where(f => !f.IsIdentity && !f.IsTemporalField && !TimeStampFieldNames.Contains(f.FieldName)); }
         }
 
         /// <summary>Gets the update time stamp fields.</summary>
