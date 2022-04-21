@@ -1,10 +1,10 @@
-﻿using Newtonsoft.Json;
-using Serilog;
-using Serilog.Sinks.SystemConsole.Themes;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Newtonsoft.Json;
+using Serilog;
+using Serilog.Sinks.SystemConsole.Themes;
 using VanillaDb.Configuration;
 using VanillaDb.DataProviders;
 using VanillaDb.DeleteProcs;
@@ -228,8 +228,16 @@ namespace " + config.CodeNamespace + @"
                         throw new InvalidOperationException("Field definition line in Create Table statement should split into at least [FieldName] Type.");
                     }
 
+                    // Check for keywords - skip this line if one is encountered (only checking for PERIOD for now)
+                    var rawFieldName = splitFieldTokens[0];
+                    if (rawFieldName.Equals("period", StringComparison.InvariantCultureIgnoreCase))
+                    {
+                        fieldDef = reader.ReadLine();
+                        continue;
+                    }
+
                     // Make sure to remove any [ and ] characters for the field name
-                    var fieldName = splitFieldTokens[0].Replace("[", string.Empty).Replace("]", string.Empty);
+                    var fieldName = rawFieldName.Replace("[", string.Empty).Replace("]", string.Empty);
                     var newField = new FieldModel()
                     {
                         FieldName = fieldName,
@@ -237,6 +245,15 @@ namespace " + config.CodeNamespace + @"
                         IsPrimaryKey = splitFieldTokens.Any(s => string.Equals(s, "primary", StringComparison.InvariantCultureIgnoreCase)),
                         IsNullable = fieldDef.IndexOf(" NOT NULL", StringComparison.InvariantCultureIgnoreCase) == -1,
                     };
+
+                    if (fieldDef.IndexOf("datetime", StringComparison.InvariantCultureIgnoreCase) > -1 &&
+                        fieldDef.IndexOf("generated", StringComparison.InvariantCultureIgnoreCase) > -1 &&
+                        fieldDef.IndexOf("row", StringComparison.InvariantCultureIgnoreCase) > -1)
+                    {
+                        newField.IsTemporalField = true;
+                        newField.IsTemporalStart = fieldDef.IndexOf("row start", StringComparison.InvariantCultureIgnoreCase) != -1;
+                        newField.IsTemporalEnd = fieldDef.IndexOf("row end", StringComparison.InvariantCultureIgnoreCase) != -1;
+                    }
 
                     newField.FieldType = ParseFieldType(splitFieldTokens[1], newField.IsNullable);
                     table.Fields.Add(newField);
@@ -310,6 +327,11 @@ namespace " + config.CodeNamespace + @"
                             {
                                 throw new InvalidOperationException("The CREATE INDEX statement must have the ON clause on the next line.");
                             }
+                        }
+                        else if (nextLine.StartsWith("WITH", StringComparison.InvariantCultureIgnoreCase) &&
+                                 nextLine.ToUpper().Contains("SYSTEM_VERSIONING = ON"))
+                        {
+                            table.IsTemporal = true;
                         }
                     }
                 }

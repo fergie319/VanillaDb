@@ -29,6 +29,9 @@ namespace VanillaDb.Models
         /// <summary>Gets or sets the schema.</summary>
         public string Schema { get; set; }
 
+        /// <summary>Gets or sets a whether this is a Temporal table.</summary>
+        public bool IsTemporal { get; set; }
+
         /// <summary>Gets or sets the fields.</summary>
         public IList<FieldModel> Fields { get; set; }
 
