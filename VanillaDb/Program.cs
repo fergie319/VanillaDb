@@ -171,22 +171,22 @@ namespace " + config.CodeNamespace + @"
                 // TODO: Add more detailed logging along the way.
 
                 // Check first line for /* and grab every line until encountering */ to parse as table configuration
-                var firstLine = reader.ReadLine();
+                var firstLine = ReadLineOfSql(reader);
                 var createTable = string.Empty;
                 if (firstLine.Trim() == "/*")
                 {
                     // Read all the contents of the block comment to build the table config JSON
-                    var line = reader.ReadLine();
+                    var line = ReadLineOfSql(reader);
                     var tableConfigJson = string.Empty;
                     while (line.Trim() != "*/")
                     {
                         tableConfigJson += line;
-                        line = reader.ReadLine();
+                        line = ReadLineOfSql(reader);
                     }
 
                     // Deserialize the table config and then read the next line (should be Create Table)
                     table.Config = JsonConvert.DeserializeObject<TableConfig>(tableConfigJson);
-                    createTable = reader.ReadLine();
+                    createTable = ReadLineOfSql(reader);
                 }
                 else
                 {
@@ -196,7 +196,7 @@ namespace " + config.CodeNamespace + @"
                 // Ignore any blank lines before encountering the Create Table method
                 while (string.IsNullOrEmpty(createTable.Trim()))
                 {
-                    createTable = reader.ReadLine();
+                    createTable = ReadLineOfSql(reader);
                 }
 
                 // extract table name from the createTable line (last parameter)
@@ -211,13 +211,13 @@ namespace " + config.CodeNamespace + @"
                 table.Schema = splitTableTokens.Reverse().Skip(1).Take(1).FirstOrDefault() ?? throw new InvalidOperationException("Missing Schema from Table Name");
 
                 // Second line should be just the parenthesis start
-                if (reader.ReadLine().Trim() != "(")
+                if (ReadLineOfSql(reader) != "(")
                 {
                     throw new InvalidOperationException("First line after Create Table statement should be just (");
                 }
 
                 // Now Loop and record each field until end of statement is reached ')'
-                var fieldDef = reader.ReadLine();
+                var fieldDef = ReadLineOfSql(reader);
                 while (!fieldDef.StartsWith(")"))
                 {
                     // Remove all trailing commas, as they are useless and will only confuse further parsing
@@ -232,7 +232,7 @@ namespace " + config.CodeNamespace + @"
                     var rawFieldName = splitFieldTokens[0];
                     if (rawFieldName.Equals("period", StringComparison.InvariantCultureIgnoreCase))
                     {
-                        fieldDef = reader.ReadLine();
+                        fieldDef = ReadLineOfSql(reader);
                         continue;
                     }
 
@@ -278,7 +278,7 @@ namespace " + config.CodeNamespace + @"
                     }
                     else
                     {
-                        fieldDef = reader.ReadLine();
+                        fieldDef = ReadLineOfSql(reader);
                     }
                 }
 
@@ -288,12 +288,12 @@ namespace " + config.CodeNamespace + @"
                     while (!reader.EndOfStream)
                     {
                         // First make sure this is an 'ON' clause (so part of Index definition)
-                        var nextLine = reader.ReadLine().Trim();
+                        var nextLine = ReadLineOfSql(reader);
                         if (nextLine.StartsWith("CREATE", StringComparison.InvariantCultureIgnoreCase) &&
                             nextLine.IndexOf(" INDEX ", StringComparison.InvariantCultureIgnoreCase) > -1)
                         {
                             var isUnique = nextLine.IndexOf(" UNIQUE ", StringComparison.InvariantCultureIgnoreCase) > -1;
-                            var indexOnClause = reader.ReadLine().Trim();
+                            var indexOnClause = ReadLineOfSql(reader);
                             if (indexOnClause.StartsWith("ON", StringComparison.InvariantCultureIgnoreCase))
                             {
                                 // The fields exist within the parenthesis, which are at the end of the line
@@ -470,6 +470,26 @@ namespace " + config.CodeNamespace + @"
             }
 
             File.WriteAllText(sqlFileInfo.FullName, fileContent);
+        }
+
+        /// <summary>Reads the next line of text from the given TextReader and automatically trims whitespace and strips out line comments.</summary>
+        /// <param name="reader">The text reader.</param>
+        /// <returns>The next line of clean sql from the TextReader.</returns>
+        private static string ReadLineOfSql(TextReader reader)
+        {
+            // First read the next line
+            var nextLine = reader.ReadLine();
+
+            // Look for -- comments and trim them
+            var commentStartIndex = nextLine.IndexOf("--");
+            if (commentStartIndex > -1)
+            {
+                nextLine = nextLine.Substring(0, commentStartIndex);
+            }
+
+            // Trim whitespace before returning
+            nextLine = nextLine.Trim();
+            return nextLine;
         }
 
         /// <summary>Parses the type of the field from the given SQL Type markup.</summary>
