@@ -25,18 +25,21 @@ namespace <#= Table.Namespace #>.<#= Table.TableName #>
     using System.Data.SqlClient;
     using System.Linq;
     using System.Threading.Tasks;
-    using log4net;
+    using Microsoft.Extensions.Logging;
+    using Microsoft.Extensions.Logging.Abstractions;
 
     /// <summary>SQL implementation of data provider interface for <#= Record #> data.</summary>
     /// <seealso cref="<#= Table.Namespace #>.<#= Table.TableName #>.I<#= Record #>DataProvider" />
     public partial class <#= GenerateName() #> : I<#= Record #>DataProvider
     {
-        private static readonly ILog Log = LogManager.GetLogger(typeof(<#=GenerateName() #>));
+        private ILogger Log { get; set; }
 
         /// <summary>Initializes a new instance of the <see cref="<#= GenerateName() #>"/> class.</summary>
         /// <param name="connectionString">The connection string.</param>
-        public <#= GenerateName() #>(string connectionString)
+        /// <param name="logger">The logger for this instance.</param>
+        public <#= GenerateName() #>(string connectionString, ILogger<<#= GenerateName() #>> logger)
         {
+            this.Log = (ILogger)logger ?? NullLogger.Instance;
             this.ConnectionString = connectionString;
         }
 
@@ -59,7 +62,7 @@ namespace <#= Table.Namespace #>.<#= Table.TableName #>
                 var procName = "[<#= Table.Schema #>].[<#= Table.GetGetAllProcName() #>]";
                 using (var command = new SqlCommand(procName))
                 {
-                    Log.InfoFormat("Invoking Stored Procedure {0}.", procName);
+                    Log.LogInformation("Invoking Stored Procedure {0}.", procName);
                     command.CommandType = CommandType.StoredProcedure;
                     command.Connection = connection;
 
@@ -125,7 +128,7 @@ namespace <#= Table.Namespace #>.<#= Table.TableName #>
                 var procName = "[<#= Table.Schema #>].[<#= GenerateGetByIndexStoredProcName(index) #>]";
                 using (var command = new SqlCommand(procName))
                 {
-                    Log.InfoFormat("Invoking Stored Procedure {0}.", procName);
+                    Log.LogInformation("Invoking Stored Procedure {0}.", procName);
                     command.CommandType = CommandType.StoredProcedure;
                     command.Connection = connection;
                     <#= GenerateGetByIndexAddParametersCode(index.Parameters) #>
@@ -190,7 +193,7 @@ namespace <#= Table.Namespace #>.<#= Table.TableName #>
                 var procName = "[<#= Table.Schema #>].[<#= GenerateGetByIndexBulkStoredProcName(index) #>]";
                 using (var command = new SqlCommand(procName))
                 {
-                    Log.InfoFormat("Invoking Stored Procedure {0}.", procName);
+                    Log.LogInformation("Invoking Stored Procedure {0}.", procName);
                     command.CommandType = CommandType.StoredProcedure;
                     command.Connection = connection;
 
@@ -256,7 +259,7 @@ namespace <#= Table.Namespace #>.<#= Table.TableName #>
                 var procName = "[<#= Table.Schema #>].[<#= Table.GetInsertProcName() #>]";
                 using (var command = new SqlCommand(procName))
                 {
-                    Log.InfoFormat("Invoking Stored Procedure {0}.", procName);
+                    Log.LogInformation("Invoking Stored Procedure {0}.", procName);
                     command.CommandType = CommandType.StoredProcedure;
                     command.Connection = connection;
                     <#= GenerateInsertProcParams() #>
@@ -310,7 +313,7 @@ namespace <#= Table.Namespace #>.<#= Table.TableName #>
                 var procName = "[<#= Table.Schema #>].[<#= Table.GetUpdateProcName() #>]";
                 using (var command = new SqlCommand(procName))
                 {
-                    Log.InfoFormat("Invoking Stored Procedure {0}.", procName);
+                    Log.LogInformation("Invoking Stored Procedure {0}.", procName);
                     command.CommandType = CommandType.StoredProcedure;
                     command.Connection = connection;
                     <#= GenerateUpdateProcParams() #>
@@ -346,7 +349,7 @@ namespace <#= Table.Namespace #>.<#= Table.TableName #>
                 var procName = "[<#= Table.Schema #>].[<#= Table.GetDeleteProcName() #>]";
                 using (var command = new SqlCommand(procName))
                 {
-                    Log.InfoFormat("Invoking Stored Procedure {0}.", procName);
+                    Log.LogInformation("Invoking Stored Procedure {0}.", procName);
                     command.CommandType = CommandType.StoredProcedure;
                     command.Connection = connection;
                     command.Parameters.AddWithValue("<#= PrimaryKey.GetParamName() #>", <#= PrimaryKey.GetCodeParamName() #>);
@@ -392,7 +395,7 @@ namespace <#= Table.Namespace #>.<#= Table.TableName #>
                 var procName = "[<#= Table.Schema #>].[<#= Table.GetDeleteBulkProcName() #>]";
                 using (var command = new SqlCommand(procName))
                 {
-                    Log.InfoFormat("Invoking Stored Procedure {0}.", procName);
+                    Log.LogInformation("Invoking Stored Procedure {0}.", procName);
                     command.CommandType = CommandType.StoredProcedure;
                     command.Connection = connection;
 

@@ -66,6 +66,8 @@ namespace VanillaDb
                 }
                 else
                 {
+                    // Set the working directory to the vanillaDb.config folder so relative paths work relative to that file
+                    Directory.SetCurrentDirectory(configFileInfo.Directory.FullName);
                     var configString = File.ReadAllText(configFileInfo.FullName);
                     config = JsonConvert.DeserializeObject<VanillaConfig>(configString);
                 }
@@ -84,8 +86,11 @@ namespace VanillaDb
                 // If 6 arguments, then check for --generate-config
                 if (args.Length == 7 && string.Equals(args[5], "--generate-config", StringComparison.InvariantCultureIgnoreCase))
                 {
+                    // Set the working directory to the vanillaDb.config folder so relative paths work relative to that file
                     var outputLocation = args[6];
                     var outputContents = JsonConvert.SerializeObject(config, Formatting.Indented);
+                    var outputDirInfo = new DirectoryInfo(args[6]);
+                    Directory.SetCurrentDirectory(outputDirInfo.FullName);
                     File.WriteAllText(Path.Combine(outputLocation, ConfigFileName), outputContents);
                 }
             }
