@@ -540,9 +540,13 @@ namespace " + config.CodeNamespace + @"
 
                     break;
                 case "INT":
-                case "TINYINT":
-                case "SMALLINT":
                     fieldType.FieldType = typeof(int);
+                    break;
+                case "SMALLINT":
+                    fieldType.FieldType = typeof(short);
+                    break;
+                case "TINYINT":
+                    fieldType.FieldType = typeof(byte);
                     break;
                 case "BIGINT":
                     fieldType.FieldType = typeof(long);
