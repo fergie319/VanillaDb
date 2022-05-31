@@ -75,6 +75,9 @@ namespace <#= Table.Namespace #>.<#= Table.TableName #>
                             var data = Parse<#= Record #>DataModel(reader);
                             <#= RecordCamel #>Data.Add(data);
                         }
+
+                        // consume any trailing pieces
+                        while (reader.NextResult()) {}
                     }
                 }
             }
@@ -142,6 +145,9 @@ namespace <#= Table.Namespace #>.<#= Table.TableName #>
                             var data = Parse<#= Record #>DataModel(reader);
                             <#= RecordCamel #>Data.Add(data);
                         }
+
+                        // consume any trailing pieces
+                        while (reader.NextResult()) {}
                     }
                 }
             }
@@ -211,6 +217,9 @@ namespace <#= Table.Namespace #>.<#= Table.TableName #>
                             var data = Parse<#= Record #>DataModel(reader);
                             <#= RecordCamel #>Data.Add(data);
                         }
+
+                        // consume any trailing pieces
+                        while (reader.NextResult()) {}
                     }
                 }
             }
@@ -272,6 +281,9 @@ namespace <#= Table.Namespace #>.<#= Table.TableName #>
                         {
                             <#= PrimaryKey.GetCodeParamName() #> = (int)reader["<#= PrimaryKey.FieldName #>"];
                         }
+
+                        // consume any trailing pieces
+                        while (reader.NextResult()) {}
                     }
                 }
             }
