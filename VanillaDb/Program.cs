@@ -251,8 +251,10 @@ namespace " + config.CodeNamespace + @"
                         IsNullable = fieldDef.IndexOf(" NOT NULL", StringComparison.InvariantCultureIgnoreCase) == -1,
                     };
 
-                    // Make sure that the field is marked NOT nullable if it is a Primary Key
-                    if (newField.IsPrimaryKey)
+                    // Make sure that the field is marked NOT nullable if it is a Primary Key or an Identity column
+                    // (if not explicitly stated as NULL)
+                    if (newField.IsPrimaryKey ||
+                        newField.IsIdentity && fieldDef.IndexOf("NULL", StringComparison.InvariantCultureIgnoreCase) == -1)
                     {
                         newField.IsNullable = false;
                     }
