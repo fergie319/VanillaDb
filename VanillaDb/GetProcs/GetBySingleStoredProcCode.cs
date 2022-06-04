@@ -11,13 +11,21 @@ namespace VanillaDb.GetProcs
 
         private IndexModel Index { get; set; }
 
+        private TemporalTypes TemporalType { get; set; }
+
         /// <summary>Initializes a new instance of the <see cref="GetBySingleStoredProc" /> class.</summary>
         /// <param name="table">The table to query.</param>
         /// <param name="index">The index to query by.</param>
-        public GetBySingleStoredProc(TableModel table, IndexModel index)
+        /// <param name="temporalType">The type of temporal query to generate - only for temporal tables.</param>
+        public GetBySingleStoredProc(TableModel table, IndexModel index, TemporalTypes temporalType = TemporalTypes.Default)
         {
             Table = table;
             Index = index;
+            TemporalType = temporalType;
+            if (TemporalType != TemporalTypes.Default && !Table.IsTemporal)
+            {
+                throw new InvalidOperationException("Cannot generate temporal procedures for a non-temporal table.");
+            }
         }
 
         /// <summary>Generates the portion of the procedure name that is composed of the indexed fields.</summary>
@@ -25,7 +33,17 @@ namespace VanillaDb.GetProcs
         public string GenerateName()
         {
             var procNameFields = Index.Fields.Select(f => f.FieldName);
-            return $"USP_{Table.TableName}_GetBy{string.Join("_", procNameFields)}";
+            var procName = $"USP_{Table.TableName}_GetBy{string.Join("_", procNameFields)}";
+            if (Table.IsTemporal && TemporalType == TemporalTypes.AsOf)
+            {
+                procName += "_AsOf";
+            }
+            else if (TemporalType == TemporalTypes.All)
+            {
+                procName += "_All";
+            }
+
+            return procName;
         }
 
         /// <summary>Generates the stored procedure's parameter list.</summary>
@@ -34,6 +52,10 @@ namespace VanillaDb.GetProcs
         {
             var procParams = Index.Parameters
                 .Select(f => $"    @{f.FieldName.ToCamelCase()} {f.FieldType.SqlType}");
+            if (Table.IsTemporal && TemporalType == TemporalTypes.AsOf)
+            {
+                procParams = procParams.Append($"    @asOfDate DATETIME2");
+            }
             return string.Join("," + Environment.NewLine, procParams);
         }
 

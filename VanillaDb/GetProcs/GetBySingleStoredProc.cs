@@ -12,6 +12,7 @@ namespace VanillaDb.GetProcs
     using System.Linq;
     using System.Text;
     using System.Collections.Generic;
+    using VanillaDb.Models;
     using System;
     
     /// <summary>
@@ -30,42 +31,72 @@ namespace VanillaDb.GetProcs
         {
             this.Write("CREATE PROCEDURE [");
             
-            #line 6 "C:\git-scratch\vanilladb\VanillaDb\GetProcs\GetBySingleStoredProc.tt"
+            #line 7 "C:\git-scratch\vanilladb\VanillaDb\GetProcs\GetBySingleStoredProc.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(Table.Schema));
             
             #line default
             #line hidden
             this.Write("].[");
             
-            #line 6 "C:\git-scratch\vanilladb\VanillaDb\GetProcs\GetBySingleStoredProc.tt"
+            #line 7 "C:\git-scratch\vanilladb\VanillaDb\GetProcs\GetBySingleStoredProc.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(GenerateName()));
             
             #line default
             #line hidden
             this.Write("]\r\n");
             
-            #line 7 "C:\git-scratch\vanilladb\VanillaDb\GetProcs\GetBySingleStoredProc.tt"
+            #line 8 "C:\git-scratch\vanilladb\VanillaDb\GetProcs\GetBySingleStoredProc.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(GenerateProcParameters()));
             
             #line default
             #line hidden
             this.Write("\r\nAS\r\nBegin\r\n    SET NOCOUNT ON\r\n\r\n    SELECT ");
             
-            #line 12 "C:\git-scratch\vanilladb\VanillaDb\GetProcs\GetBySingleStoredProc.tt"
+            #line 13 "C:\git-scratch\vanilladb\VanillaDb\GetProcs\GetBySingleStoredProc.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(GenerateSelectFields()));
             
             #line default
             #line hidden
             this.Write("\r\n    FROM [");
             
-            #line 13 "C:\git-scratch\vanilladb\VanillaDb\GetProcs\GetBySingleStoredProc.tt"
+            #line 14 "C:\git-scratch\vanilladb\VanillaDb\GetProcs\GetBySingleStoredProc.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(Table.TableName));
             
             #line default
             #line hidden
-            this.Write("]\r\n    WHERE ");
+            this.Write("]\r\n    ");
             
-            #line 14 "C:\git-scratch\vanilladb\VanillaDb\GetProcs\GetBySingleStoredProc.tt"
+            #line 15 "C:\git-scratch\vanilladb\VanillaDb\GetProcs\GetBySingleStoredProc.tt"
+
+    if (TemporalType == TemporalTypes.AsOf)
+    {
+    
+            
+            #line default
+            #line hidden
+            this.Write("    FOR SYSTEM_TIME AS OF @asOfDate\r\n    ");
+            
+            #line 20 "C:\git-scratch\vanilladb\VanillaDb\GetProcs\GetBySingleStoredProc.tt"
+
+    }
+    else if (TemporalType == TemporalTypes.All)
+    {
+    
+            
+            #line default
+            #line hidden
+            this.Write("    FOR SYSTEM_TIME ALL\r\n    ");
+            
+            #line 26 "C:\git-scratch\vanilladb\VanillaDb\GetProcs\GetBySingleStoredProc.tt"
+
+    }
+    
+            
+            #line default
+            #line hidden
+            this.Write("    WHERE ");
+            
+            #line 29 "C:\git-scratch\vanilladb\VanillaDb\GetProcs\GetBySingleStoredProc.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(GenerateWhereClause()));
             
             #line default

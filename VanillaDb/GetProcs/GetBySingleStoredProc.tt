@@ -3,6 +3,7 @@
 <#@ import namespace="System.Linq" #>
 <#@ import namespace="System.Text" #>
 <#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="VanillaDb.Models" #>
 CREATE PROCEDURE [<#= Table.Schema #>].[<#= GenerateName() #>]
 <#= GenerateProcParameters() #>
 AS
@@ -11,6 +12,20 @@ Begin
 
     SELECT <#= GenerateSelectFields() #>
     FROM [<#= Table.TableName #>]
+    <#
+    if (TemporalType == TemporalTypes.AsOf)
+    {
+    #>
+    FOR SYSTEM_TIME AS OF @asOfDate
+    <#
+    }
+    else if (TemporalType == TemporalTypes.All)
+    {
+    #>
+    FOR SYSTEM_TIME ALL
+    <#
+    }
+    #>
     WHERE <#= GenerateWhereClause() #>
 
     SET NOCOUNT OFF
