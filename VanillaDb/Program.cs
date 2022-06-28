@@ -160,7 +160,7 @@ namespace " + config.CodeNamespace + @"
             return result;
         }
 
-        private static void ProcessTableSql(FileInfo sqlFileInfo, VanillaConfig config)
+        private static void ProcessTableSql(FileInfo tableFileInfo, VanillaConfig config)
         {
             // Open the file and start parsing
             var table = new TableModel()
@@ -177,7 +177,7 @@ namespace " + config.CodeNamespace + @"
                 }
             };
             var indexes = new List<IndexModel>();
-            using (var stream = sqlFileInfo.OpenRead())
+            using (var stream = tableFileInfo.OpenRead())
             using (var reader = new StreamReader(stream))
             {
                 // TODO: Use Microsoft.SqlServer.Management.SqlParser.Parser - for now it is too complicated
@@ -230,7 +230,7 @@ namespace " + config.CodeNamespace + @"
                 // Second line should be just the parenthesis start
                 if (ReadLineOfSql(reader) != "(")
                 {
-                    throw new InvalidOperationException("First line after Create Table statement should be just (");
+                    throw new InvalidOperationException($"{table.TableName} - First line after Create Table statement should be just (");
                 }
 
                 // Now Loop and record each field until end of statement is reached ')'
@@ -371,10 +371,32 @@ namespace " + config.CodeNamespace + @"
                 }
             }
 
-            // Throw an error if the table has no primary key - no excuses!
+            // Throw an error if the table has no primary key - no excuses!  Well, except that we have an option now...
             if (table.PrimaryKey == null)
             {
-                throw new InvalidOperationException($"The table {table.TableName} doesn't have a primary key!  Fix this, you monster!");
+                // If the table has no primary key setting, but also doesn't have a primary key, then
+                // default it to false and write out the table so that the user can switch it.
+                if (!table.Config.AllowNoPrimaryKey.HasValue)
+                {
+                    table.Config.AllowNoPrimaryKey = false;
+                    WriteTableConfigToFile(tableFileInfo, table);
+                }
+
+                if (!table.Config.AllowNoPrimaryKey.Value)
+                {
+                    throw new InvalidOperationException(
+                        $"The table {table.TableName} doesn't have a primary key!  Fix this, you monster!  " +
+                        "Alternatively, if you wish to remain a monster, you can change the AllowNoPrimaryKey " +
+                        "setting that has been added to your table config to be 'true'.  However, I strongly " +
+                        "discourage this, and am judging you.");
+                }
+                else
+                {
+                    // If we are allowing the table to not have a primary key, then explicitly disable
+                    // Update and Delete because those require a primary key to match on.
+                    table.Config.Update = false;
+                    table.Config.Delete = false;
+                }
             }
 
             // Log the table and indexes if verbose is enabled
@@ -477,9 +499,15 @@ namespace " + config.CodeNamespace + @"
             LogVerbose($"Content: {0}", content);
             File.WriteAllText($"{dataProviderDir}\\{sqlDataProviderGen.GenerateName()}.cs", content);
 
+            // Add table config to file for easy configuration
+            WriteTableConfigToFile(tableFileInfo, table);
+        }
+
+        private static void WriteTableConfigToFile(FileInfo tableFileInfo, TableModel table)
+        {
             // Overwrite the table.sql file to include the table config at the beginning
             var fileContent = string.Empty;
-            using (var stream = sqlFileInfo.OpenRead())
+            using (var stream = tableFileInfo.OpenRead())
             using (var reader = new StreamReader(stream))
             {
                 fileContent = reader.ReadLine();
@@ -506,7 +534,7 @@ namespace " + config.CodeNamespace + @"
                 fileContent = $"/*{newLine}{tableConfigJson}{newLine}*/{newLine}{fileContent}";
             }
 
-            File.WriteAllText(sqlFileInfo.FullName, fileContent);
+            File.WriteAllText(tableFileInfo.FullName, fileContent);
         }
 
         private static void LogVerbose(string message, params string[] arguments)

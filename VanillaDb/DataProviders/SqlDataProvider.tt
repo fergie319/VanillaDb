@@ -237,7 +237,7 @@ namespace <#= Table.Namespace #>.<#= Table.TableName #>
 #>
         /// <summary>Inserts the given <#= Record #> data model into the <#= Record #> table.</summary>
         /// <param name="<#= RecordCamel #>Data">The <#= RecordLower #> data to insert.</param>
-        /// <returns>The ID of the inserted <#= Record #> record.</returns>
+        /// <returns>The ID of the inserted <#= Record #> record if a primary key exists, otherwise, -1.</returns>
         public async Task<int> Insert(<#= Record #>DataModel <#= RecordCamel #>Data)
         {
             if (<#= RecordCamel #>Data == null)
@@ -250,7 +250,7 @@ namespace <#= Table.Namespace #>.<#= Table.TableName #>
                 throw new InvalidOperationException("Connection String is null.  Insert operation cannot be performed.");
             }
             <#
-            if (PrimaryKey.IsIdentity)
+            if (Table.HasPrimaryKey && PrimaryKey.IsIdentity)
             {
             #>
 
@@ -262,7 +262,7 @@ namespace <#= Table.Namespace #>.<#= Table.TableName #>
             }
             #>
 
-            var <#= PrimaryKey.GetCodeParamName() #> = -1;
+            var newId = -1;
             using (var connection = new SqlConnection(this.ConnectionString))
             {
                 var procName = "[<#= Table.Schema #>].[<#= Table.GetInsertProcName() #>]";
@@ -279,7 +279,9 @@ namespace <#= Table.Namespace #>.<#= Table.TableName #>
                     {
                         while (reader.Read())
                         {
-                            <#= PrimaryKey.GetCodeParamName() #> = (int)reader["<#= PrimaryKey.FieldName #>"];
+                            <# if (Table.HasPrimaryKey) { #>
+                            newId = (int)reader["<#= PrimaryKey.FieldName #>"];
+                            <# } #>
                         }
 
                         // consume any trailing pieces
@@ -288,7 +290,7 @@ namespace <#= Table.Namespace #>.<#= Table.TableName #>
                 }
             }
 
-            return <#= PrimaryKey.GetCodeParamName() #>;
+            return newId;
         }
 
 <#

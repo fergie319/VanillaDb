@@ -1,4 +1,6 @@
-﻿namespace VanillaDb.Configuration
+﻿using Newtonsoft.Json;
+
+namespace VanillaDb.Configuration
 {
     /// <summary>Stores VanillaDb table generation configuration settings</summary>
     public class TableConfig
@@ -14,5 +16,9 @@
 
         /// <summary>Gets or sets a value indicating whether Delete endpoints should be generated.</summary>
         public bool Delete { get; set; }
+
+        /// <summary>Gets or sets whether this table is allowed to have no primary key.</summary>
+        [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
+        public bool? AllowNoPrimaryKey { get; set; }
     }
 }

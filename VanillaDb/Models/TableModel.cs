@@ -35,6 +35,9 @@ namespace VanillaDb.Models
         /// <summary>Gets or sets the fields.</summary>
         public IList<FieldModel> Fields { get; set; }
 
+        /// <summary>Gets or sets a value indicating whether this table has a primary key.</summary>
+        public bool HasPrimaryKey { get; set; }
+
         /// <summary>Gets the primary key for the table model - throws exception if more than one primary key exists.</summary>
         /// <value>The primary key.</value>
         public FieldModel PrimaryKey
