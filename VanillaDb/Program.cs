@@ -24,6 +24,9 @@ namespace VanillaDb
 
         private static ILogger Log { get; set; }
 
+        /// <summary>Gets or sets a value indicating whether console output should be verbose.</summary>
+        private static bool IsVerbose { get; set; }
+
         /// <summary>
         /// Defines the entry point of the application.
         /// </summary>
@@ -37,6 +40,14 @@ namespace VanillaDb
                 .WriteTo.Console(theme: AnsiConsoleTheme.Code)
                 .CreateLogger();
             Serilog.Log.Logger = Log;
+
+            // Check for the "verbose" argument and remove it now so further parsing works correctly
+            if (args.Any(arg => string.Equals(arg, "--verbose", StringComparison.InvariantCultureIgnoreCase)))
+            {
+                IsVerbose = true;
+                args = args.Where(arg => !string.Equals(arg, "--verbose", StringComparison.InvariantCultureIgnoreCase))
+                           .ToArray();
+            }
 
             var result = 0;
             var currentDirectory = new DirectoryInfo(Environment.CurrentDirectory);
@@ -61,8 +72,9 @@ namespace VanillaDb
                 if (configFileInfo == null)
                 {
                     throw new InvalidOperationException(
-                        $"{ConfigFileName} is required in folder hierarchy, or all required arguments must be provided." +
-                        "Required Arguments: <Table>.sql|<directory> <outSqlDir> <outCodeDir> <namespace> <company-name> (optional)--generate-config <config-path>.");
+                        $"{ConfigFileName} is required in folder hierarchy, or all required arguments must be provided.\n" +
+                        "Required Arguments: <Table>.sql|<directory> <outSqlDir> <outCodeDir> <namespace> <company-name> (optional)--generate-config <config-path>.\n" +
+                        "Optional Arguments: --verbose");
                 }
                 else
                 {
@@ -356,9 +368,12 @@ namespace " + config.CodeNamespace + @"
                 throw new InvalidOperationException($"The table {table.TableName} doesn't have a primary key!  Fix this, you monster!");
             }
 
-            // TODO: First verify we're getting the models filled out.
-            Log.Debug("Table: {@Table}", table);
-            Log.Debug("Indexes: {@Indexes}", indexes);
+            // Log the table and indexes if verbose is enabled
+            if (IsVerbose)
+            {
+                Log.Debug("Table: {@Table}", table);
+                Log.Debug("Indexes: {@Indexes}", indexes);
+            }
 
             // Create the output directories for all of the different files
             var typeTableDir = Path.Combine(config.OutputSqlPath, "Types");
@@ -372,7 +387,7 @@ namespace " + config.CodeNamespace + @"
                 // Generate the single-select stored procedures
                 var getByAll = new GetAllStoredProc(table);
                 var sqlContent = getByAll.TransformText();
-                Log.Debug($"Content: {sqlContent}");
+                LogVerbose($"Content: {0}", sqlContent);
                 File.WriteAllText($"{storedProcDir}\\{getByAll.GenerateName()}.sql", sqlContent);
             }
 
@@ -382,19 +397,19 @@ namespace " + config.CodeNamespace + @"
                 var typeTable = new TypeTable(index);
                 var sqlContent = typeTable.TransformText();
                 var fieldNames = string.Join("_", index.Fields.Select(f => f.FieldName));
-                Log.Debug($"Content: {sqlContent}");
+                LogVerbose($"Content: {0}", sqlContent);
                 File.WriteAllText($"{typeTableDir}\\{typeTable.GenerateName()}.sql", sqlContent);
 
                 // Generate the single-select stored procedures
                 var getBy = new GetBySingleStoredProc(table, index);
                 sqlContent = getBy.TransformText();
-                Log.Debug($"Content: {sqlContent}");
+                LogVerbose($"Content: {0}", sqlContent);
                 File.WriteAllText($"{storedProcDir}\\{getBy.GenerateName()}.sql", sqlContent);
 
                 // Generate the bulk-select stored procedures
                 var getByBulk = new GetByBulkStoredProc(table, index);
                 sqlContent = getByBulk.TransformText();
-                Log.Debug($"Content: {sqlContent}");
+                LogVerbose($"Content: {0}", sqlContent);
                 File.WriteAllText($"{storedProcDir}\\{getByBulk.GenerateName()}.sql", sqlContent);
             }
 
@@ -403,7 +418,7 @@ namespace " + config.CodeNamespace + @"
             {
                 var insertStoredProc = new InsertStoredProc(table);
                 var insertContent = insertStoredProc.TransformText();
-                Log.Debug($"Content: {insertContent}");
+                LogVerbose($"Content: {0}", insertContent);
                 File.WriteAllText($"{storedProcDir}\\{insertStoredProc.GenerateName()}.sql", insertContent);
             }
 
@@ -412,7 +427,7 @@ namespace " + config.CodeNamespace + @"
             {
                 var updateStoredProc = new UpdateStoredProc(table);
                 var updateContent = updateStoredProc.TransformText();
-                Log.Debug($"Content: {updateContent}");
+                LogVerbose($"Content: {0}", updateContent);
                 File.WriteAllText($"{storedProcDir}\\{updateStoredProc.GenerateName()}.sql", updateContent);
             }
 
@@ -421,13 +436,13 @@ namespace " + config.CodeNamespace + @"
                 // Generate the Delete stored procedure
                 var deleteStoredProc = new DeleteStoredProc(table);
                 var deleteContent = deleteStoredProc.TransformText();
-                Log.Debug($"Content: {deleteContent}");
+                LogVerbose($"Content: {0}", deleteContent);
                 File.WriteAllText($"{storedProcDir}\\{deleteStoredProc.GenerateName()}.sql", deleteContent);
 
                 // Generate the Bulk Delete stored procedure
                 var deleteBulkStoredProc = new DeleteBulkStoredProc(table, indexes.First(i => i.IsPrimaryKey));
                 var deleteBulkContent = deleteBulkStoredProc.TransformText();
-                Log.Debug($"Content: {deleteBulkContent}");
+                LogVerbose($"Content: {0}", deleteBulkContent);
                 File.WriteAllText($"{storedProcDir}\\{deleteBulkStoredProc.GenerateName()}.sql", deleteBulkContent);
             }
 
@@ -438,19 +453,19 @@ namespace " + config.CodeNamespace + @"
             // Generate the DataModel class
             var dataModelGen = new DataModel(table);
             var content = dataModelGen.TransformText();
-            Log.Debug($"Content: {content}");
+            LogVerbose($"Content: {0}", content);
             File.WriteAllText($"{dataProviderDir}\\{dataModelGen.GenerateName()}.cs", content);
 
             // Generate the DataProvider interface
             var dataProviderInterfaceGen = new DataProviderInterface(table, indexes);
             content = dataProviderInterfaceGen.TransformText();
-            Log.Debug($"Content: {content}");
+            LogVerbose($"Content: {0}", content);
             File.WriteAllText($"{dataProviderDir}\\{dataProviderInterfaceGen.GenerateName()}.cs", content);
 
             // Generate the SqlDataProvider class
             var sqlDataProviderGen = new SqlDataProvider(table, indexes);
             content = sqlDataProviderGen.TransformText();
-            Log.Debug($"Content: {content}");
+            LogVerbose($"Content: {0}", content);
             File.WriteAllText($"{dataProviderDir}\\{sqlDataProviderGen.GenerateName()}.cs", content);
 
             // Overwrite the table.sql file to include the table config at the beginning
@@ -483,6 +498,14 @@ namespace " + config.CodeNamespace + @"
             }
 
             File.WriteAllText(sqlFileInfo.FullName, fileContent);
+        }
+
+        private static void LogVerbose(string message, params string[] arguments)
+        {
+            if (IsVerbose)
+            {
+                Log.Debug(message, arguments);
+            }
         }
 
         /// <summary>Reads the next line of text from the given TextReader and automatically trims whitespace and strips out line comments.</summary>
