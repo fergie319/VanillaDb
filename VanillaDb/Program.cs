@@ -438,6 +438,13 @@ namespace " + config.CodeNamespace + @"
                 }
             }
 
+            // If this is a temporal table, then set the default config if not already provided
+            if (table.IsTemporal)
+            {
+                table.Config.TemporalGetAll = table.Config.TemporalGetAll ?? true;
+                table.Config.TemporalGetAsOf = table.Config.TemporalGetAsOf ?? true;
+            }
+
             // Log the table and indexes if verbose is enabled
             if (IsVerbose)
             {

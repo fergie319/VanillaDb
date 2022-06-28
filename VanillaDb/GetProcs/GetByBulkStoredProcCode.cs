@@ -13,23 +13,39 @@ namespace VanillaDb.GetProcs
 
         private IndexModel Index { get; set; }
 
+        private TemporalTypes TemporalType { get; set; }
+
         /// <summary>Initializes a new instance of the <see cref="GetBySingleStoredProc" /> class.</summary>
         /// <param name="table">The table to query.</param>
         /// <param name="index">The index to query by.</param>
-        public GetByBulkStoredProc(TableModel table, IndexModel index)
+        /// <param name="temporalType">The type of temporal query to generate - only for temporal tables.</param>
+        public GetByBulkStoredProc(TableModel table, IndexModel index, TemporalTypes temporalType = TemporalTypes.Default)
         {
             Table = table;
             Index = index;
+            TemporalType = temporalType;
+            if (TemporalType != TemporalTypes.Default && !Table.IsTemporal)
+            {
+                throw new InvalidOperationException("Cannot generate temporal procedures for a non-temporal table.");
+            }
         }
-        // TODO: Implement the transform.
-        // TODO: Add method to all transform classes for getting proc/file name.
 
         /// <summary>Gets the name of the stored procedure.</summary>
         /// <returns>Procedure name and file name (without .sql).</returns>
         public string GenerateName()
         {
-            var fieldNames = Index.Fields.Select(f => f.FieldName);
-            return $"USP_{Table.TableName}_GetBy{string.Join("_", fieldNames)}_Bulk";
+            var procNameFields = Index.Fields.Select(f => f.FieldName);
+            var procName = $"USP_{Table.TableName}_GetBy{string.Join("_", procNameFields)}_Bulk";
+            if (Table.IsTemporal && TemporalType == TemporalTypes.AsOf)
+            {
+                procName += "_AsOf";
+            }
+            else if (TemporalType == TemporalTypes.All)
+            {
+                procName += "_All";
+            }
+
+            return procName;
         }
 
         /// <summary>Generates the GetBy(Bulk) stored procedure's parameter name.</summary>

@@ -23,5 +23,15 @@ namespace VanillaDb.Configuration
 
         /// <summary>Gets or sets the table alias - used for naming models, dataproviders, and interfaces.</summary>
         public string TableAlias { get; set; }
+
+        /// <summary>Gets or sets a value indicating whether the temporal endpoints for getting all history should be generated.</summary>
+        /// <remarks>This is nullable so that it won't be rendered for non-temporal tables</remarks>
+        [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
+        public bool? TemporalGetAll { get; set; }
+
+        /// <summary>Gets or sets a value indicating whether the temporal endpoints for getting records as of a date should be generated.</summary>
+        /// <remarks>This is nullable so that it won't be rendered for non-temporal tables</remarks>
+        [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
+        public bool? TemporalGetAsOf { get; set; }
     }
 }
