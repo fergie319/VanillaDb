@@ -280,7 +280,16 @@ namespace " + config.CodeNamespace + @"
                         newField.IsTemporalEnd = fieldDef.IndexOf("row end", StringComparison.InvariantCultureIgnoreCase) != -1;
                     }
 
-                    newField.FieldType = ParseFieldType(splitFieldTokens[1], newField.IsNullable);
+                    // Get the field type and grab the following token if it is incomplete - like "Decimal(18," - where we need the rest of the type
+                    // Future Matt: If you find yourself looking at this code because it's not parsing correctly, then just write code at the beginning
+                    //              of the parsing to find the open/close parenthesis and remove all spaces within them.
+                    var fieldTypeString = splitFieldTokens[1];
+                    if (fieldTypeString.EndsWith(","))
+                    {
+                        fieldTypeString += splitFieldTokens[2];
+                    }
+
+                    newField.FieldType = ParseFieldType(fieldTypeString, newField.IsNullable);
                     table.Fields.Add(newField);
 
                     // If this field is the primary key, then add an index for it
