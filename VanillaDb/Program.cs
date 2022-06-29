@@ -223,9 +223,16 @@ namespace " + config.CodeNamespace + @"
                     throw new InvalidOperationException("The first line must be the Create Table command, and it must split into a minimum of 3 parts: Create Table [name].");
                 }
 
-                // Start building the table model - starting with the name and the schema
+                // Start building the table model - starting with the name, alias, and the schema
                 table.TableName = splitTableTokens.Last();
                 table.Schema = splitTableTokens.Reverse().Skip(1).Take(1).FirstOrDefault() ?? throw new InvalidOperationException("Missing Schema from Table Name");
+                if (string.IsNullOrWhiteSpace(table.Config.TableAlias))
+                {
+                    table.Config.TableAlias = table.TableName
+                                                .Replace("_", string.Empty)
+                                                .Replace("-", string.Empty)
+                                                .Replace("tbl", string.Empty);
+                }
 
                 // Second line should be just the parenthesis start
                 if (ReadLineOfSql(reader) != "(")
@@ -409,7 +416,7 @@ namespace " + config.CodeNamespace + @"
             // Create the output directories for all of the different files
             var typeTableDir = Path.Combine(config.OutputSqlPath, "Types");
             Directory.CreateDirectory(typeTableDir);
-            var storedProcDir = Path.Combine(config.OutputSqlPath, $"Stored Procedures\\{table.TableName}");
+            var storedProcDir = Path.Combine(config.OutputSqlPath, $"Stored Procedures\\{table.TableAlias}");
             Directory.CreateDirectory(storedProcDir);
 
             // Generate the stored procedures using our parsed table information
@@ -478,7 +485,7 @@ namespace " + config.CodeNamespace + @"
             }
 
             // Create Data Provider directory
-            var dataProviderDir = Path.Combine(config.OutputCodePath, table.TableName);
+            var dataProviderDir = Path.Combine(config.OutputCodePath, table.TableAlias);
             Directory.CreateDirectory(dataProviderDir);
 
             // Generate the DataModel class

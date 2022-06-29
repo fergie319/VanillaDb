@@ -26,6 +26,9 @@ namespace VanillaDb.Models
         /// <summary>Gets or sets the table name.</summary>
         public string TableName { get; set; }
 
+        /// <summary>Gets the table alias - used for naming models, dataproviders, and interfaces.</summary>
+        public string TableAlias { get { return Config?.TableAlias; } }
+
         /// <summary>Gets or sets the schema.</summary>
         public string Schema { get; set; }
 
@@ -70,7 +73,7 @@ namespace VanillaDb.Models
         /// <returns></returns>
         public string GetDataModelName()
         {
-            return $"{TableName}DataModel";
+            return $"{TableAlias}DataModel";
         }
 
         /// <summary>Generates the name of the GetAll stored proc.</summary>

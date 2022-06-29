@@ -71,7 +71,7 @@ namespace ");
             this.Write(".");
             
             #line 20 "C:\git\VanillaDb\VanillaDb\DataProviders\SqlDataProvider.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(Table.TableName));
+            this.Write(this.ToStringHelper.ToStringWithCulture(Table.TableAlias));
             
             #line default
             #line hidden
@@ -103,7 +103,7 @@ namespace ");
             this.Write(".");
             
             #line 32 "C:\git\VanillaDb\VanillaDb\DataProviders\SqlDataProvider.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(Table.TableName));
+            this.Write(this.ToStringHelper.ToStringWithCulture(Table.TableAlias));
             
             #line default
             #line hidden

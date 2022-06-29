@@ -20,5 +20,8 @@ namespace VanillaDb.Configuration
         /// <summary>Gets or sets whether this table is allowed to have no primary key.</summary>
         [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
         public bool? AllowNoPrimaryKey { get; set; }
+
+        /// <summary>Gets or sets the table alias - used for naming models, dataproviders, and interfaces.</summary>
+        public string TableAlias { get; set; }
     }
 }

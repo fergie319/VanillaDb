@@ -31,26 +31,26 @@ namespace VanillaDb.DataProviders
         /// <summary>Gets the name of the record type being worked with (the table name).</summary>
         public string Record
         {
-            get { return Table.TableName; }
+            get { return Table.TableAlias; }
         }
 
         /// <summary>Gets the lowercase name of the record type being worked with (the table name).</summary>
         public string RecordLower
         {
-            get { return Table.TableName.ToLower(); }
+            get { return Table.TableAlias.ToLower(); }
         }
 
         /// <summary>Gets the camelCase name of the record type being worked with (the table name).</summary>
         public string RecordCamel
         {
-            get { return Table.TableName.ToLower(); }
+            get { return Table.TableAlias.ToLower(); }
         }
 
         /// <summary>Gets the name of the stored procedure.</summary>
         /// <returns>Class name and file name (without .sql).</returns>
         public string GenerateName()
         {
-            return $"I{Table.TableName}DataProvider";
+            return $"I{Table.TableAlias}DataProvider";
         }
 
         /// <summary>Generates the insert method for the data provider.</summary>

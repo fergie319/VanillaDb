@@ -14,11 +14,11 @@
 //     the code is regenerated.
 // </auto-generated>
 
-namespace <#= Table.Namespace #>.<#= Table.TableName #>
+namespace <#= Table.Namespace #>.<#= Table.TableAlias #>
 {
     using System;
 
-    /// <summary>The <#= Table.TableName #> Data Model.</summary>
+    /// <summary>The <#= Table.TableAlias #> Data Model.</summary>
     public class <#= GenerateName() #>
     {
         <#= GenerateProperties() #>

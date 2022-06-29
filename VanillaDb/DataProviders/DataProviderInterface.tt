@@ -16,7 +16,7 @@
 //     the code is regenerated.
 // </auto-generated>
 
-namespace <#= Table.Namespace #>.<#= Table.TableName #>
+namespace <#= Table.Namespace #>.<#= Table.TableAlias #>
 {
     using System;
     using System.Collections.Generic;
