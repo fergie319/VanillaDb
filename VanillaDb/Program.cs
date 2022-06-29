@@ -260,6 +260,38 @@ namespace " + config.CodeNamespace + @"
                         continue;
                     }
 
+                    // If this is a primary key constraint, then attempt to parse out the index and continue
+                    if (rawFieldName.Equals("constraint", StringComparison.InvariantCultureIgnoreCase))
+                    {
+                        if (fieldDef.IndexOf("primary key", StringComparison.InvariantCultureIgnoreCase) > -1)
+                        {
+                            // The fields exist within the parenthesis, which are at the end of the line
+                            var splitIndexTokens = fieldDef.Trim(new[] { ',', ' ' }).Split(new[] { "(", ")" }, StringSplitOptions.RemoveEmptyEntries);
+                            var fieldClause = splitIndexTokens.Last();
+
+                            // Now split out the field names - removing whitespace characters
+                            var splitFields = fieldClause.Split(new[] { ",", " ", "[", "]", "\t" }, StringSplitOptions.RemoveEmptyEntries);
+                            var fields = table.Fields.Where(f => splitFields.Any(sf => string.Equals(f.FieldName, sf, StringComparison.InvariantCultureIgnoreCase))).ToList();
+
+                            var index = new IndexModel()
+                            {
+                                Table = table,
+                                Fields = fields,
+                                IsUnique = true,
+                                IsPrimaryKey = true,
+                            };
+                            indexes.Add(index);
+                        }
+                        else
+                        {
+                            Log.Warning("A non-primary key constraint was encountered - this will be ignored by VanillaDb - use different syntax " +
+                                        "(like a created index, or the UNIQUE keyword in the field definition) if you expect generated methods for it.");
+                        }
+
+                        fieldDef = ReadLineOfSql(reader);
+                        continue;
+                    }
+
                     // Make sure to remove any [ and ] characters for the field name
                     var fieldName = rawFieldName.Replace("[", string.Empty).Replace("]", string.Empty);
                     var newField = new FieldModel()
