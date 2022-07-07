@@ -479,6 +479,31 @@ namespace " + config.CodeNamespace + @"
                 // Generate the bulk-select stored procedures
                 var getByBulk = new GetByBulkStoredProc(table, index);
                 getByBulk.GenerateFile(storedProcDir);
+
+                if (table.IsTemporal)
+                {
+                    if (table.Config.TemporalGetAll.HasValue && table.Config.TemporalGetAll.Value)
+                    {
+                        // Generate the single-select stored procedures
+                        getBy = new GetBySingleStoredProc(table, index, TemporalTypes.All);
+                        getBy.GenerateFile(storedProcDir);
+
+                        // Generate the bulk-select stored procedures
+                        getByBulk = new GetByBulkStoredProc(table, index, TemporalTypes.All);
+                        getByBulk.GenerateFile(storedProcDir);
+                    }
+
+                    if (table.Config.TemporalGetAsOf.HasValue && table.Config.TemporalGetAsOf.Value)
+                    {
+                        // Generate the single-select stored procedures
+                        getBy = new GetBySingleStoredProc(table, index, TemporalTypes.AsOf);
+                        getBy.GenerateFile(storedProcDir);
+
+                        // Generate the bulk-select stored procedures
+                        getByBulk = new GetByBulkStoredProc(table, index, TemporalTypes.AsOf);
+                        getByBulk.GenerateFile(storedProcDir);
+                    }
+                }
             }
 
             // Generate the Insert stored procedure
