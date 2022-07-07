@@ -21,7 +21,7 @@ namespace VanillaDb.DataProviders
         /// <returns>Class name and file name (without .sql).</returns>
         public string GenerateName()
         {
-            return $"{Table.TableName}DataModel";
+            return $"{Table.TableAlias}DataModel";
         }
 
         /// <summary>Generates the properties for the datamodel.</summary>

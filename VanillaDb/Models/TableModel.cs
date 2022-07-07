@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using VanillaDb.Configuration;
 
 namespace VanillaDb.Models
 {
@@ -13,6 +14,9 @@ namespace VanillaDb.Models
         /// <summary>The update time stamp field names</summary>
         public readonly IEnumerable<string> UpdateTimeStampFieldNames = new[] { "UpdatedOnUtc" };
 
+        /// <summary>Gets or sets the configuration settings for this table.</summary>
+        public TableConfig Config { get; set; }
+
         /// <summary>Gets or sets the company.</summary>
         public string Company { get; set; }
 
@@ -22,8 +26,20 @@ namespace VanillaDb.Models
         /// <summary>Gets or sets the table name.</summary>
         public string TableName { get; set; }
 
+        /// <summary>Gets the table alias - used for naming models, dataproviders, and interfaces.</summary>
+        public string TableAlias { get { return Config?.TableAlias; } }
+
+        /// <summary>Gets or sets the schema.</summary>
+        public string Schema { get; set; }
+
+        /// <summary>Gets or sets a whether this is a Temporal table.</summary>
+        public bool IsTemporal { get; set; }
+
         /// <summary>Gets or sets the fields.</summary>
         public IList<FieldModel> Fields { get; set; }
+
+        /// <summary>Gets or sets a value indicating whether this table has a primary key.</summary>
+        public bool HasPrimaryKey { get { return PrimaryKey != null; } }
 
         /// <summary>Gets the primary key for the table model - throws exception if more than one primary key exists.</summary>
         /// <value>The primary key.</value>
@@ -36,14 +52,14 @@ namespace VanillaDb.Models
         /// <value>The insert fields.</value>
         public IEnumerable<FieldModel> InsertFields
         {
-            get { return Fields.Where(f => !f.IsIdentity && !TimeStampFieldNames.Contains(f.FieldName)); }
+            get { return Fields.Where(f => !f.IsIdentity && !f.IsTemporalField && !TimeStampFieldNames.Contains(f.FieldName)); }
         }
 
         /// <summary>Gets the update fields.</summary>
         /// <value>The update fields.</value>
         public IEnumerable<FieldModel> UpdateFields
         {
-            get { return Fields.Where(f => !f.IsIdentity && !TimeStampFieldNames.Contains(f.FieldName)); }
+            get { return Fields.Where(f => !f.IsIdentity && !f.IsTemporalField && !TimeStampFieldNames.Contains(f.FieldName)); }
         }
 
         /// <summary>Gets the update time stamp fields.</summary>
@@ -57,7 +73,14 @@ namespace VanillaDb.Models
         /// <returns></returns>
         public string GetDataModelName()
         {
-            return $"{TableName}DataModel";
+            return $"{TableAlias}DataModel";
+        }
+
+        /// <summary>Generates the name of the GetAll stored proc.</summary>
+        /// <returns>Insert Stored proc name</returns>
+        public string GetGetAllProcName()
+        {
+            return $"USP_{TableName}_GetAll";
         }
 
         /// <summary>Generates the name of the insert stored proc.</summary>

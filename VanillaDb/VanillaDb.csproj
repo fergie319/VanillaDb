@@ -53,6 +53,9 @@
     <Reference Include="Microsoft.SqlServer.Management.SqlParser, Version=16.0.0.0, Culture=neutral, PublicKeyToken=89845dcd8080cc91, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.SqlServer.Management.SqlParser.160.20216.14\lib\net462\Microsoft.SqlServer.Management.SqlParser.dll</HintPath>
     </Reference>
+    <Reference Include="Newtonsoft.Json, Version=13.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.13.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
     <Reference Include="Serilog, Version=2.0.0.0, Culture=neutral, PublicKeyToken=24c2f752a8e58a10, processorArchitecture=MSIL">
       <HintPath>..\packages\Serilog.2.9.0\lib\net46\Serilog.dll</HintPath>
     </Reference>
@@ -61,6 +64,7 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -105,11 +109,17 @@
       <DependentUpon>GetByBulkStoredProc.tt</DependentUpon>
     </Compile>
     <Compile Include="GetProcs\GetByBulkStoredProcCode.cs" />
+    <Compile Include="GetProcs\GetAllStoredProc.cs">
+      <DependentUpon>GetAllStoredProc.tt</DependentUpon>
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+    </Compile>
     <Compile Include="GetProcs\GetBySingleStoredProc.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>GetBySingleStoredProc.tt</DependentUpon>
     </Compile>
+    <Compile Include="GetProcs\GetAllStoredProcCode.cs" />
     <Compile Include="GetProcs\GetBySingleStoredProcCode.cs" />
     <Compile Include="InsertProcs\InsertStoredProc.cs">
       <AutoGen>True</AutoGen>
@@ -117,10 +127,12 @@
       <DependentUpon>InsertStoredProc.tt</DependentUpon>
     </Compile>
     <Compile Include="InsertProcs\InsertStoredProcCode.cs" />
+    <Compile Include="Configuration\VanillaConfig.cs" />
     <Compile Include="Models\FieldModel.cs" />
     <Compile Include="Models\FieldTypeModel.cs" />
     <Compile Include="Models\IndexModel.cs" />
     <Compile Include="Models\QueryOperator.cs" />
+    <Compile Include="Configuration\TableConfig.cs" />
     <Compile Include="Models\TableModel.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -155,6 +167,10 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="GetProcs\GetAllStoredProc.tt">
+      <Generator>TextTemplatingFilePreprocessor</Generator>
+      <LastGenOutput>GetAllStoredProc.cs</LastGenOutput>
+    </Content>
     <Content Include="UpdateProcs\UpdateStoredProc.tt">
       <Generator>TextTemplatingFilePreprocessor</Generator>
       <LastGenOutput>UpdateStoredProc.cs</LastGenOutput>

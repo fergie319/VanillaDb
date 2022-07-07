@@ -20,6 +20,15 @@ namespace VanillaDb.Models
         /// <summary>Gets or sets whether this field is an identity field.</summary>
         public bool IsIdentity { get; set; }
 
+        /// <summary>Gets or sets whether this field is a temporal date field.</summary>
+        public bool IsTemporalField { get; set; }
+
+        /// <summary>Gets or sets whether this field is the temporal start or ValidFrom field.</summary>
+        public bool IsTemporalStart { get; set; }
+
+        /// <summary>Gets or sets whether this field is the temporal end or ValidTo field.</summary>
+        public bool IsTemporalEnd { get; set; }
+
         /// <summary>Gets this field's name as a stored procedure parameter.</summary>
         /// <returns>This field as a SQL Stored Procedure parameter name.</returns>
         public string GetParamName()

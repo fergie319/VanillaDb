@@ -18,7 +18,7 @@ namespace VanillaDb.DataProviders
     /// Class to produce the template output
     /// </summary>
     
-    #line 1 "C:\git-scratch\vanilladb\VanillaDb\DataProviders\DataModel.tt"
+    #line 1 "C:\git\VanillaDb\VanillaDb\DataProviders\DataModel.tt"
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.TextTemplating", "16.0.0.0")]
     public partial class DataModel : DataModelBase
     {
@@ -30,21 +30,21 @@ namespace VanillaDb.DataProviders
         {
             this.Write("// <copyright file=\"");
             
-            #line 6 "C:\git-scratch\vanilladb\VanillaDb\DataProviders\DataModel.tt"
+            #line 6 "C:\git\VanillaDb\VanillaDb\DataProviders\DataModel.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(GenerateName()));
             
             #line default
             #line hidden
             this.Write(".cs\" company=\"");
             
-            #line 6 "C:\git-scratch\vanilladb\VanillaDb\DataProviders\DataModel.tt"
+            #line 6 "C:\git\VanillaDb\VanillaDb\DataProviders\DataModel.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(Table.Company));
             
             #line default
             #line hidden
             this.Write("\">\r\n// Copyright (c) ");
             
-            #line 7 "C:\git-scratch\vanilladb\VanillaDb\DataProviders\DataModel.tt"
+            #line 7 "C:\git\VanillaDb\VanillaDb\DataProviders\DataModel.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(Table.Company));
             
             #line default
@@ -61,35 +61,35 @@ namespace VanillaDb.DataProviders
 
 namespace ");
             
-            #line 17 "C:\git-scratch\vanilladb\VanillaDb\DataProviders\DataModel.tt"
+            #line 17 "C:\git\VanillaDb\VanillaDb\DataProviders\DataModel.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(Table.Namespace));
             
             #line default
             #line hidden
             this.Write(".");
             
-            #line 17 "C:\git-scratch\vanilladb\VanillaDb\DataProviders\DataModel.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(Table.TableName));
+            #line 17 "C:\git\VanillaDb\VanillaDb\DataProviders\DataModel.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(Table.TableAlias));
             
             #line default
             #line hidden
             this.Write("\r\n{\r\n    using System;\r\n\r\n    /// <summary>The ");
             
-            #line 21 "C:\git-scratch\vanilladb\VanillaDb\DataProviders\DataModel.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(Table.TableName));
+            #line 21 "C:\git\VanillaDb\VanillaDb\DataProviders\DataModel.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(Table.TableAlias));
             
             #line default
             #line hidden
             this.Write(" Data Model.</summary>\r\n    public class ");
             
-            #line 22 "C:\git-scratch\vanilladb\VanillaDb\DataProviders\DataModel.tt"
+            #line 22 "C:\git\VanillaDb\VanillaDb\DataProviders\DataModel.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(GenerateName()));
             
             #line default
             #line hidden
             this.Write("\r\n    {\r\n        ");
             
-            #line 24 "C:\git-scratch\vanilladb\VanillaDb\DataProviders\DataModel.tt"
+            #line 24 "C:\git\VanillaDb\VanillaDb\DataProviders\DataModel.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(GenerateProperties()));
             
             #line default

@@ -17,7 +17,7 @@
 //     the code is regenerated.
 // </auto-generated>
 
-namespace <#= Table.Namespace #>.<#= Table.TableName #>
+namespace <#= Table.Namespace #>.<#= Table.TableAlias #>
 {
     using System;
     using System.Collections.Generic;
@@ -25,24 +25,68 @@ namespace <#= Table.Namespace #>.<#= Table.TableName #>
     using System.Data.SqlClient;
     using System.Linq;
     using System.Threading.Tasks;
-    using log4net;
+    using Microsoft.Extensions.Logging;
+    using Microsoft.Extensions.Logging.Abstractions;
 
     /// <summary>SQL implementation of data provider interface for <#= Record #> data.</summary>
-    /// <seealso cref="<#= Table.Namespace #>.<#= Table.TableName #>.I<#= Record #>DataProvider" />
+    /// <seealso cref="<#= Table.Namespace #>.<#= Table.TableAlias #>.I<#= Record #>DataProvider" />
     public partial class <#= GenerateName() #> : I<#= Record #>DataProvider
     {
-        private static readonly ILog Log = LogManager.GetLogger(typeof(<#=GenerateName() #>));
+        private ILogger Log { get; set; }
 
         /// <summary>Initializes a new instance of the <see cref="<#= GenerateName() #>"/> class.</summary>
         /// <param name="connectionString">The connection string.</param>
-        public <#= GenerateName() #>(string connectionString)
+        /// <param name="logger">The logger for this instance.</param>
+        public <#= GenerateName() #>(string connectionString, ILogger<<#= GenerateName() #>> logger)
         {
+            this.Log = (ILogger)logger ?? NullLogger.Instance;
             this.ConnectionString = connectionString;
         }
 
         /// <summary>Gets or sets the connection string.</summary>
         /// <value>The connection string.</value>
         private string ConnectionString { get; set; }
+<#
+    // Generate the GetAll method if configured
+    if (Table.Config.GetAll)
+    {
+#>
+
+        /// <summary>Gets the data for all <#= Record #>(s) from the <#= Table.TableName #> table.</summary>
+        /// <returns>Enumerable of <#= Record #> Data Model or null if not found.</returns>
+        public async Task<IEnumerable<<#= Table.GetDataModelName() #>>> GetAll()
+        {
+            var <#= RecordCamel #>Data = new List<<#= Record #>DataModel>();
+            using (var connection = new SqlConnection(this.ConnectionString))
+            {
+                var procName = "[<#= Table.Schema #>].[<#= Table.GetGetAllProcName() #>]";
+                using (var command = new SqlCommand(procName))
+                {
+                    Log.LogInformation("Invoking Stored Procedure {0}.", procName);
+                    command.CommandType = CommandType.StoredProcedure;
+                    command.Connection = connection;
+
+                    connection.Open();
+                    var reader = await command.ExecuteReaderAsync();
+                    if (reader.HasRows)
+                    {
+                        while (reader.Read())
+                        {
+                            var data = Parse<#= Record #>DataModel(reader);
+                            <#= RecordCamel #>Data.Add(data);
+                        }
+
+                        // consume any trailing pieces
+                        while (reader.NextResult()) {}
+                    }
+                }
+            }
+
+            return <#= RecordCamel #>Data;
+        }
+<#
+    }
+#>
 
 <#
     // Generate the GetBy-Index and GetBy-Index-Bulk methods for each index
@@ -84,10 +128,10 @@ namespace <#= Table.Namespace #>.<#= Table.TableName #>
             var <#= RecordCamel #>Data = new List<<#= Record #>DataModel>();
             using (var connection = new SqlConnection(this.ConnectionString))
             {
-                var procName = "<#= GenerateGetByIndexStoredProcName(index) #>";
+                var procName = "[<#= Table.Schema #>].[<#= GenerateGetByIndexStoredProcName(index) #>]";
                 using (var command = new SqlCommand(procName))
                 {
-                    Log.InfoFormat("Invoking Stored Procedure {0}.", procName);
+                    Log.LogInformation("Invoking Stored Procedure {0}.", procName);
                     command.CommandType = CommandType.StoredProcedure;
                     command.Connection = connection;
                     <#= GenerateGetByIndexAddParametersCode(index.Parameters) #>
@@ -101,6 +145,9 @@ namespace <#= Table.Namespace #>.<#= Table.TableName #>
                             var data = Parse<#= Record #>DataModel(reader);
                             <#= RecordCamel #>Data.Add(data);
                         }
+
+                        // consume any trailing pieces
+                        while (reader.NextResult()) {}
                     }
                 }
             }
@@ -149,10 +196,10 @@ namespace <#= Table.Namespace #>.<#= Table.TableName #>
             var <#= RecordCamel #>Data = new List<<#= Record #>DataModel>();
             using (var connection = new SqlConnection(this.ConnectionString))
             {
-                var procName = "<#= GenerateGetByIndexBulkStoredProcName(index) #>";
+                var procName = "[<#= Table.Schema #>].[<#= GenerateGetByIndexBulkStoredProcName(index) #>]";
                 using (var command = new SqlCommand(procName))
                 {
-                    Log.InfoFormat("Invoking Stored Procedure {0}.", procName);
+                    Log.LogInformation("Invoking Stored Procedure {0}.", procName);
                     command.CommandType = CommandType.StoredProcedure;
                     command.Connection = connection;
 
@@ -170,6 +217,9 @@ namespace <#= Table.Namespace #>.<#= Table.TableName #>
                             var data = Parse<#= Record #>DataModel(reader);
                             <#= RecordCamel #>Data.Add(data);
                         }
+
+                        // consume any trailing pieces
+                        while (reader.NextResult()) {}
                     }
                 }
             }
@@ -180,9 +230,14 @@ namespace <#= Table.Namespace #>.<#= Table.TableName #>
 <#
     }
 #>
+<#
+    // Generate the Insert method if configured
+    if (Table.Config.Insert)
+    {
+#>
         /// <summary>Inserts the given <#= Record #> data model into the <#= Record #> table.</summary>
         /// <param name="<#= RecordCamel #>Data">The <#= RecordLower #> data to insert.</param>
-        /// <returns>The ID of the inserted <#= Record #> record.</returns>
+        /// <returns>The ID of the inserted <#= Record #> record if a primary key exists, otherwise, -1.</returns>
         public async Task<int> Insert(<#= Record #>DataModel <#= RecordCamel #>Data)
         {
             if (<#= RecordCamel #>Data == null)
@@ -195,7 +250,7 @@ namespace <#= Table.Namespace #>.<#= Table.TableName #>
                 throw new InvalidOperationException("Connection String is null.  Insert operation cannot be performed.");
             }
             <#
-            if (PrimaryKey.IsIdentity)
+            if (Table.HasPrimaryKey && PrimaryKey.IsIdentity)
             {
             #>
 
@@ -207,13 +262,13 @@ namespace <#= Table.Namespace #>.<#= Table.TableName #>
             }
             #>
 
-            var <#= PrimaryKey.GetCodeParamName() #> = -1;
+            var newId = -1;
             using (var connection = new SqlConnection(this.ConnectionString))
             {
-                var procName = "<#= Table.GetInsertProcName() #>";
+                var procName = "[<#= Table.Schema #>].[<#= Table.GetInsertProcName() #>]";
                 using (var command = new SqlCommand(procName))
                 {
-                    Log.InfoFormat("Invoking Stored Procedure {0}.", procName);
+                    Log.LogInformation("Invoking Stored Procedure {0}.", procName);
                     command.CommandType = CommandType.StoredProcedure;
                     command.Connection = connection;
                     <#= GenerateInsertProcParams() #>
@@ -224,15 +279,28 @@ namespace <#= Table.Namespace #>.<#= Table.TableName #>
                     {
                         while (reader.Read())
                         {
-                            <#= PrimaryKey.GetCodeParamName() #> = (int)reader["<#= PrimaryKey.FieldName #>"];
+                            <# if (Table.HasPrimaryKey) { #>
+                            newId = (int)reader["<#= PrimaryKey.FieldName #>"];
+                            <# } #>
                         }
+
+                        // consume any trailing pieces
+                        while (reader.NextResult()) {}
                     }
                 }
             }
 
-            return <#= PrimaryKey.GetCodeParamName() #>;
+            return newId;
         }
 
+<#
+    }
+#>
+<#
+    // Generate the Update method if configured
+    if (Table.Config.Update)
+    {
+#>
         /// <summary>Updates the given <#= Record #> data model in the <#= Record #> table.</summary>
         /// <param name="<#= RecordCamel #>Data">The <#= RecordLower #> data to update.</param>
         /// <returns>The number of records affected by the update.</returns>
@@ -256,10 +324,10 @@ namespace <#= Table.Namespace #>.<#= Table.TableName #>
             var affectedRows = 0;
             using (var connection = new SqlConnection(this.ConnectionString))
             {
-                var procName = "<#= Table.GetUpdateProcName() #>";
+                var procName = "[<#= Table.Schema #>].[<#= Table.GetUpdateProcName() #>]";
                 using (var command = new SqlCommand(procName))
                 {
-                    Log.InfoFormat("Invoking Stored Procedure {0}.", procName);
+                    Log.LogInformation("Invoking Stored Procedure {0}.", procName);
                     command.CommandType = CommandType.StoredProcedure;
                     command.Connection = connection;
                     <#= GenerateUpdateProcParams() #>
@@ -272,6 +340,14 @@ namespace <#= Table.Namespace #>.<#= Table.TableName #>
             return affectedRows;
         }
 
+<#
+    }
+#>
+<#
+    // Generate the Delete method if configured
+    if (Table.Config.Delete)
+    {
+#>
         /// <summary>Deletes record with the given <#= PrimaryKey.FieldName #> from the <#= Table.TableName #> table.</summary>
         /// <param name="<#= PrimaryKey.GetCodeParamName() #>">The <#= PrimaryKey.FieldName #>.</param>
         public async Task<int> Delete(int <#= PrimaryKey.GetCodeParamName() #>)
@@ -284,10 +360,10 @@ namespace <#= Table.Namespace #>.<#= Table.TableName #>
             var affectedRows = 0;
             using (var connection = new SqlConnection(this.ConnectionString))
             {
-                var procName = "<#= Table.GetDeleteProcName() #>";
+                var procName = "[<#= Table.Schema #>].[<#= Table.GetDeleteProcName() #>]";
                 using (var command = new SqlCommand(procName))
                 {
-                    Log.InfoFormat("Invoking Stored Procedure {0}.", procName);
+                    Log.LogInformation("Invoking Stored Procedure {0}.", procName);
                     command.CommandType = CommandType.StoredProcedure;
                     command.Connection = connection;
                     command.Parameters.AddWithValue("<#= PrimaryKey.GetParamName() #>", <#= PrimaryKey.GetCodeParamName() #>);
@@ -321,7 +397,7 @@ namespace <#= Table.Namespace #>.<#= Table.TableName #>
 
             // Create an in-memory datatable with the primary key values
             var idDataTable = new DataTable();
-            idDataTable.Columns.Add(new DataColumn("<#=PrimaryKey.FieldName #>"));
+            idDataTable.Columns.Add(new DataColumn("<#= PrimaryKey.FieldName #>"));
             for (var i = 0; i < <#= PrimaryKey.GetCodeParamName() #>s.Count(); i++)
             {
                 idDataTable.Rows.Add(<#= PrimaryKey.GetCodeParamName() #>s.ElementAt(i));
@@ -330,10 +406,10 @@ namespace <#= Table.Namespace #>.<#= Table.TableName #>
             var affectedRows = 0;
             using (var connection = new SqlConnection(this.ConnectionString))
             {
-                var procName = "<#= Table.GetDeleteBulkProcName() #>";
+                var procName = "[<#= Table.Schema #>].[<#= Table.GetDeleteBulkProcName() #>]";
                 using (var command = new SqlCommand(procName))
                 {
-                    Log.InfoFormat("Invoking Stored Procedure {0}.", procName);
+                    Log.LogInformation("Invoking Stored Procedure {0}.", procName);
                     command.CommandType = CommandType.StoredProcedure;
                     command.Connection = connection;
 
@@ -350,6 +426,9 @@ namespace <#= Table.Namespace #>.<#= Table.TableName #>
             return affectedRows;
         }
 
+<#
+    }
+#>
         /// <summary>Parses the <#= Record #> data model out of the reader.</summary>
         /// <param name="reader">The reader.</param>
         /// <returns>Populated <#= Record #> Data Model</returns>

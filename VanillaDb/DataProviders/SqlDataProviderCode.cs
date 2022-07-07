@@ -26,19 +26,19 @@ namespace VanillaDb.DataProviders
         /// <summary>Gets the name of the record type being worked with (the table name).</summary>
         public string Record
         {
-            get { return Table.TableName; }
+            get { return Table.TableAlias; }
         }
 
         /// <summary>Gets the lowercase name of the record type being worked with (the table name).</summary>
         public string RecordLower
         {
-            get { return Table.TableName.ToLower(); }
+            get { return Table.TableAlias.ToLower(); }
         }
 
         /// <summary>Gets the camelCase name of the record type being worked with (the table name).</summary>
         public string RecordCamel
         {
-            get { return Table.TableName.ToLower(); }
+            get { return Table.TableAlias.ToLower(); }
         }
 
         /// <summary>Gets the name of the primary key field.</summary>
@@ -57,7 +57,7 @@ namespace VanillaDb.DataProviders
         /// <returns>Class name and file name (without .sql).</returns>
         public string GenerateName()
         {
-            return $"{Table.TableName}SqlDataProvider";
+            return $"{Table.TableAlias}SqlDataProvider";
         }
 
         /// <summary>Generates the insert proc parameters.</summary>
@@ -124,7 +124,7 @@ namespace VanillaDb.DataProviders
         public string GenerateGetByIndexStoredProcName(IndexModel index)
         {
             var procNameFields = index.Fields.Select(f => f.FieldName);
-            return $"dbo.USP_{Table.TableName}_GetBy{string.Join("_", procNameFields)}";
+            return $"USP_{Table.TableName}_GetBy{string.Join("_", procNameFields)}";
         }
 
         /// <summary>Generates the code to add parameters for the get by index procedure.</summary>
@@ -162,7 +162,7 @@ namespace VanillaDb.DataProviders
         public string GenerateGetByIndexBulkStoredProcName(IndexModel index)
         {
             var fieldNames = index.Fields.Select(f => f.FieldName);
-            return $"dbo.USP_{Table.TableName}_GetBy{string.Join("_", fieldNames)}_Bulk";
+            return $"USP_{Table.TableName}_GetBy{string.Join("_", fieldNames)}_Bulk";
         }
 
         /// <summary>Generates the GetBy(Bulk) stored procedure's parameter name.</summary>

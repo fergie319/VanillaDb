@@ -4,7 +4,7 @@
 <#@ import namespace="System.Text" #>
 <#@ import namespace="System.Collections.Generic" #>
 <#@ import namespace="VanillaDb.Models" #>
-CREATE TYPE [dbo].[<#= GenerateName() #>]
+CREATE TYPE [<#= Index.Table.Schema #>].[<#= GenerateName() #>]
 AS TABLE
 (
 <#= GenerateFields() #>

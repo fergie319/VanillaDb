@@ -44,7 +44,7 @@ namespace VanillaDb.DeleteProcs
         {
             var typeTable = new TypeTable(Index);
             var fieldNames = Index.Fields.Select(f => f.FieldName.ToCamelCase());
-            return $"    {GenerateBulkProcParameter(Index)} dbo.{typeTable.GenerateName()} READONLY";
+            return $"    {GenerateBulkProcParameter(Index)} [{Index.Table.Schema}].[{typeTable.GenerateName()}] READONLY";
         }
 
         /// <summary>Gets the table alias to use in the query.</summary>
