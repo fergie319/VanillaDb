@@ -7,7 +7,7 @@ namespace VanillaDb.GetProcs
 {
     /// <summary>Partial class supplies parameters to the T4 Template.</summary>
     /// <seealso cref="VanillaDb.GetProcs.GetByBulkStoredProcBase" />
-    public partial class GetByBulkStoredProc
+    public partial class GetByBulkStoredProc : ICodeTemplate
     {
         private TableModel Table { get; set; }
 

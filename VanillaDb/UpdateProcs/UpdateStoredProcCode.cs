@@ -5,7 +5,7 @@ using VanillaDb.Models;
 namespace VanillaDb.UpdateProcs
 {
     /// <summary>Partial class supplies parameters to the T4 Template.</summary>
-    public partial class UpdateStoredProc
+    public partial class UpdateStoredProc : ICodeTemplate
     {
         private TableModel Table { get; set; }
 

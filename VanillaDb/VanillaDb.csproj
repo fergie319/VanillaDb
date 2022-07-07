@@ -73,6 +73,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CodeTemplateExtensions.cs" />
     <Compile Include="DataProviders\DataModel.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -121,6 +122,7 @@
     </Compile>
     <Compile Include="GetProcs\GetAllStoredProcCode.cs" />
     <Compile Include="GetProcs\GetBySingleStoredProcCode.cs" />
+    <Compile Include="ICodeTemplate.cs" />
     <Compile Include="InsertProcs\InsertStoredProc.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>

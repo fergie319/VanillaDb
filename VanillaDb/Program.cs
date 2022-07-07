@@ -463,64 +463,47 @@ namespace " + config.CodeNamespace + @"
             {
                 // Generate the single-select stored procedures
                 var getByAll = new GetAllStoredProc(table);
-                var sqlContent = getByAll.TransformText();
-                LogVerbose($"Content: {0}", sqlContent);
-                File.WriteAllText($"{storedProcDir}\\{getByAll.GenerateName()}.sql", sqlContent);
+                getByAll.GenerateFile(storedProcDir);
             }
 
             // First generate type tables for all fields participating in indexes and then the GetBy procs
             foreach (var index in indexes)
             {
                 var typeTable = new TypeTable(index);
-                var sqlContent = typeTable.TransformText();
-                var fieldNames = string.Join("_", index.Fields.Select(f => f.FieldName));
-                LogVerbose($"Content: {0}", sqlContent);
-                File.WriteAllText($"{typeTableDir}\\{typeTable.GenerateName()}.sql", sqlContent);
+                typeTable.GenerateFile(storedProcDir);
 
                 // Generate the single-select stored procedures
                 var getBy = new GetBySingleStoredProc(table, index);
-                sqlContent = getBy.TransformText();
-                LogVerbose($"Content: {0}", sqlContent);
-                File.WriteAllText($"{storedProcDir}\\{getBy.GenerateName()}.sql", sqlContent);
+                getBy.GenerateFile(storedProcDir);
 
                 // Generate the bulk-select stored procedures
                 var getByBulk = new GetByBulkStoredProc(table, index);
-                sqlContent = getByBulk.TransformText();
-                LogVerbose($"Content: {0}", sqlContent);
-                File.WriteAllText($"{storedProcDir}\\{getByBulk.GenerateName()}.sql", sqlContent);
+                getByBulk.GenerateFile(storedProcDir);
             }
 
             // Generate the Insert stored procedure
             if (table.Config.Insert)
             {
                 var insertStoredProc = new InsertStoredProc(table);
-                var insertContent = insertStoredProc.TransformText();
-                LogVerbose($"Content: {0}", insertContent);
-                File.WriteAllText($"{storedProcDir}\\{insertStoredProc.GenerateName()}.sql", insertContent);
+                insertStoredProc.GenerateFile(storedProcDir);
             }
 
             // Generate the Update stored procedure
             if (table.Config.Update)
             {
                 var updateStoredProc = new UpdateStoredProc(table);
-                var updateContent = updateStoredProc.TransformText();
-                LogVerbose($"Content: {0}", updateContent);
-                File.WriteAllText($"{storedProcDir}\\{updateStoredProc.GenerateName()}.sql", updateContent);
+                updateStoredProc.GenerateFile(storedProcDir);
             }
 
             if (table.Config.Delete)
             {
                 // Generate the Delete stored procedure
                 var deleteStoredProc = new DeleteStoredProc(table);
-                var deleteContent = deleteStoredProc.TransformText();
-                LogVerbose($"Content: {0}", deleteContent);
-                File.WriteAllText($"{storedProcDir}\\{deleteStoredProc.GenerateName()}.sql", deleteContent);
+                deleteStoredProc.GenerateFile(storedProcDir);
 
                 // Generate the Bulk Delete stored procedure
                 var deleteBulkStoredProc = new DeleteBulkStoredProc(table, indexes.First(i => i.IsPrimaryKey));
-                var deleteBulkContent = deleteBulkStoredProc.TransformText();
-                LogVerbose($"Content: {0}", deleteBulkContent);
-                File.WriteAllText($"{storedProcDir}\\{deleteBulkStoredProc.GenerateName()}.sql", deleteBulkContent);
+                deleteBulkStoredProc.GenerateFile(storedProcDir);
             }
 
             // Create Data Provider directory
@@ -529,21 +512,15 @@ namespace " + config.CodeNamespace + @"
 
             // Generate the DataModel class
             var dataModelGen = new DataModel(table);
-            var content = dataModelGen.TransformText();
-            LogVerbose($"Content: {0}", content);
-            File.WriteAllText($"{dataProviderDir}\\{dataModelGen.GenerateName()}.cs", content);
+            dataModelGen.GenerateFile(dataProviderDir);
 
             // Generate the DataProvider interface
             var dataProviderInterfaceGen = new DataProviderInterface(table, indexes);
-            content = dataProviderInterfaceGen.TransformText();
-            LogVerbose($"Content: {0}", content);
-            File.WriteAllText($"{dataProviderDir}\\{dataProviderInterfaceGen.GenerateName()}.cs", content);
+            dataProviderInterfaceGen.GenerateFile(dataProviderDir);
 
             // Generate the SqlDataProvider class
             var sqlDataProviderGen = new SqlDataProvider(table, indexes);
-            content = sqlDataProviderGen.TransformText();
-            LogVerbose($"Content: {0}", content);
-            File.WriteAllText($"{dataProviderDir}\\{sqlDataProviderGen.GenerateName()}.cs", content);
+            sqlDataProviderGen.GenerateFile(dataProviderDir);
 
             // Add table config to file for easy configuration
             WriteTableConfigToFile(tableFileInfo, table);
@@ -583,7 +560,10 @@ namespace " + config.CodeNamespace + @"
             File.WriteAllText(tableFileInfo.FullName, fileContent);
         }
 
-        private static void LogVerbose(string message, params string[] arguments)
+        /// <summary>Logs the given message when Verbose is enabled.</summary>
+        /// <param name="message">The message.</param>
+        /// <param name="arguments">The arguments.</param>
+        public static void LogVerbose(string message, params string[] arguments)
         {
             if (IsVerbose)
             {

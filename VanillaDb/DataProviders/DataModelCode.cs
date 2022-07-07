@@ -6,7 +6,7 @@ namespace VanillaDb.DataProviders
 {
     /// <summary>Partial class supplies parameters to the T4 Template.</summary>
     /// <seealso cref="VanillaDb.DataProviders.DataModelBase" />
-    public partial class DataModel
+    public partial class DataModel : ICodeTemplate
     {
         private TableModel Table { get; set; }
 

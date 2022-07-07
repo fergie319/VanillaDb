@@ -5,7 +5,7 @@ using VanillaDb.Models;
 namespace VanillaDb.GetProcs
 {
     /// <summary>Partial class supplies parameters to the T4 Template.</summary>
-    public partial class GetBySingleStoredProc
+    public partial class GetBySingleStoredProc : ICodeTemplate
     {
         private TableModel Table { get; set; }
 

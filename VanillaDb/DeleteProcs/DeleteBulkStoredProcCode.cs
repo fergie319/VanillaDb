@@ -7,7 +7,7 @@ namespace VanillaDb.DeleteProcs
 {
     /// <summary>Partial class supplies parameters to the T4 Template.</summary>
     /// <seealso cref="VanillaDb.GetProcs.GetByBulkStoredProcBase" />
-    public partial class DeleteBulkStoredProc
+    public partial class DeleteBulkStoredProc : ICodeTemplate
     {
         private TableModel Table { get; set; }
 

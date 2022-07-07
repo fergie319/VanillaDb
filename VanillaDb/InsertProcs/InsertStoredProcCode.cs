@@ -5,7 +5,7 @@ using VanillaDb.Models;
 namespace VanillaDb.InsertProcs
 {
     /// <summary>Partial class supplies parameters to the T4 Template.</summary>
-    public partial class InsertStoredProc
+    public partial class InsertStoredProc : ICodeTemplate
     {
         private TableModel Table { get; set; }
 

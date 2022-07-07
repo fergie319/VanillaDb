@@ -5,7 +5,7 @@ using VanillaDb.Models;
 namespace VanillaDb.DeleteProcs
 {
     /// <summary>Partial class supplies parameters to the T4 Template.</summary>
-    public partial class DeleteStoredProc
+    public partial class DeleteStoredProc : ICodeTemplate
     {
         private TableModel Table { get; set; }
 

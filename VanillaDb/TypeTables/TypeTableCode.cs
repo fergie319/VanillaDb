@@ -5,7 +5,7 @@ using VanillaDb.Models;
 namespace VanillaDb.TypeTables
 {
     /// <summary>Partial class supplies parameters to the T4 Template.</summary>
-    public partial class TypeTable
+    public partial class TypeTable : ICodeTemplate
     {
         private IndexModel Index { get; set; }
 
