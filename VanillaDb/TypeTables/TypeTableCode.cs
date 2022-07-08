@@ -16,6 +16,9 @@ namespace VanillaDb.TypeTables
             Index = index;
         }
 
+        /// <summary>Gets the file extension.</summary>
+        public string FileExtension => "sql";
+
         /// <summary>Gets the name of the file.</summary>
         /// <returns>Type Table name and file name (without .sql).</returns>
         public string GenerateName()

@@ -12,6 +12,9 @@ namespace VanillaDb.DataProviders
 
         private IEnumerable<IndexModel> Indexes { get; set; }
 
+        /// <summary>Gets the file extension.</summary>
+        public string FileExtension => "cs";
+
         /// <summary>Initializes a new instance of the <see cref="DataProviderInterface" /> class.</summary>
         /// <param name="table">The table model.</param>
         /// <param name="indexes">The indexes.</param>

@@ -23,6 +23,9 @@ namespace VanillaDb.DeleteProcs
             return Table.GetDeleteProcName();
         }
 
+        /// <summary>Gets the file extension.</summary>
+        public string FileExtension => "sql";
+
         /// <summary>Generates the stored procedure's parameter list.</summary>
         /// <returns></returns>
         public string GenerateProcParameters()

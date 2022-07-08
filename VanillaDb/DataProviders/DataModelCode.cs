@@ -17,6 +17,9 @@ namespace VanillaDb.DataProviders
             Table = table;
         }
 
+        /// <summary>Gets the file extension.</summary>
+        public string FileExtension => "cs";
+
         /// <summary>Gets the name of the stored procedure.</summary>
         /// <returns>Class name and file name (without .sql).</returns>
         public string GenerateName()

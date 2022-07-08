@@ -10,5 +10,8 @@
         /// <summary>Generates the name for the generated file.</summary>
         /// <returns>Extensionless file name.</returns>
         string GenerateName();
+
+        /// <summary>Gets the file extension.</summary>
+        string FileExtension { get; }
     }
 }

@@ -29,6 +29,9 @@ namespace VanillaDb.DeleteProcs
             return Table.GetDeleteBulkProcName();
         }
 
+        /// <summary>Gets the file extension.</summary>
+        public string FileExtension => "sql";
+
         /// <summary>Generates the GetBy(Bulk) stored procedure's parameter name.</summary>
         /// <returns>Newline separated stored procedure parameters</returns>
         public string GenerateBulkProcParameter(IndexModel index)

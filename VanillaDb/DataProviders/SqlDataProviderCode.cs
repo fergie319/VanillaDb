@@ -23,6 +23,9 @@ namespace VanillaDb.DataProviders
             Indexes = indexes;
         }
 
+        /// <summary>Gets the file extension.</summary>
+        public string FileExtension => "cs";
+
         /// <summary>Gets the name of the record type being worked with (the table name).</summary>
         public string Record
         {

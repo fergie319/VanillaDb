@@ -12,7 +12,7 @@ namespace VanillaDb
         {
             var content = template.TransformText();
             Program.LogVerbose($"Content: {0}", content);
-            File.WriteAllText($"{folderPath}\\{template.GenerateName()}.cs", content);
+            File.WriteAllText($"{folderPath}\\{template.GenerateName()}.{template.FileExtension}", content);
         }
     }
 }

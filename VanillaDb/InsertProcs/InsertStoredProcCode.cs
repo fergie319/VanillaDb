@@ -16,6 +16,9 @@ namespace VanillaDb.InsertProcs
             Table = table;
         }
 
+        /// <summary>Gets the file extension.</summary>
+        public string FileExtension => "sql";
+
         /// <summary>Gets the name of the stored procedure.</summary>
         /// <returns>Stored Procedure name and file name (without .sql).</returns>
         public string GenerateName()

@@ -14,6 +14,9 @@ namespace VanillaDb.GetProcs
             Table = table;
         }
 
+        /// <summary>Gets the file extension.</summary>
+        public string FileExtension => "sql";
+
         /// <summary>Generates the portion of the procedure name that is composed of the indexed fields.</summary>
         /// <returns>Underscore-separated field names</returns>
         public string GenerateName()
