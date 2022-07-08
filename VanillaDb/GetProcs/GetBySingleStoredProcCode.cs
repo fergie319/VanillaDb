@@ -54,11 +54,8 @@ namespace VanillaDb.GetProcs
         public string GenerateProcParameters()
         {
             var procParams = Index.Parameters
+                .Where(f => f.FieldType.IsSqlParameter)
                 .Select(f => $"    @{f.FieldName.ToCamelCase()} {f.FieldType.SqlType}");
-            if (Table.IsTemporal && TemporalType == TemporalTypes.AsOf)
-            {
-                procParams = procParams.Append($"    @asOfDate DATETIME2");
-            }
             return string.Join("," + Environment.NewLine, procParams);
         }
 

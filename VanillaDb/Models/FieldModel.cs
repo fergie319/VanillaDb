@@ -102,6 +102,14 @@ namespace VanillaDb.Models
             {
                 result += " = QueryOperator.Equals";
             }
+            else if (FieldType.FieldType == typeof(TemporalTypes))
+            {
+                result += " = TemporalTypes.Default";
+            }
+            else if (FieldName == "AsOfDate")
+            {
+                result += " = null";
+            }
 
             return result;
         }

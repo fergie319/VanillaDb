@@ -56,6 +56,37 @@ namespace VanillaDb.Models
                     return result;
                 });
 
+                // Add the temporal enum option if supported
+                if (Table.IsTemporal)
+                {
+                    if (Table.Config.TemporalGetAll.Value || Table.Config.TemporalGetAsOf.Value)
+                    {
+                        parameters.Add(new FieldModel()
+                        {
+                            FieldName = "TemporalOperator",
+                            FieldType = new FieldTypeModel()
+                            {
+                                FieldType = typeof(TemporalTypes),
+                                IsSqlParameter = false,
+                            },
+                        });
+                    }
+
+                    if (Table.Config.TemporalGetAsOf.Value)
+                    {
+                        parameters.Add(new FieldModel()
+                        {
+                            FieldName = "AsOfDate",
+                            FieldType = new FieldTypeModel()
+                            {
+                                FieldType = typeof(DateTime),
+                                IsNullable = true,
+                                SqlType = "DATETIME2"
+                            },
+                        });
+                    }
+                }
+
                 return parameters;
             }
         }

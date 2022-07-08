@@ -65,7 +65,9 @@ namespace VanillaDb.GetProcs
         public string GenerateProcParameters()
         {
             var typeTable = new TypeTable(Index);
-            var fieldNames = Index.Fields.Select(f => f.FieldName.ToCamelCase());
+            var fieldNames = Index.Parameters
+                .Where(p => p.FieldType.IsSqlParameter)
+                .Select(p => p.FieldName.ToCamelCase());
             return $"    {GenerateBulkProcParameter(Index)} {Table.Schema}.{typeTable.GenerateName()} READONLY";
         }
 
