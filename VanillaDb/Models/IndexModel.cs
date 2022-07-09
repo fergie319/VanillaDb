@@ -115,8 +115,9 @@ namespace VanillaDb.Models
         /// <returns></returns>
         public string GetByIndexReturnType()
         {
-            var returnType = (IsUnique) ? Table.GetDataModelName()
-                                        : $"IEnumerable<{Table.GetDataModelName()}>";
+            var isSingleResult = IsUnique && (!Table.IsTemporal || !Table.Config.TemporalGetAll.Value);
+            var returnType = (isSingleResult) ? Table.GetDataModelName()
+                                              : $"IEnumerable<{Table.GetDataModelName()}>";
             return returnType;
         }
 
@@ -125,6 +126,25 @@ namespace VanillaDb.Models
         public string GetByIndexMethodName()
         {
             return $"GetBy{string.Join("And", Fields.Select(f => f.FieldName))}";
+        }
+
+        /// <summary>Gets the name of the GetByIndex stored procedure.</summary>
+        /// <param name="temporalType">The temporal type of procedure.</param>
+        /// <returns>GetByIndex Proc Name</returns>
+        public string GetByIndexProcName(TemporalTypes temporalType)
+        {
+            var procNameFields = Fields.Select(f => f.FieldName);
+            var procName = $"USP_{Table.TableName}_GetBy{string.Join("_", procNameFields)}";
+            if (Table.IsTemporal && temporalType == TemporalTypes.AsOf)
+            {
+                procName += "_AsOf";
+            }
+            else if (temporalType == TemporalTypes.All)
+            {
+                procName += "_All";
+            }
+
+            return procName;
         }
 
         /// <summary>Generates the get by index method parameters.</summary>
@@ -159,6 +179,25 @@ namespace VanillaDb.Models
         public string BulkGetByIndexMethodParams()
         {
             return string.Join(", ", Fields.Select(f => $"IEnumerable<{f.FieldType.GetAliasOrName()}> {f.FieldName.ToCamelCase()}s"));
+        }
+
+        /// <summary>Gets the name of the GetbyIndex bulk stored procedure.</summary>
+        /// <param name="temporalType">The temporal type of procedure.</param>
+        /// <returns>GetByIndex Bulk Proc Name</returns>
+        public string BulkGetByIndexProcName(TemporalTypes temporalType)
+        {
+            var procNameFields = Fields.Select(f => f.FieldName);
+            var procName = $"USP_{Table.TableName}_GetBy{string.Join("_", procNameFields)}_Bulk";
+            if (Table.IsTemporal && temporalType == TemporalTypes.AsOf)
+            {
+                procName += "_AsOf";
+            }
+            else if (temporalType == TemporalTypes.All)
+            {
+                procName += "_All";
+            }
+
+            return procName;
         }
 
         /// <summary>Generates the bulk type identifier table.</summary>

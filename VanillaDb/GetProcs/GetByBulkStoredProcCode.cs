@@ -37,18 +37,7 @@ namespace VanillaDb.GetProcs
         /// <returns>Procedure name and file name (without .sql).</returns>
         public string GenerateName()
         {
-            var procNameFields = Index.Fields.Select(f => f.FieldName);
-            var procName = $"USP_{Table.TableName}_GetBy{string.Join("_", procNameFields)}_Bulk";
-            if (Table.IsTemporal && TemporalType == TemporalTypes.AsOf)
-            {
-                procName += "_AsOf";
-            }
-            else if (TemporalType == TemporalTypes.All)
-            {
-                procName += "_All";
-            }
-
-            return procName;
+            return Index.BulkGetByIndexProcName(TemporalType);
         }
 
         /// <summary>Generates the GetBy(Bulk) stored procedure's parameter name.</summary>

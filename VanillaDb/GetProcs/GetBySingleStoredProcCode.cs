@@ -35,18 +35,7 @@ namespace VanillaDb.GetProcs
         /// <returns>Underscore-separated field names</returns>
         public string GenerateName()
         {
-            var procNameFields = Index.Fields.Select(f => f.FieldName);
-            var procName = $"USP_{Table.TableName}_GetBy{string.Join("_", procNameFields)}";
-            if (Table.IsTemporal && TemporalType == TemporalTypes.AsOf)
-            {
-                procName += "_AsOf";
-            }
-            else if (TemporalType == TemporalTypes.All)
-            {
-                procName += "_All";
-            }
-
-            return procName;
+            return Index.GetByIndexProcName(TemporalType);
         }
 
         /// <summary>Generates the stored procedure's parameter list.</summary>
