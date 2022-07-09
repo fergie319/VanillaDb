@@ -448,7 +448,7 @@ namespace ");
                     ");
             
             #line 137 "C:\git\VanillaDb\VanillaDb\DataProviders\SqlDataProvider.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(GenerateGetByIndexAddParametersCode(index.Parameters)));
+            this.Write(this.ToStringHelper.ToStringWithCulture(GenerateGetByIndexAddParametersCode(index.Parameters())));
             
             #line default
             #line hidden

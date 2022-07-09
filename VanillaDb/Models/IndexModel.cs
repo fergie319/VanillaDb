@@ -20,75 +20,69 @@ namespace VanillaDb.Models
         public bool IsPrimaryKey { get; set; }
 
         /// <summary>Gets or sets the parameters for the fields</summary>
-        /// <remarks>
-        /// This list is different because we might have additional parameters for specifying the operator to use.
-        /// </remarks>
-        public IEnumerable<FieldModel> Parameters
+        /// <param name="temporalType">The Temporal Type of parameters to get - Default is the default :-)</param>
+        /// <returns>List of parameters for the stored proc and dataprovider interface</returns>
+        /// <remarks>This list is different because we might have additional parameters for specifying the operator to use.</remarks>
+        public IEnumerable<FieldModel> Parameters(TemporalTypes temporalType = TemporalTypes.Default)
         {
-            get
+            var parameters = new List<FieldModel>();
+            foreach (var field in Fields)
             {
-                var parameters = new List<FieldModel>();
-                foreach (var field in Fields)
+                foreach (var parameter in field.GetParameters())
                 {
-                    foreach (var parameter in field.GetParameters())
+                    parameters.Add(parameter);
+                }
+            }
+
+            parameters.Sort((p1, p2) =>
+            {
+                var result = 0;
+                var p1Type = p1.FieldType.FieldType;
+                var p2Type = p2.FieldType.FieldType;
+                if (p1Type != p2Type)
+                {
+                    if (p1Type == typeof(QueryOperator))
                     {
-                        parameters.Add(parameter);
+                        result = 1;
+                    }
+                    else if (p2Type == typeof(QueryOperator))
+                    {
+                        result = -1;
                     }
                 }
 
-                parameters.Sort((p1, p2) =>
-                {
-                    var result = 0;
-                    var p1Type = p1.FieldType.FieldType;
-                    var p2Type = p2.FieldType.FieldType;
-                    if (p1Type != p2Type)
-                    {
-                        if (p1Type == typeof(QueryOperator))
-                        {
-                            result = 1;
-                        }
-                        else if (p2Type == typeof(QueryOperator))
-                        {
-                            result = -1;
-                        }
-                    }
+                return result;
+            });
 
-                    return result;
+            // Add the temporal enum option if supported
+            if (temporalType != TemporalTypes.Default)
+            {
+                parameters.Add(new FieldModel()
+                {
+                    FieldName = "TemporalOperator",
+                    FieldType = new FieldTypeModel()
+                    {
+                        FieldType = typeof(TemporalTypes),
+                        IsSqlParameter = false,
+                    },
                 });
 
-                // Add the temporal enum option if supported
-                if (Table.IsTemporal)
+                if (temporalType == TemporalTypes.AsOf)
                 {
-                    if (Table.Config.TemporalGetAll.Value || Table.Config.TemporalGetAsOf.Value)
+                    parameters.Add(new FieldModel()
                     {
-                        parameters.Add(new FieldModel()
+                        FieldName = "AsOfDate",
+                        FieldType = new FieldTypeModel()
                         {
-                            FieldName = "TemporalOperator",
-                            FieldType = new FieldTypeModel()
-                            {
-                                FieldType = typeof(TemporalTypes),
-                                IsSqlParameter = false,
-                            },
-                        });
-                    }
-
-                    if (Table.Config.TemporalGetAsOf.Value)
-                    {
-                        parameters.Add(new FieldModel()
-                        {
-                            FieldName = "AsOfDate",
-                            FieldType = new FieldTypeModel()
-                            {
-                                FieldType = typeof(DateTime),
-                                IsNullable = true,
-                                SqlType = "DATETIME2"
-                            },
-                        });
-                    }
+                            FieldType = typeof(DateTime),
+                            IsNullable = true,
+                            SqlType = "DATETIME2"
+                        },
+                    });
                 }
-
-                return parameters;
             }
+
+            return parameters;
         }
 
         /// <summary>Creates a readable list of the indexes' field names (joined by 'and').</summary>
@@ -103,7 +97,17 @@ namespace VanillaDb.Models
         public string GetByIndexParamsXmlComments()
         {
             var indent = "        ";
-            var xmlParams = Parameters.Select(f => $"/// <param name=\"{f.FieldName.ToCamelCase()}\">The {f.FieldName} value.</param>");
+            var temporalType = TemporalTypes.Default;
+            if (Table.IsTemporal && Table.Config.TemporalGetAsOf.Value)
+            {
+                temporalType = TemporalTypes.AsOf;
+            }
+            else if (Table.IsTemporal && Table.Config.TemporalGetAll.Value)
+            {
+                temporalType = TemporalTypes.All;
+            }
+
+            var xmlParams = Parameters(temporalType).Select(f => $"/// <param name=\"{f.FieldName.ToCamelCase()}\">The {f.FieldName} value.</param>");
             return string.Join($"{Environment.NewLine}{indent}", xmlParams);
         }
 
@@ -127,7 +131,17 @@ namespace VanillaDb.Models
         /// <returns></returns>
         public string GetByIndexMethodParams()
         {
-            var fields = Parameters.Select(f => f.GetMethodParamDeclaration());
+            var temporalType = TemporalTypes.Default;
+            if (Table.IsTemporal && Table.Config.TemporalGetAsOf.Value)
+            {
+                temporalType = TemporalTypes.AsOf;
+            }
+            else if (Table.IsTemporal && Table.Config.TemporalGetAll.Value)
+            {
+                temporalType = TemporalTypes.All;
+            }
+
+            var fields = Parameters(temporalType).Select(f => f.GetMethodParamDeclaration());
             return string.Join(", ", fields);
         }
 

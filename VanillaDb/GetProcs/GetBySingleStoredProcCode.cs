@@ -53,7 +53,7 @@ namespace VanillaDb.GetProcs
         /// <returns>Newline separated stored procedure parameters</returns>
         public string GenerateProcParameters()
         {
-            var procParams = Index.Parameters
+            var procParams = Index.Parameters(TemporalType)
                 .Where(f => f.FieldType.IsSqlParameter)
                 .Select(f => $"    @{f.FieldName.ToCamelCase()} {f.FieldType.SqlType}");
             return string.Join("," + Environment.NewLine, procParams);

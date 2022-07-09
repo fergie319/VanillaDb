@@ -64,11 +64,20 @@ namespace VanillaDb.GetProcs
         /// <returns>Newline separated stored procedure parameters</returns>
         public string GenerateProcParameters()
         {
-            var typeTable = new TypeTable(Index);
-            var fieldNames = Index.Parameters
+            // Create a list of the non-field parameters (like Query Operator and Temporal Operator)
+            var procParams = Index.Parameters(TemporalType)
                 .Where(p => p.FieldType.IsSqlParameter)
-                .Select(p => p.FieldName.ToCamelCase());
-            return $"    {GenerateBulkProcParameter(Index)} {Table.Schema}.{typeTable.GenerateName()} READONLY";
+                .Select(p => $"    @{p.FieldName.ToCamelCase()} {p.FieldType.SqlType}")
+                .ToList();
+            var fields = Index.Fields.Select(f => $"    @{f.FieldName.ToCamelCase()} {f.FieldType.SqlType}");
+            procParams = procParams.Except(fields).ToList();
+
+            // Generate the 'bulk' parameter which uses a type table to include all fields and add it as the first parameter
+            var typeTable = new TypeTable(Index);
+            procParams.Insert(0, $"    {GenerateBulkProcParameter(Index)} {Table.Schema}.{typeTable.GenerateName()} READONLY");
+
+            // Join the parameters together and return
+            return string.Join("," + Environment.NewLine, procParams);
         }
 
         /// <summary>Generates the fields for the SELECT clause.</summary>
