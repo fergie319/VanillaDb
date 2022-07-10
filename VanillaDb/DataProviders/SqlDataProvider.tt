@@ -314,9 +314,14 @@ namespace <#= Table.Namespace #>.<#= Table.TableAlias #>
                     {
                         while (reader.Read())
                         {
-                            <# if (Table.HasPrimaryKey) { #>
+<#
+                            if (Table.HasPrimaryKey)
+                            {
+#>
                             newId = (int)reader["<#= PrimaryKey.FieldName #>"];
-                            <# } #>
+<#
+                            }
+#>
                         }
 
                         // consume any trailing pieces
