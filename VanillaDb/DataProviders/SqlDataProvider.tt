@@ -232,6 +232,31 @@ namespace <#= Table.Namespace #>.<#= Table.TableAlias #>
             using (var connection = new SqlConnection(this.ConnectionString))
             {
                 var procName = "[<#= Table.Schema #>].[<#= index.BulkGetByIndexProcName(TemporalTypes.Default) #>]";
+                <#
+                if (index.Table.IsTemporal && index.Table.Config.TemporalGetAll.Value)
+                {
+                #>
+                if (temporalOperator == TemporalTypes.All)
+                {
+                    procName = "[<#= Table.Schema #>].[<#= index.BulkGetByIndexProcName(TemporalTypes.All) #>]";
+                }
+
+                <#
+                }
+                #>
+                <#
+                if (index.Table.IsTemporal && index.Table.Config.TemporalGetAsOf.Value)
+                {
+                #>
+                if (temporalOperator == TemporalTypes.AsOf)
+                {
+                    procName = "[<#= Table.Schema #>].[<#= index.BulkGetByIndexProcName(TemporalTypes.AsOf) #>]";
+                }
+
+                <#
+                }
+                #>
+
                 using (var command = new SqlCommand(procName))
                 {
                     Log.LogInformation("Invoking Stored Procedure {0}.", procName);
@@ -242,6 +267,18 @@ namespace <#= Table.Namespace #>.<#= Table.TableAlias #>
                     var idsParam = command.Parameters.AddWithValue("<#= GenerateBulkProcParameter(index) #>", idDataTable);
                     idsParam.SqlDbType = SqlDbType.Structured;
                     idsParam.TypeName = "<#= index.GetBulkTypeIdTable() #>";
+                    <#
+                    if (index.Table.IsTemporal && index.Table.Config.TemporalGetAsOf.Value)
+                    {
+                    #>
+                    if (temporalOperator == TemporalTypes.AsOf)
+                    {
+                        command.Parameters.AddWithValue("@asOfDate", asOfDate);
+                    }
+                    <#
+                    }
+                    #>
+
 
                     connection.Open();
                     var reader = await command.ExecuteReaderAsync();
