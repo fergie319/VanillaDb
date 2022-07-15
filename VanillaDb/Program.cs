@@ -487,7 +487,7 @@ namespace " + config.CodeNamespace + @"
             foreach (var index in indexes)
             {
                 var typeTable = new TypeTable(index);
-                typeTable.GenerateFile(storedProcDir);
+                typeTable.GenerateFile(typeTableDir);
 
                 // Generate the single-select stored procedures
                 var getBy = new GetBySingleStoredProc(table, index);
