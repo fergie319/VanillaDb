@@ -560,9 +560,24 @@ namespace " + config.CodeNamespace + @"
             var dataProviderInterfaceGen = new DataProviderInterface(table, indexes);
             dataProviderInterfaceGen.GenerateFile(dataProviderDir);
 
-            // Generate the SqlDataProvider class
+            // Generate the SqlDataProvider classC:\git\RFA.Bank.Finance\Remittance.Database\Tables\pSubledger_Daily.sql
             var sqlDataProviderGen = new SqlDataProvider(table, indexes);
             sqlDataProviderGen.GenerateFile(dataProviderDir);
+
+            // Check if a datadictionary exists for the table
+            var extendedPropertiesFile = Path.Combine(config.OutputSqlPath, $"Extended Properties\\{table.TableAlias}.sql");
+            var dictionaryFilePath = Path.Combine(tableFileInfo.DirectoryName, $"{table.TableName}.csv");
+            var dictionaryFileInfo = new FileInfo(dictionaryFilePath);
+            if (dictionaryFileInfo.Exists)
+            {
+                var extendedPropertiesScript =
+                    DataDictionaryParser.ProcessDataDictionary(
+                        dictionaryFileInfo,
+                        table.Schema,
+                        table.TableName);
+
+                File.WriteAllText(extendedPropertiesFile, extendedPropertiesScript);
+            }
 
             // Add table config to file for easy configuration
             WriteTableConfigToFile(tableFileInfo, table);
