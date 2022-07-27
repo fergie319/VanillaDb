@@ -565,7 +565,8 @@ namespace " + config.CodeNamespace + @"
             sqlDataProviderGen.GenerateFile(dataProviderDir);
 
             // Check if a datadictionary exists for the table
-            var extendedPropertiesFile = Path.Combine(config.OutputSqlPath, $"Extended Properties\\{table.TableAlias}.sql");
+            var extendedPropertiesDir = Path.Combine(config.OutputSqlPath, $"Extended Properties");
+            var extendedPropertiesFile = Path.Combine(extendedPropertiesDir, $"{table.TableAlias}.sql");
             var dictionaryFilePath = Path.Combine(tableFileInfo.DirectoryName, $"{table.TableName}.csv");
             var dictionaryFileInfo = new FileInfo(dictionaryFilePath);
             if (dictionaryFileInfo.Exists)
@@ -576,6 +577,7 @@ namespace " + config.CodeNamespace + @"
                         table.Schema,
                         table.TableName);
 
+                Directory.CreateDirectory(extendedPropertiesDir);
                 File.WriteAllText(extendedPropertiesFile, extendedPropertiesScript);
             }
 
