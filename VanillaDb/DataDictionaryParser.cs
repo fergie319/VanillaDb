@@ -35,35 +35,36 @@ namespace VanillaDb
             using (var reader = new StreamReader(file.OpenRead(), Encoding.UTF8))
             using (var csv = new CsvReader(reader, config))
             {
-                var definitionDictionary = new Dictionary<string, string>();
-                var valuesDictionary = new Dictionary<string, string>();
-
                 csv.Read();
                 csv.ReadHeader();
                 var definitions = csv.GetRecords<DictionaryDefinitionModel>().ToArray();
-
-                // TODO: Update the 'GenerateExtendedPropertyScript method to accept the DictionaryDefinitionModel enumerable
-                var returnScript = GenerateExtendedPropertyScript("MS_Description", definitionDictionary, schemaName, tableName);
-                returnScript += GenerateExtendedPropertyScript("ENUM_Definition", valuesDictionary, schemaName, tableName);
+                var returnScript = GenerateExtendedPropertyScript(definitions, schemaName, tableName);
 
                 return returnScript;
             }
         }
 
-        private static string GenerateExtendedPropertyScript(string name, Dictionary<string, string> dictionary, string schema, string table)
+        private static string GenerateExtendedPropertyScript(IEnumerable<DictionaryDefinitionModel> dictionary, string schema, string table)
         {
             var returnString = string.Empty;
+            var extendedPropertyScript =
+                @"EXEC sp_addextendedproperty
+            @name = '{0}', @value = '{1}',
+            @level0type = N'Schema', @level0name = '{2}',
+            @level1type = N'Table', @level1name = '{3}',
+            @level2type = N'Column', @level2name = '{4}'" +
+            Environment.NewLine + "GO;" + Environment.NewLine;
 
-            foreach (var kvp in dictionary)
+            foreach (var definition in dictionary)
             {
-                returnString +=
-                $@"EXEC sp_addextendedproperty
-            @name = '{name}', @value = '{kvp.Value}',
-            @level0type = N'Schema', @level0name = '{schema}',
-            @level1type = N'Table', @level1name = '{table}',
-            @level2type = N'Column', @level2name = '{kvp.Key}'";
-
-                returnString += Environment.NewLine;
+                var description = definition.Description.Replace("\r", " ").Replace("\n", " ").Replace("'", "''");
+                returnString += string.Format
+                    (extendedPropertyScript, "MS_Description", description, schema, table, definition.Field);
+                if (!string.IsNullOrEmpty(definition.Values))
+                {
+                    returnString += string.Format
+                        (extendedPropertyScript, "ENUM_Definition", definition.ParsedValues, schema, table, definition.Field);
+                }
             }
 
             return returnString;
