@@ -571,13 +571,9 @@ namespace " + config.CodeNamespace + @"
             var dictionaryFileInfo = new FileInfo(dictionaryFilePath);
             if (dictionaryFileInfo.Exists)
             {
-                var extendedPropertiesScript =
-                    DataDictionaryParser.ProcessDataDictionary(
-                        dictionaryFileInfo,
-                        table.Schema,
-                        table.TableName);
-
+                var dataDictionary = DataDictionaryParser.ParseDataDictionary(dictionaryFileInfo);
                 Directory.CreateDirectory(extendedPropertiesDir);
+                var extendedPropertiesScript = DataDictionaryParser.GenerateExtendedPropertyScript(dataDictionary, table.Schema, table.TableName);
                 File.WriteAllText(extendedPropertiesFile, extendedPropertiesScript);
             }
 
