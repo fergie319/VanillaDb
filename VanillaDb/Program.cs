@@ -469,6 +469,21 @@ namespace " + config.CodeNamespace + @"
                 Log.Debug("Indexes: {@Indexes}", indexes);
             }
 
+
+            // Check if a datadictionary exists for the table
+            var extendedPropertiesDir = Path.Combine(config.OutputSqlPath, $"Extended Properties");
+            var extendedPropertiesFile = Path.Combine(extendedPropertiesDir, $"{table.TableAlias}.sql");
+            var dictionaryFilePath = Path.Combine(tableFileInfo.DirectoryName, $"{table.TableName}.csv");
+            var dictionaryFileInfo = new FileInfo(dictionaryFilePath);
+            if (dictionaryFileInfo.Exists)
+            {
+                table.DataDictionary = DataDictionaryParser.ParseDataDictionary(dictionaryFileInfo);
+            }
+            else
+            {
+                table.DataDictionary = new List<DictionaryDefinitionModel>();
+            }
+
             // Create the output directories for all of the different files
             var typeTableDir = Path.Combine(config.OutputSqlPath, "Types");
             Directory.CreateDirectory(typeTableDir);
@@ -564,16 +579,10 @@ namespace " + config.CodeNamespace + @"
             var sqlDataProviderGen = new SqlDataProvider(table, indexes);
             sqlDataProviderGen.GenerateFile(dataProviderDir);
 
-            // Check if a datadictionary exists for the table
-            var extendedPropertiesDir = Path.Combine(config.OutputSqlPath, $"Extended Properties");
-            var extendedPropertiesFile = Path.Combine(extendedPropertiesDir, $"{table.TableAlias}.sql");
-            var dictionaryFilePath = Path.Combine(tableFileInfo.DirectoryName, $"{table.TableName}.csv");
-            var dictionaryFileInfo = new FileInfo(dictionaryFilePath);
-            if (dictionaryFileInfo.Exists)
+            if (table.DataDictionary.Any())
             {
-                var dataDictionary = DataDictionaryParser.ParseDataDictionary(dictionaryFileInfo);
                 Directory.CreateDirectory(extendedPropertiesDir);
-                var extendedPropertiesScript = DataDictionaryParser.GenerateExtendedPropertyScript(dataDictionary, table.Schema, table.TableName);
+                var extendedPropertiesScript = DataDictionaryParser.GenerateExtendedPropertyScript(table.DataDictionary, table.Schema, table.TableName);
                 File.WriteAllText(extendedPropertiesFile, extendedPropertiesScript);
             }
 

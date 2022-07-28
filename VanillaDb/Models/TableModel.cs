@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using VanillaDb.Configuration;
 
@@ -38,6 +39,9 @@ namespace VanillaDb.Models
         /// <summary>Gets or sets the fields.</summary>
         public IList<FieldModel> Fields { get; set; }
 
+        /// <summary>Gets or sets the data dictionary for the table.</summary>
+        public IEnumerable<DictionaryDefinitionModel> DataDictionary { get; set; }
+
         /// <summary>Gets or sets a value indicating whether this table has a primary key.</summary>
         public bool HasPrimaryKey { get { return PrimaryKey != null; } }
 
@@ -67,6 +71,61 @@ namespace VanillaDb.Models
         public IEnumerable<FieldModel> UpdateTimeStampFields
         {
             get { return Fields.Where(f => UpdateTimeStampFieldNames.Contains(f.FieldName)); }
+        }
+
+        /// <summary>Gets the definition for the given field if the table has a data dictionary.</summary>
+        /// <param name="field">The field.</param>
+        /// <returns>string definition - or empty string</returns>
+        public string GetDefinition(FieldModel field)
+        {
+            var entry = DataDictionary.FirstOrDefault(d => string.Equals(d.Field, field.FieldName, StringComparison.InvariantCultureIgnoreCase));
+            var result = entry?.Description ?? string.Empty;
+            return result;
+        }
+
+        /// <summary>Gets the values for the given field if the table has a data dictionary.</summary>
+        /// <param name="field">The field.</param>
+        /// <returns>string of values - or empty string</returns>
+        public string GetValues(FieldModel field)
+        {
+            var entry = DataDictionary.FirstOrDefault(d => string.Equals(d.Field, field.FieldName, StringComparison.InvariantCultureIgnoreCase));
+            var result = entry?.ParsedValues ?? string.Empty;
+            return result;
+        }
+
+        /// <summary>Gets the remarks for the given field (formatted string of definition + values) if the table has a data dictionary.</summary>
+        /// <param name="field">The field.</param>
+        /// <param name="indent">The indent string so that remarks lines up with the other comments.</param>
+        /// <returns>string of remarks - or empty string</returns>
+        public string GetRemarks(FieldModel field, string indent)
+        {
+            var remarks = string.Empty;
+            var definition = GetDefinition(field);
+            if (!string.IsNullOrEmpty(definition))
+            {
+                var splitDefinition = definition.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
+                remarks = $"{indent}/// Definition: {string.Join($"{Environment.NewLine}{indent}/// ", splitDefinition)}";
+            }
+
+            var values = GetValues(field);
+            if (!string.IsNullOrEmpty(values))
+            {
+                if (!string.IsNullOrEmpty(remarks))
+                {
+                    // Add a newline if there was a definition (remarks is not null)
+                    remarks += Environment.NewLine;
+                }
+
+                remarks += $"{indent}/// Possible Values: {GetValues(field)}";
+            }
+
+            // Replace special characters with xml-safe characters
+            remarks = remarks
+                .Replace("&", "&amp;")
+                .Replace("<", "&lt;")
+                .Replace(">", "&gt;");
+
+            return remarks;
         }
 
         /// <summary>Gets the name of the generated data model for this table.</summary>
