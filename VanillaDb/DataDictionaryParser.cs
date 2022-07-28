@@ -14,14 +14,11 @@ namespace VanillaDb
     /// <summary>Parses data dictionary CSV to create SQL Server Extended Properties.</summary>
     public static class DataDictionaryParser
     {
-        /// <summary>
-        /// Accept Data Dictionary CSV and generate extended property sql script
-        /// </summary>
-        /// <param name="file"></param>
-        /// <param name="schemaName"></param>
-        /// <param name="tableName"></param>
+        /// <summary>Parses CSV from the given file to extract a data dictionary - matching DictionaryDefinitionModel.</summary>
+        /// <param name="file">The file to parse.</param>
+        /// <returns>Enumerable of DictionaryDefinitionModel</returns>
         /// <remarks>the indexs supplied should be 0 index based columns in csv.</remarks>
-        public static string ProcessDataDictionary(FileInfo file, string schemaName, string tableName)
+        public static IEnumerable<DictionaryDefinitionModel> ParseDataDictionary(FileInfo file)
         {
             file = file ?? throw new ArgumentNullException(nameof(file));
 
@@ -38,13 +35,16 @@ namespace VanillaDb
                 csv.Read();
                 csv.ReadHeader();
                 var definitions = csv.GetRecords<DictionaryDefinitionModel>().ToArray();
-                var returnScript = GenerateExtendedPropertyScript(definitions, schemaName, tableName);
-
-                return returnScript;
+                return definitions;
             }
         }
 
-        private static string GenerateExtendedPropertyScript(IEnumerable<DictionaryDefinitionModel> dictionary, string schema, string table)
+        /// <summary>Generates the extended property script from the given data dictionary for the given schema.table.</summary>
+        /// <param name="dictionary">The data dictionary.</param>
+        /// <param name="schema">The schema of the table.</param>
+        /// <param name="table">The table name.</param>
+        /// <returns></returns>
+        public static string GenerateExtendedPropertyScript(IEnumerable<DictionaryDefinitionModel> dictionary, string schema, string table)
         {
             var returnString = string.Empty;
             var extendedPropertyScript =
