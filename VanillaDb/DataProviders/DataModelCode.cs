@@ -33,9 +33,24 @@ namespace VanillaDb.DataProviders
         {
             var indent = "        ";
             var properties = Table.Fields
-                .Select(f => $"/// <summary>Gets or sets the {f.FieldName}.</summary>{Environment.NewLine}" +
+                .Select(f => $"/// <summary>Gets or sets the {f.FieldName}.</summary>{Environment.NewLine}{GetRemarks(f, indent)}" +
                              $"{indent}public {f.FieldType.GetAliasOrName()} {f.FieldName} {{ get; set; }}");
             return string.Join($"{Environment.NewLine}{Environment.NewLine}{indent}", properties);
+        }
+
+        /// <summary>Gets the remarks for the given field - if there are any.</summary>
+        /// <param name="field">The field.</param>
+        /// <param name="indent">The indent string so that remarks lines up with the other comments.</param>
+        /// <returns>remarks or empty string if the table has no datadictionary</returns>
+        private string GetRemarks(FieldModel field, string indent)
+        {
+            var remarks = Table.GetRemarks(field, indent);
+            if (!string.IsNullOrEmpty(remarks))
+            {
+                // if there are remarks, then format them for the xml comment summary
+                remarks = $"{indent}/// <remarks>{Environment.NewLine}{remarks}{Environment.NewLine}{indent}/// </remarks>{Environment.NewLine}";
+            }
+            return remarks;
         }
     }
 }
