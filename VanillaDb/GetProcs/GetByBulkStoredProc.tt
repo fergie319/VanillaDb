@@ -8,11 +8,10 @@ CREATE PROCEDURE [<#= Table.Schema #>].[<#= GenerateName() #>]
 <#= GenerateProcParameters() #>
 AS
 Begin
-	SET NOCOUNT ON
+    SET NOCOUNT ON
 
-	SELECT <#= GenerateSelectFields() #>
-	FROM [<#= Table.TableName #>]
-	AS <#= GetTableAlias() #>
+    SELECT <#= GenerateSelectFields() #>
+    FROM [<#= Table.TableName #>]
     <#
     if (TemporalType == TemporalTypes.AsOf)
     {
@@ -27,7 +26,8 @@ Begin
     <#
     }
     #>
-	INNER JOIN <#= GenerateJoinClause() #>
+    AS <#= GetTableAlias() #>
+    INNER JOIN <#= GenerateJoinClause() #>
 
-	SET NOCOUNT OFF
+    SET NOCOUNT OFF
 End
