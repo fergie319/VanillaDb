@@ -496,6 +496,20 @@ namespace " + config.CodeNamespace + @"
                 // Generate the single-select stored procedures
                 var getByAll = new GetAllStoredProc(table);
                 getByAll.GenerateFile(storedProcDir);
+
+                if (table.Config.TemporalGetAll.HasValue && table.Config.TemporalGetAll.Value)
+                {
+                    // Generate the single-select stored procedures
+                    getByAll = new GetAllStoredProc(table, TemporalTypes.All);
+                    getByAll.GenerateFile(storedProcDir);
+                }
+
+                if (table.Config.TemporalGetAsOf.HasValue && table.Config.TemporalGetAsOf.Value)
+                {
+                    // Generate the single-select stored procedures
+                    getByAll = new GetAllStoredProc(table, TemporalTypes.AsOf);
+                    getByAll.GenerateFile(storedProcDir);
+                }
             }
 
             // First generate type tables for all fields participating in indexes and then the GetBy procs

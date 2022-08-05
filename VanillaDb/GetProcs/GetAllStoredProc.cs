@@ -12,13 +12,14 @@ namespace VanillaDb.GetProcs
     using System.Linq;
     using System.Text;
     using System.Collections.Generic;
+    using VanillaDb.Models;
     using System;
     
     /// <summary>
     /// Class to produce the template output
     /// </summary>
     
-    #line 1 "C:\git-scratch\vanilladb\VanillaDb\GetProcs\GetAllStoredProc.tt"
+    #line 1 "C:\git\VanillaDb\VanillaDb\GetProcs\GetAllStoredProc.tt"
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.TextTemplating", "16.0.0.0")]
     public partial class GetAllStoredProc : GetAllStoredProcBase
     {
@@ -30,26 +31,63 @@ namespace VanillaDb.GetProcs
         {
             this.Write("CREATE PROCEDURE [");
             
-            #line 6 "C:\git-scratch\vanilladb\VanillaDb\GetProcs\GetAllStoredProc.tt"
+            #line 7 "C:\git\VanillaDb\VanillaDb\GetProcs\GetAllStoredProc.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(Table.Schema));
             
             #line default
             #line hidden
             this.Write("].[");
             
-            #line 6 "C:\git-scratch\vanilladb\VanillaDb\GetProcs\GetAllStoredProc.tt"
+            #line 7 "C:\git\VanillaDb\VanillaDb\GetProcs\GetAllStoredProc.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(GenerateName()));
             
             #line default
             #line hidden
-            this.Write("]\r\nAS\r\nBegin\r\n    SET NOCOUNT ON\r\n\r\n    SELECT *\r\n    FROM [");
+            this.Write("]");
             
-            #line 12 "C:\git-scratch\vanilladb\VanillaDb\GetProcs\GetAllStoredProc.tt"
+            #line 7 "C:\git\VanillaDb\VanillaDb\GetProcs\GetAllStoredProc.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(GenerateProcParameters()));
+            
+            #line default
+            #line hidden
+            this.Write("\r\nAS\r\nBegin\r\n    SET NOCOUNT ON\r\n\r\n    SELECT *\r\n    FROM [");
+            
+            #line 14 "C:\git\VanillaDb\VanillaDb\GetProcs\GetAllStoredProc.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(Table.TableName));
             
             #line default
             #line hidden
-            this.Write("]\r\n\r\n    SET NOCOUNT OFF\r\nEnd\r\n");
+            this.Write("]");
+            
+            #line 14 "C:\git\VanillaDb\VanillaDb\GetProcs\GetAllStoredProc.tt"
+
+    if (TemporalType == TemporalTypes.AsOf)
+    {
+    
+            
+            #line default
+            #line hidden
+            this.Write("\r\n    FOR SYSTEM_TIME AS OF @asOfDate\r\n    ");
+            
+            #line 20 "C:\git\VanillaDb\VanillaDb\GetProcs\GetAllStoredProc.tt"
+
+    }
+    else if (TemporalType == TemporalTypes.All)
+    {
+    
+            
+            #line default
+            #line hidden
+            this.Write("\r\n    FOR SYSTEM_TIME ALL\r\n    ");
+            
+            #line 27 "C:\git\VanillaDb\VanillaDb\GetProcs\GetAllStoredProc.tt"
+
+    }
+    
+            
+            #line default
+            #line hidden
+            this.Write("\r\n\r\n    SET NOCOUNT OFF\r\nEnd\r\n");
             return this.GenerationEnvironment.ToString();
         }
     }
