@@ -90,6 +90,17 @@ namespace <#= Table.Namespace #>.<#= Table.TableAlias #>
                     Log.LogInformation("Invoking Stored Procedure {0}.", procName);
                     command.CommandType = CommandType.StoredProcedure;
                     command.Connection = connection;
+<#
+                    if (Table.IsTemporal && Table.Config.TemporalGetAsOf.Value)
+                    {
+                    #>
+                    if (temporalOperator == TemporalTypes.AsOf)
+                    {
+                        command.Parameters.AddWithValue("@asOfDate", asOfDate);
+                    }
+<#
+                    }
+                    #>
 
                     connection.Open();
                     var reader = await command.ExecuteReaderAsync();
