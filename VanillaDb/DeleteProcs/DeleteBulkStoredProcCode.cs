@@ -7,7 +7,7 @@ namespace VanillaDb.DeleteProcs
 {
     /// <summary>Partial class supplies parameters to the T4 Template.</summary>
     /// <seealso cref="VanillaDb.GetProcs.GetByBulkStoredProcBase" />
-    public partial class DeleteBulkStoredProc
+    public partial class DeleteBulkStoredProc : ICodeTemplate
     {
         private TableModel Table { get; set; }
 
@@ -28,6 +28,9 @@ namespace VanillaDb.DeleteProcs
         {
             return Table.GetDeleteBulkProcName();
         }
+
+        /// <summary>Gets the file extension.</summary>
+        public string FileExtension => "sql";
 
         /// <summary>Generates the GetBy(Bulk) stored procedure's parameter name.</summary>
         /// <returns>Newline separated stored procedure parameters</returns>

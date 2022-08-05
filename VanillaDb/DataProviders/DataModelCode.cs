@@ -6,7 +6,7 @@ namespace VanillaDb.DataProviders
 {
     /// <summary>Partial class supplies parameters to the T4 Template.</summary>
     /// <seealso cref="VanillaDb.DataProviders.DataModelBase" />
-    public partial class DataModel
+    public partial class DataModel : ICodeTemplate
     {
         private TableModel Table { get; set; }
 
@@ -16,6 +16,9 @@ namespace VanillaDb.DataProviders
         {
             Table = table;
         }
+
+        /// <summary>Gets the file extension.</summary>
+        public string FileExtension => "cs";
 
         /// <summary>Gets the name of the stored procedure.</summary>
         /// <returns>Class name and file name (without .sql).</returns>

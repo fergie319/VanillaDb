@@ -23,7 +23,7 @@ namespace <#= Table.Namespace #>.<#= Table.TableAlias #>
     using System.Threading.Tasks;
 
     /// <summary>Interface for <#= Record #> Data Providers.</summary>
-    public interface <#= GenerateName() #>
+    public partial interface <#= GenerateName() #>
     {
 <#
     // Generate the Insert method if configured

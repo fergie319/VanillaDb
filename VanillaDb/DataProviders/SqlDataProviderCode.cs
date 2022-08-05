@@ -8,7 +8,7 @@ namespace VanillaDb.DataProviders
 {
     /// <summary>Partial class supplies parameters to the T4 Template.</summary>
     /// <seealso cref="VanillaDb.DataProviders.SqlDataProviderBase" />
-    public partial class SqlDataProvider
+    public partial class SqlDataProvider : ICodeTemplate
     {
         private TableModel Table { get; set; }
 
@@ -22,6 +22,9 @@ namespace VanillaDb.DataProviders
             Table = table;
             Indexes = indexes;
         }
+
+        /// <summary>Gets the file extension.</summary>
+        public string FileExtension => "cs";
 
         /// <summary>Gets the name of the record type being worked with (the table name).</summary>
         public string Record
@@ -119,14 +122,6 @@ namespace VanillaDb.DataProviders
             return string.Join($"{Environment.NewLine}{indent}", readLines);
         }
 
-        /// <summary>Generates the name of the get by index stored proc.</summary>
-        /// <returns></returns>
-        public string GenerateGetByIndexStoredProcName(IndexModel index)
-        {
-            var procNameFields = index.Fields.Select(f => f.FieldName);
-            return $"USP_{Table.TableName}_GetBy{string.Join("_", procNameFields)}";
-        }
-
         /// <summary>Generates the code to add parameters for the get by index procedure.</summary>
         /// <returns></returns>
         public string GenerateGetByIndexAddParametersCode(IEnumerable<FieldModel> fields)
@@ -154,15 +149,6 @@ namespace VanillaDb.DataProviders
             var rows = fields.Select(f => $"{f.FieldName.ToCamelCase()}s.ElementAt(i)");
             var rowParams = string.Join(", ", rows);
             return $"idDataTable.Rows.Add({rowParams});";
-        }
-
-        /// <summary>Generates the name of the get by index bulk stored procedure.</summary>
-        /// <param name="index">The index.</param>
-        /// <returns></returns>
-        public string GenerateGetByIndexBulkStoredProcName(IndexModel index)
-        {
-            var fieldNames = index.Fields.Select(f => f.FieldName);
-            return $"USP_{Table.TableName}_GetBy{string.Join("_", fieldNames)}_Bulk";
         }
 
         /// <summary>Generates the GetBy(Bulk) stored procedure's parameter name.</summary>

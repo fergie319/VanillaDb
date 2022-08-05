@@ -7,29 +7,37 @@ namespace VanillaDb.GetProcs
 {
     /// <summary>Partial class supplies parameters to the T4 Template.</summary>
     /// <seealso cref="VanillaDb.GetProcs.GetByBulkStoredProcBase" />
-    public partial class GetByBulkStoredProc
+    public partial class GetByBulkStoredProc : ICodeTemplate
     {
         private TableModel Table { get; set; }
 
         private IndexModel Index { get; set; }
 
+        private TemporalTypes TemporalType { get; set; }
+
         /// <summary>Initializes a new instance of the <see cref="GetBySingleStoredProc" /> class.</summary>
         /// <param name="table">The table to query.</param>
         /// <param name="index">The index to query by.</param>
-        public GetByBulkStoredProc(TableModel table, IndexModel index)
+        /// <param name="temporalType">The type of temporal query to generate - only for temporal tables.</param>
+        public GetByBulkStoredProc(TableModel table, IndexModel index, TemporalTypes temporalType = TemporalTypes.Default)
         {
             Table = table;
             Index = index;
+            TemporalType = temporalType;
+            if (TemporalType != TemporalTypes.Default && !Table.IsTemporal)
+            {
+                throw new InvalidOperationException("Cannot generate temporal procedures for a non-temporal table.");
+            }
         }
-        // TODO: Implement the transform.
-        // TODO: Add method to all transform classes for getting proc/file name.
+
+        /// <summary>Gets the file extension.</summary>
+        public string FileExtension => "sql";
 
         /// <summary>Gets the name of the stored procedure.</summary>
         /// <returns>Procedure name and file name (without .sql).</returns>
         public string GenerateName()
         {
-            var fieldNames = Index.Fields.Select(f => f.FieldName);
-            return $"USP_{Table.TableName}_GetBy{string.Join("_", fieldNames)}_Bulk";
+            return Index.BulkGetByIndexProcName(TemporalType);
         }
 
         /// <summary>Generates the GetBy(Bulk) stored procedure's parameter name.</summary>
@@ -45,9 +53,20 @@ namespace VanillaDb.GetProcs
         /// <returns>Newline separated stored procedure parameters</returns>
         public string GenerateProcParameters()
         {
+            // Create a list of the non-field parameters (like Query Operator and Temporal Operator)
+            var procParams = Index.Parameters(TemporalType)
+                .Where(p => p.FieldType.IsSqlParameter)
+                .Select(p => $"    @{p.FieldName.ToCamelCase()} {p.FieldType.SqlType}")
+                .ToList();
+            var fields = Index.Fields.Select(f => $"    @{f.FieldName.ToCamelCase()} {f.FieldType.SqlType}");
+            procParams = procParams.Except(fields).ToList();
+
+            // Generate the 'bulk' parameter which uses a type table to include all fields and add it as the first parameter
             var typeTable = new TypeTable(Index);
-            var fieldNames = Index.Fields.Select(f => f.FieldName.ToCamelCase());
-            return $"    {GenerateBulkProcParameter(Index)} {Table.Schema}.{typeTable.GenerateName()} READONLY";
+            procParams.Insert(0, $"    {GenerateBulkProcParameter(Index)} {Table.Schema}.{typeTable.GenerateName()} READONLY");
+
+            // Join the parameters together and return
+            return string.Join("," + Environment.NewLine, procParams);
         }
 
         /// <summary>Generates the fields for the SELECT clause.</summary>

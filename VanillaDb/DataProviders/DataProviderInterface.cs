@@ -83,7 +83,7 @@ namespace ");
             
             #line default
             #line hidden
-            this.Write(" Data Providers.</summary>\r\n    public interface ");
+            this.Write(" Data Providers.</summary>\r\n    public partial interface ");
             
             #line 26 "C:\git\VanillaDb\VanillaDb\DataProviders\DataProviderInterface.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(GenerateName()));

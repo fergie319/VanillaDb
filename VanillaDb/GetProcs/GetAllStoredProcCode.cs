@@ -3,7 +3,7 @@
 namespace VanillaDb.GetProcs
 {
     /// <summary>Partial class supplies parameters to the T4 Template.</summary>
-    public partial class GetAllStoredProc
+    public partial class GetAllStoredProc : ICodeTemplate
     {
         private TableModel Table { get; set; }
 
@@ -13,6 +13,9 @@ namespace VanillaDb.GetProcs
         {
             Table = table;
         }
+
+        /// <summary>Gets the file extension.</summary>
+        public string FileExtension => "sql";
 
         /// <summary>Generates the portion of the procedure name that is composed of the indexed fields.</summary>
         /// <returns>Underscore-separated field names</returns>

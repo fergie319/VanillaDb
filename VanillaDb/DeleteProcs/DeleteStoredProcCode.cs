@@ -5,7 +5,7 @@ using VanillaDb.Models;
 namespace VanillaDb.DeleteProcs
 {
     /// <summary>Partial class supplies parameters to the T4 Template.</summary>
-    public partial class DeleteStoredProc
+    public partial class DeleteStoredProc : ICodeTemplate
     {
         private TableModel Table { get; set; }
 
@@ -22,6 +22,9 @@ namespace VanillaDb.DeleteProcs
         {
             return Table.GetDeleteProcName();
         }
+
+        /// <summary>Gets the file extension.</summary>
+        public string FileExtension => "sql";
 
         /// <summary>Generates the stored procedure's parameter list.</summary>
         /// <returns></returns>

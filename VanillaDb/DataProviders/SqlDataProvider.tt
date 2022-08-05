@@ -128,13 +128,48 @@ namespace <#= Table.Namespace #>.<#= Table.TableAlias #>
             var <#= RecordCamel #>Data = new List<<#= Record #>DataModel>();
             using (var connection = new SqlConnection(this.ConnectionString))
             {
-                var procName = "[<#= Table.Schema #>].[<#= GenerateGetByIndexStoredProcName(index) #>]";
+                var procName = "[<#= Table.Schema #>].[<#= index.GetByIndexProcName(TemporalTypes.Default) #>]";
+                <#
+                if (index.Table.IsTemporal && index.Table.Config.TemporalGetAll.Value)
+                {
+                #>
+                if (temporalOperator == TemporalTypes.All)
+                {
+                    procName = "[<#= Table.Schema #>].[<#= index.GetByIndexProcName(TemporalTypes.All) #>]";
+                }
+
+                <#
+                }
+                #>
+                <#
+                if (index.Table.IsTemporal && index.Table.Config.TemporalGetAsOf.Value)
+                {
+                #>
+                if (temporalOperator == TemporalTypes.AsOf)
+                {
+                    procName = "[<#= Table.Schema #>].[<#= index.GetByIndexProcName(TemporalTypes.AsOf) #>]";
+                }
+
+                <#
+                }
+                #>
                 using (var command = new SqlCommand(procName))
                 {
                     Log.LogInformation("Invoking Stored Procedure {0}.", procName);
                     command.CommandType = CommandType.StoredProcedure;
                     command.Connection = connection;
-                    <#= GenerateGetByIndexAddParametersCode(index.Parameters) #>
+                    <#= GenerateGetByIndexAddParametersCode(index.Parameters()) #>
+                    <#
+                    if (index.Table.IsTemporal && index.Table.Config.TemporalGetAsOf.Value)
+                    {
+                    #>
+                    if (temporalOperator == TemporalTypes.AsOf)
+                    {
+                        command.Parameters.AddWithValue("@asOfDate", asOfDate);
+                    }
+                    <#
+                    }
+                    #>
 
                     connection.Open();
                     var reader = await command.ExecuteReaderAsync();
@@ -153,7 +188,7 @@ namespace <#= Table.Namespace #>.<#= Table.TableAlias #>
             }
 
 <#
-            if (index.IsUnique)
+            if (index.IsUnique && (!Table.IsTemporal || !Table.Config.TemporalGetAll.Value))
             {
 #>
             return <#= RecordCamel #>Data.FirstOrDefault();
@@ -196,7 +231,32 @@ namespace <#= Table.Namespace #>.<#= Table.TableAlias #>
             var <#= RecordCamel #>Data = new List<<#= Record #>DataModel>();
             using (var connection = new SqlConnection(this.ConnectionString))
             {
-                var procName = "[<#= Table.Schema #>].[<#= GenerateGetByIndexBulkStoredProcName(index) #>]";
+                var procName = "[<#= Table.Schema #>].[<#= index.BulkGetByIndexProcName(TemporalTypes.Default) #>]";
+                <#
+                if (index.Table.IsTemporal && index.Table.Config.TemporalGetAll.Value)
+                {
+                #>
+                if (temporalOperator == TemporalTypes.All)
+                {
+                    procName = "[<#= Table.Schema #>].[<#= index.BulkGetByIndexProcName(TemporalTypes.All) #>]";
+                }
+
+                <#
+                }
+                #>
+                <#
+                if (index.Table.IsTemporal && index.Table.Config.TemporalGetAsOf.Value)
+                {
+                #>
+                if (temporalOperator == TemporalTypes.AsOf)
+                {
+                    procName = "[<#= Table.Schema #>].[<#= index.BulkGetByIndexProcName(TemporalTypes.AsOf) #>]";
+                }
+
+                <#
+                }
+                #>
+
                 using (var command = new SqlCommand(procName))
                 {
                     Log.LogInformation("Invoking Stored Procedure {0}.", procName);
@@ -207,6 +267,18 @@ namespace <#= Table.Namespace #>.<#= Table.TableAlias #>
                     var idsParam = command.Parameters.AddWithValue("<#= GenerateBulkProcParameter(index) #>", idDataTable);
                     idsParam.SqlDbType = SqlDbType.Structured;
                     idsParam.TypeName = "<#= index.GetBulkTypeIdTable() #>";
+                    <#
+                    if (index.Table.IsTemporal && index.Table.Config.TemporalGetAsOf.Value)
+                    {
+                    #>
+                    if (temporalOperator == TemporalTypes.AsOf)
+                    {
+                        command.Parameters.AddWithValue("@asOfDate", asOfDate);
+                    }
+                    <#
+                    }
+                    #>
+
 
                     connection.Open();
                     var reader = await command.ExecuteReaderAsync();
@@ -279,9 +351,14 @@ namespace <#= Table.Namespace #>.<#= Table.TableAlias #>
                     {
                         while (reader.Read())
                         {
-                            <# if (Table.HasPrimaryKey) { #>
+<#
+                            if (Table.HasPrimaryKey)
+                            {
+#>
                             newId = (int)reader["<#= PrimaryKey.FieldName #>"];
-                            <# } #>
+<#
+                            }
+#>
                         }
 
                         // consume any trailing pieces

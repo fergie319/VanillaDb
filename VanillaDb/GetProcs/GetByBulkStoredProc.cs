@@ -12,6 +12,7 @@ namespace VanillaDb.GetProcs
     using System.Linq;
     using System.Text;
     using System.Collections.Generic;
+    using VanillaDb.Models;
     using System;
     
     /// <summary>
@@ -30,49 +31,79 @@ namespace VanillaDb.GetProcs
         {
             this.Write("CREATE PROCEDURE [");
             
-            #line 6 "C:\git-scratch\vanilladb\VanillaDb\GetProcs\GetByBulkStoredProc.tt"
+            #line 7 "C:\git-scratch\vanilladb\VanillaDb\GetProcs\GetByBulkStoredProc.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(Table.Schema));
             
             #line default
             #line hidden
             this.Write("].[");
             
-            #line 6 "C:\git-scratch\vanilladb\VanillaDb\GetProcs\GetByBulkStoredProc.tt"
+            #line 7 "C:\git-scratch\vanilladb\VanillaDb\GetProcs\GetByBulkStoredProc.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(GenerateName()));
             
             #line default
             #line hidden
             this.Write("]\r\n");
             
-            #line 7 "C:\git-scratch\vanilladb\VanillaDb\GetProcs\GetByBulkStoredProc.tt"
+            #line 8 "C:\git-scratch\vanilladb\VanillaDb\GetProcs\GetByBulkStoredProc.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(GenerateProcParameters()));
             
             #line default
             #line hidden
             this.Write("\r\nAS\r\nBegin\r\n\tSET NOCOUNT ON\r\n\r\n\tSELECT ");
             
-            #line 12 "C:\git-scratch\vanilladb\VanillaDb\GetProcs\GetByBulkStoredProc.tt"
+            #line 13 "C:\git-scratch\vanilladb\VanillaDb\GetProcs\GetByBulkStoredProc.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(GenerateSelectFields()));
             
             #line default
             #line hidden
             this.Write("\r\n\tFROM [");
             
-            #line 13 "C:\git-scratch\vanilladb\VanillaDb\GetProcs\GetByBulkStoredProc.tt"
+            #line 14 "C:\git-scratch\vanilladb\VanillaDb\GetProcs\GetByBulkStoredProc.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(Table.TableName));
             
             #line default
             #line hidden
             this.Write("]\r\n\tAS ");
             
-            #line 14 "C:\git-scratch\vanilladb\VanillaDb\GetProcs\GetByBulkStoredProc.tt"
+            #line 15 "C:\git-scratch\vanilladb\VanillaDb\GetProcs\GetByBulkStoredProc.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(GetTableAlias()));
             
             #line default
             #line hidden
-            this.Write("\r\n\tINNER JOIN ");
+            this.Write("\r\n    ");
             
-            #line 15 "C:\git-scratch\vanilladb\VanillaDb\GetProcs\GetByBulkStoredProc.tt"
+            #line 16 "C:\git-scratch\vanilladb\VanillaDb\GetProcs\GetByBulkStoredProc.tt"
+
+    if (TemporalType == TemporalTypes.AsOf)
+    {
+    
+            
+            #line default
+            #line hidden
+            this.Write("    FOR SYSTEM_TIME AS OF @asOfDate\r\n    ");
+            
+            #line 21 "C:\git-scratch\vanilladb\VanillaDb\GetProcs\GetByBulkStoredProc.tt"
+
+    }
+    else if (TemporalType == TemporalTypes.All)
+    {
+    
+            
+            #line default
+            #line hidden
+            this.Write("    FOR SYSTEM_TIME ALL\r\n    ");
+            
+            #line 27 "C:\git-scratch\vanilladb\VanillaDb\GetProcs\GetByBulkStoredProc.tt"
+
+    }
+    
+            
+            #line default
+            #line hidden
+            this.Write("\tINNER JOIN ");
+            
+            #line 30 "C:\git-scratch\vanilladb\VanillaDb\GetProcs\GetByBulkStoredProc.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(GenerateJoinClause()));
             
             #line default

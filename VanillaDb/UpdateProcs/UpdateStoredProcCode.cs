@@ -5,7 +5,7 @@ using VanillaDb.Models;
 namespace VanillaDb.UpdateProcs
 {
     /// <summary>Partial class supplies parameters to the T4 Template.</summary>
-    public partial class UpdateStoredProc
+    public partial class UpdateStoredProc : ICodeTemplate
     {
         private TableModel Table { get; set; }
 
@@ -22,6 +22,9 @@ namespace VanillaDb.UpdateProcs
         {
             get { return Table.PrimaryKey; }
         }
+
+        /// <summary>Gets the file extension.</summary>
+        public string FileExtension => "sql";
 
         /// <summary>Gets the name of the stored procedure.</summary>
         /// <returns>Stored Procedure name and file name (without .sql).</returns>
