@@ -159,5 +159,47 @@ namespace VanillaDb.DataProviders
             var fieldNames = index.Fields.Select(f => f.FieldName.ToCamelCase());
             return $"@{string.Join("_", fieldNames)}s";
         }
+
+        /// <summary>Gets the method parameters for the GetAll dataprovider method.</summary>
+        /// <returns>Method params string</returns>
+        public string GetAllMethodParams()
+        {
+            // Create a fake index so that Temporal parameters are generated
+            var index = new IndexModel() { Fields = new List<FieldModel>(), Table = Table };
+            return index.GetByIndexMethodParams();
+        }
+
+        /// <summary>Gets the xml parameter comments for the GetAll dataprovider method.</summary>
+        /// <returns></returns>
+        public string GetAllParamsXmlComments()
+        {
+            // Create a fake index so that Temporal parameters are generated
+            var index = new IndexModel() { Fields = new List<FieldModel>(), Table = Table };
+            var result = index.GetByIndexParamsXmlComments();
+            if (!string.IsNullOrWhiteSpace(result))
+            {
+                result = $"{Environment.NewLine}        {result}";
+            }
+
+            return result;
+        }
+
+        /// <summary>Gets the name of the GetAll stored procedure.</summary>
+        /// <param name="temporalType">Type of the temporal.</param>
+        /// <returns></returns>
+        public string GetAllProcName(TemporalTypes temporalType)
+        {
+            var procName = $"USP_{Table.TableName}_GetAll";
+            if (Table.IsTemporal && temporalType == TemporalTypes.AsOf)
+            {
+                procName += "_AsOf";
+            }
+            else if (temporalType == TemporalTypes.All)
+            {
+                procName += "_All";
+            }
+
+            return procName;
+        }
     }
 }

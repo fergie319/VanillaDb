@@ -52,14 +52,39 @@ namespace <#= Table.Namespace #>.<#= Table.TableAlias #>
     {
 #>
 
-        /// <summary>Gets the data for all <#= Record #>(s) from the <#= Table.TableName #> table.</summary>
+        /// <summary>Gets the data for all <#= Record #>(s) from the <#= Table.TableName #> table.</summary><#=
+        GetAllParamsXmlComments() #>
         /// <returns>Enumerable of <#= Record #> Data Model or null if not found.</returns>
-        public async Task<IEnumerable<<#= Table.GetDataModelName() #>>> GetAll()
+        public async Task<IEnumerable<<#= Table.GetDataModelName() #>>> GetAll(<#= GetAllMethodParams() #>)
         {
             var <#= RecordCamel #>Data = new List<<#= Record #>DataModel>();
             using (var connection = new SqlConnection(this.ConnectionString))
             {
                 var procName = "[<#= Table.Schema #>].[<#= Table.GetGetAllProcName() #>]";
+<#
+                if (Table.IsTemporal && Table.Config.TemporalGetAll.Value)
+                {
+                #>
+                if (temporalOperator == TemporalTypes.All)
+                {
+                    procName = "[<#= Table.Schema #>].[<#= GetAllProcName(TemporalTypes.All) #>]";
+                }
+                <#
+                }
+                #>
+<#
+                if (Table.IsTemporal && Table.Config.TemporalGetAsOf.Value)
+                {
+                #>
+
+                if (temporalOperator == TemporalTypes.AsOf)
+                {
+                    procName = "[<#= Table.Schema #>].[<#= GetAllProcName(TemporalTypes.AsOf) #>]";
+                }
+
+<#
+                }
+                #>
                 using (var command = new SqlCommand(procName))
                 {
                     Log.LogInformation("Invoking Stored Procedure {0}.", procName);
