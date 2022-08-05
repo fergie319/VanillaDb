@@ -21,16 +21,24 @@ namespace VanillaDb.Models
 
         /// <summary>Gets or sets the parameters for the fields</summary>
         /// <param name="temporalType">The Temporal Type of parameters to get - Default is the default :-)</param>
+        /// <param name="excludeQueryOperators">if set to <c>true</c> [exclude query operators].</param>
         /// <returns>List of parameters for the stored proc and dataprovider interface</returns>
         /// <remarks>This list is different because we might have additional parameters for specifying the operator to use.</remarks>
-        public IEnumerable<FieldModel> Parameters(TemporalTypes temporalType = TemporalTypes.Default)
+        public IEnumerable<FieldModel> Parameters(TemporalTypes temporalType = TemporalTypes.Default, bool excludeQueryOperators = false)
         {
             var parameters = new List<FieldModel>();
             foreach (var field in Fields)
             {
-                foreach (var parameter in field.GetParameters())
+                if (!excludeQueryOperators)
                 {
-                    parameters.Add(parameter);
+                    foreach (var parameter in field.GetParameters())
+                    {
+                        parameters.Add(parameter);
+                    }
+                }
+                else
+                {
+                    parameters.Add(field);
                 }
             }
 
@@ -65,6 +73,7 @@ namespace VanillaDb.Models
                         FieldType = typeof(TemporalTypes),
                         IsSqlParameter = false,
                     },
+                    IsArtificialField = true
                 });
 
                 if (temporalType == TemporalTypes.AsOf)
@@ -78,6 +87,7 @@ namespace VanillaDb.Models
                             IsNullable = true,
                             SqlType = "DATETIME2"
                         },
+                        IsArtificialField = true
                     });
                 }
             }
@@ -169,8 +179,21 @@ namespace VanillaDb.Models
         /// <returns></returns>
         public string BulkGetByIndexParamsXmlComments()
         {
+            var temporalType = TemporalTypes.Default;
+            if (Table.IsTemporal && Table.Config.TemporalGetAsOf.Value)
+            {
+                temporalType = TemporalTypes.AsOf;
+            }
+            else if (Table.IsTemporal && Table.Config.TemporalGetAll.Value)
+            {
+                temporalType = TemporalTypes.All;
+            }
+
             var indent = "        ";
-            var xmlParams = Fields.Select(f => $"/// <param name=\"{f.FieldName.ToCamelCase()}s\">The {f.FieldName.ToCamelCase()} values.</param>");
+            var xmlParams = Parameters(temporalType, true).Select(f =>
+                (f.IsArtificialField)
+                    ? $"/// <param name=\"{f.FieldName.ToCamelCase()}\">The {f.FieldName.ToCamelCase()}</param>"
+                    : $"/// <param name=\"{f.FieldName.ToCamelCase()}s\">The {f.FieldName.ToCamelCase()} values.</param>");
             return string.Join($"{Environment.NewLine}{indent}", xmlParams);
         }
 
@@ -178,7 +201,20 @@ namespace VanillaDb.Models
         /// <returns></returns>
         public string BulkGetByIndexMethodParams()
         {
-            return string.Join(", ", Fields.Select(f => $"IEnumerable<{f.FieldType.GetAliasOrName()}> {f.FieldName.ToCamelCase()}s"));
+            var temporalType = TemporalTypes.Default;
+            if (Table.IsTemporal && Table.Config.TemporalGetAsOf.Value)
+            {
+                temporalType = TemporalTypes.AsOf;
+            }
+            else if (Table.IsTemporal && Table.Config.TemporalGetAll.Value)
+            {
+                temporalType = TemporalTypes.All;
+            }
+
+            return string.Join(", ", Parameters(temporalType, true).Select(f =>
+                (f.IsArtificialField)
+                    ? $"{f.FieldType.GetAliasOrName()} {f.FieldName.ToCamelCase()}"
+                    : $"IEnumerable<{f.FieldType.GetAliasOrName()}> {f.FieldName.ToCamelCase()}s"));
         }
 
         /// <summary>Gets the name of the GetbyIndex bulk stored procedure.</summary>
