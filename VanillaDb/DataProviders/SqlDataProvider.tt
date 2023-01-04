@@ -383,23 +383,20 @@ namespace <#= Table.Namespace #>.<#= Table.TableAlias #>
 
                     connection.Open();
                     var reader = await command.ExecuteReaderAsync();
-                    if (reader.HasRows)
+                    while (reader.Read())
                     {
-                        while (reader.Read())
+<#
+                        if (Table.HasPrimaryKey)
                         {
-<#
-                            if (Table.HasPrimaryKey)
-                            {
 #>
-                            newId = (int)reader["<#= PrimaryKey.FieldName #>"];
+                        newId = (int)reader["<#= PrimaryKey.FieldName #>"];
 <#
-                            }
-#>
                         }
-
-                        // consume any trailing pieces
-                        while (reader.NextResult()) {}
+#>
                     }
+
+                    // consume any trailing pieces
+                    while (reader.NextResult()) {}
                 }
             }
 
