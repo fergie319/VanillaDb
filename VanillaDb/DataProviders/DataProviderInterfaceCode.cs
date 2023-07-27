@@ -79,5 +79,29 @@ namespace VanillaDb.DataProviders
             $"{indent}/// <returns>The number of records affected by the update.</returns>{Environment.NewLine}" +
             $"{indent}Task<int> Update({Record}DataModel {RecordCamel}Data);";
         }
+
+        /// <summary>Gets the method parameters for the GetAll dataprovider method.</summary>
+        /// <returns>Method params string</returns>
+        public string GetAllMethodParams()
+        {
+            // Create a fake index so that Temporal parameters are generated
+            var index = new IndexModel() { Fields = new List<FieldModel>(), Table = Table };
+            return index.GetByIndexMethodParams();
+        }
+
+        /// <summary>Gets the xml parameter comments for the GetAll dataprovider method.</summary>
+        /// <returns></returns>
+        public string GetAllParamsXmlComments()
+        {
+            // Create a fake index so that Temporal parameters are generated
+            var index = new IndexModel() { Fields = new List<FieldModel>(), Table = Table };
+            var result = index.GetByIndexParamsXmlComments();
+            if (!string.IsNullOrWhiteSpace(result))
+            {
+                result = $"{Environment.NewLine}        {result}";
+            }
+
+            return result;
+        }
     }
 }

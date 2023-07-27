@@ -66,9 +66,10 @@ namespace <#= Table.Namespace #>.<#= Table.TableAlias #>
     if (Table.Config.GetAll)
     {
 #>
-        /// <summary>Gets the data for all <#= Record #>(s) from the <#= Table.TableName #> table.</summary>
+        /// <summary>Gets the data for all <#= Record #>(s) from the <#= Table.TableName #> table.</summary><#=
+        GetAllParamsXmlComments() #>
         /// <returns>Enumerable of <#= Record #> Data Model or null if not found.</returns>
-        Task<IEnumerable<<#= Table.GetDataModelName() #>>> GetAll();
+        Task<IEnumerable<<#= Table.GetDataModelName() #>>> GetAll(<#= GetAllMethodParams() #>);
 
 <#
     }
