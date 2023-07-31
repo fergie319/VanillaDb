@@ -20,6 +20,14 @@ namespace VanillaDb.Models
         [DataMember()]
         public string OutputCodePath { get; set; }
 
+        /// <summary>Gets or sets the output path for C# Controllers code.</summary>
+        [DataMember()]
+        public string OutputControllersPath { get; set; }
+
+        /// <summary>Gets or sets the output path for JavaScript Services code.</summary>
+        [DataMember()]
+        public string OutputJsServicesPath { get; set; }
+
         /// <summary>Gets or sets the code namespace.</summary>
         [DataMember()]
         public string CodeNamespace { get; set; }

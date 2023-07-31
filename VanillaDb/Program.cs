@@ -1,10 +1,10 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using Serilog;
+using Serilog.Sinks.SystemConsole.Themes;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using Newtonsoft.Json;
-using Serilog;
-using Serilog.Sinks.SystemConsole.Themes;
 using VanillaDb.Configuration;
 using VanillaDb.DataProviders;
 using VanillaDb.DeleteProcs;
@@ -73,8 +73,8 @@ namespace VanillaDb
                 {
                     throw new InvalidOperationException(
                         $"{ConfigFileName} is required in folder hierarchy, or all required arguments must be provided.\n" +
-                        "Required Arguments: <Table>.sql|<directory> <outSqlDir> <outCodeDir> <namespace> <company-name> (optional)--generate-config <config-path>.\n" +
-                        "Optional Arguments: --verbose");
+                        "Required Arguments: <Table>.sql|<directory> <outSqlDir> <outCodeDir> <outC#ServicesDir> <outJsDir> <namespace> <company-name>\n" +
+                        "Optional Arguments: --generate-config <config-path> --verbose");
                 }
                 else
                 {
@@ -84,34 +84,36 @@ namespace VanillaDb
                     config = JsonConvert.DeserializeObject<VanillaConfig>(configString);
                 }
             }
-            else if (args.Length == 5 || args.Length == 7)
+            else if (args.Length == 7 || args.Length == 9)
             {
                 config = new VanillaConfig()
                 {
                     TableSqlPath = args[0],
                     OutputSqlPath = args[1],
                     OutputCodePath = args[2],
-                    CodeNamespace = args[3],
-                    CompanyName = args[4]
+                    OutputControllersPath = args[3],
+                    OutputJsServicesPath = args[4],
+                    CodeNamespace = args[5],
+                    CompanyName = args[6]
                 };
 
-                // If 6 arguments, then check for --generate-config
-                if (args.Length == 7 && string.Equals(args[5], "--generate-config", StringComparison.InvariantCultureIgnoreCase))
+                // If 9 arguments, then check for --generate-config
+                if (args.Length == 9 && string.Equals(args[7], "--generate-config", StringComparison.InvariantCultureIgnoreCase))
                 {
                     // Set the working directory to the vanillaDb.config folder so relative paths work relative to that file
-                    var outputLocation = args[6];
+                    var outputLocation = args[8];
                     var outputContents = JsonConvert.SerializeObject(config, Formatting.Indented);
-                    var outputDirInfo = new DirectoryInfo(args[6]);
+                    var outputDirInfo = new DirectoryInfo(outputLocation);
                     Directory.SetCurrentDirectory(outputDirInfo.FullName);
                     File.WriteAllText(Path.Combine(outputLocation, ConfigFileName), outputContents);
                 }
             }
-            else if (args.Length != 5)
+            else
             {
-                // If 5 arguments, then assume all arguments were provided
                 throw new ArgumentException(
-                        $"{ConfigFileName} is required in folder hierarchy, or all required arguments must be provided." +
-                        "Required Arguments: <Table>.sql|<directory> <outSqlDir> <outCodeDir> <namespace> <company-name> (optional)--generate-config <config-path>.");
+                        $"{ConfigFileName} is required in folder hierarchy, or all required arguments must be provided.\n" +
+                        "Required Arguments: <Table>.sql|<directory> <outSqlDir> <outCodeDir> <outC#ServicesDir> <outJsDir> <namespace> <company-name>\n" +
+                        "Optional Arguments: --generate-config <config-path> --verbose");
             }
 
             // First param is the table file - expect *.sql - or directory containing *.sql table definition files
