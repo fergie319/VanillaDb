@@ -11,6 +11,8 @@ using VanillaDb.DeleteProcs;
 using VanillaDb.GetProcs;
 using VanillaDb.InsertProcs;
 using VanillaDb.Models;
+using VanillaDb.NetCoreGenerators;
+using VanillaDb.TypeScriptGenerators;
 using VanillaDb.TypeTables;
 using VanillaDb.UpdateProcs;
 
@@ -73,7 +75,7 @@ namespace VanillaDb
                 {
                     throw new InvalidOperationException(
                         $"{ConfigFileName} is required in folder hierarchy, or all required arguments must be provided.\n" +
-                        "Required Arguments: <Table>.sql|<directory> <outSqlDir> <outCodeDir> <outC#ServicesDir> <outJsDir> <namespace> <company-name>\n" +
+                        "Required Arguments: <Table>.sql|<directory> <outSqlDir> <outCodeDir> <outC#ServicesDir> <outTsDir> <namespace> <company-name>\n" +
                         "Optional Arguments: --generate-config <config-path> --verbose");
                 }
                 else
@@ -92,7 +94,7 @@ namespace VanillaDb
                     OutputSqlPath = args[1],
                     OutputCodePath = args[2],
                     OutputControllersPath = args[3],
-                    OutputJsServicesPath = args[4],
+                    OutputTsServicesPath = args[4],
                     CodeNamespace = args[5],
                     CompanyName = args[6]
                 };
@@ -591,7 +593,7 @@ namespace " + config.CodeNamespace + @"
             var dataProviderInterfaceGen = new DataProviderInterface(table, indexes);
             dataProviderInterfaceGen.GenerateFile(dataProviderDir);
 
-            // Generate the SqlDataProvider classC:\git\RFA.Bank.Finance\Remittance.Database\Tables\pSubledger_Daily.sql
+            // Generate the SqlDataProvider class
             var sqlDataProviderGen = new SqlDataProvider(table, indexes);
             sqlDataProviderGen.GenerateFile(dataProviderDir);
 
@@ -601,6 +603,24 @@ namespace " + config.CodeNamespace + @"
                 var extendedPropertiesScript = DataDictionaryParser.GenerateExtendedPropertyScript(table.DataDictionary, table.Schema, table.TableName);
                 File.WriteAllText(extendedPropertiesFile, extendedPropertiesScript);
             }
+
+            // Generate the CSharp Services output
+            Directory.CreateDirectory(config.OutputControllersPath);
+            Directory.CreateDirectory($"{config.OutputControllersPath}\\Controllers");
+            Directory.CreateDirectory($"{config.OutputControllersPath}\\Models");
+            var netControllerGenerator = new NetCoreControllerGenerator(table, indexes);
+            netControllerGenerator.GenerateFile($"{config.OutputControllersPath}\\Controllers");
+            var netModelGenerator = new NetCoreModelGenerator(table, indexes);
+            netModelGenerator.GenerateFile($"{config.OutputControllersPath}\\Models");
+
+            // Generate the TS Services output
+            Directory.CreateDirectory(config.OutputTsServicesPath);
+            Directory.CreateDirectory($"{config.OutputTsServicesPath}\\Services");
+            Directory.CreateDirectory($"{config.OutputTsServicesPath}\\Models");
+            var tsServiceGenerator = new TsServiceGenerator(table, indexes);
+            tsServiceGenerator.GenerateFile($"{config.OutputTsServicesPath}\\Services");
+            var tsModelGenerator = new TsModelGenerator(table, indexes);
+            tsModelGenerator.GenerateFile($"{config.OutputTsServicesPath}\\Models");
 
             // Add table config to file for easy configuration
             WriteTableConfigToFile(tableFileInfo, table);

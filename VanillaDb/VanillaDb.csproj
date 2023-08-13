@@ -131,6 +131,10 @@
       <DesignTime>True</DesignTime>
     </Compile>
     <Compile Include="DeleteProcs\DeleteBulkStoredProcCode.cs" />
+    <Compile Include="TypeScriptGenerators\TsServiceGenerator.cs" />
+    <Compile Include="TypeScriptGenerators\TsModelGenerator.cs" />
+    <Compile Include="NetCoreGenerators\NetCoreModelGenerator.cs" />
+    <Compile Include="NetCoreGenerators\NetCoreControllerGenerator.cs" />
     <Compile Include="GetProcs\GetByBulkStoredProc.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -250,7 +254,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="GenControllers\" />
-    <Folder Include="GenJsServices\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

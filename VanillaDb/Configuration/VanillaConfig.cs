@@ -24,9 +24,9 @@ namespace VanillaDb.Models
         [DataMember()]
         public string OutputControllersPath { get; set; }
 
-        /// <summary>Gets or sets the output path for JavaScript Services code.</summary>
+        /// <summary>Gets or sets the output path for TypeScript Services code.</summary>
         [DataMember()]
-        public string OutputJsServicesPath { get; set; }
+        public string OutputTsServicesPath { get; set; }
 
         /// <summary>Gets or sets the code namespace.</summary>
         [DataMember()]

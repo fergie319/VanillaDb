@@ -3,7 +3,10 @@
   "GetAll": true,
   "Insert": true,
   "Update": true,
-  "Delete": true
+  "Delete": true,
+  "TableAlias": "Book",
+  "TemporalGetAll": true,
+  "TemporalGetAsOf": true
 }
 */
 -- Some random comment
