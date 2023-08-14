@@ -10,6 +10,12 @@ namespace VanillaDb.TypeScriptGenerators
 
         private IEnumerable<IndexModel> Indexes { get; set; }
 
+        /// <summary>Gets the name to use for variables that reference the table name.</summary>
+        private string TableVariableName
+        {
+            get { return Table.TableAlias.ToCamelCase(); }
+        }
+
         /// <summary>Gets the file extension.</summary>
         public string FileExtension => "ts";
 
