@@ -189,8 +189,8 @@ namespace {Table.Namespace}.Controllers
             }}
 
             // Update fields that are allowed to be updated
-            toUpdate.Name = {TableVariableName}Data.Name;
-
+            {GenUpdateFields()}
+            
             // Perform the update
             var result = await {TableAlias}DataProvider.Update(toUpdate);
             if (result != 1)
@@ -201,6 +201,17 @@ namespace {Table.Namespace}.Controllers
             return toUpdate;
         }}
 ";
+        }
+
+        private string GenUpdateFields()
+        {
+            var updateStatements = new List<string>();
+            foreach (var field in Table.UpdateFields)
+            {
+                updateStatements.Add($"toUpdate.{field.FieldName} = {TableVariableName}Data.{field.FieldName}");
+            }
+
+            return string.Join($"{Environment.NewLine}            ", updateStatements);
         }
 
         private string DeleteMethod()
