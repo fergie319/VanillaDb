@@ -68,7 +68,7 @@ namespace ");
             
             #line default
             #line hidden
-            this.Write(".");
+            this.Write(".DataProviders.");
             
             #line 20 "C:\git\VanillaDb\VanillaDb\DataProviders\SqlDataProvider.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(Table.TableAlias));

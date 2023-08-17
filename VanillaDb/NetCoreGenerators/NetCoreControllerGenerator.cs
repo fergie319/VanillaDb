@@ -51,8 +51,8 @@ namespace VanillaDb.NetCoreGenerators
 
         private string BeginClass()
         {
-            return $@"using FleetRater.DataProviders.{TableAlias};
-using FleetRater.Filters;
+            return $@"using {Table.Namespace}.DataProviders.{TableAlias};
+using {Table.Namespace}.Models.{TableAlias};
 using Microsoft.AspNetCore.Mvc;
 
 namespace {Table.Namespace}.Controllers
