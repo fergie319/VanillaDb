@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using VanillaDb.Models;
 
 namespace VanillaDb.NetCoreGenerators
@@ -66,7 +68,7 @@ namespace {Table.Namespace}.Models
     /// <summary>Service Model for New {TableAlias}s</summary>
     public class New{TableAlias}Model
     {{
-{GenerateProperties(null)}
+{GenerateProperties(Table.InsertFields)}
     }}
 ";
         }
@@ -78,9 +80,8 @@ namespace {Table.Namespace}.Models
     public class {TableAlias}Model : New{TableAlias}Model
     {{
 {GenerateConstructors(Table.Fields, Table.InsertFields)}
-{GenerateProperties(null)}
-
-{GenerateToMethods(null)}
+{GenerateProperties(Table.Fields.Except(Table.InsertFields))}
+{GenerateToDataMethod(Table.Fields)}
     }}
 ";
         }
@@ -113,17 +114,25 @@ namespace {Table.Namespace}.Models
 
         private string GenerateProperties(IEnumerable<FieldModel> fields)
         {
-            return $@"        /// <summary>Gets or sets the name.</summary>
-        public string Name {{ get; set; }} = string.Empty;
+            var propertyStatements = new List<string>();
+            foreach (var field in fields)
+            {
+                // The compiler complains if strings are not assigned in the constructor
+                // So we perform an inline assignment to prevent the compiler warning
+                var assignment = string.Empty;
+                if (field.FieldType.FieldType == typeof(string))
+                {
+                    assignment = " = string.Empty;";
+                }
 
-        /// <summary>Gets or sets the Id.</summary>
-        public int Id {{ get; set; }}
+                propertyStatements.Add($"/// <summary>Gets or sets the {field.FieldName}.</summary>");
+                propertyStatements.Add($"public {field.FieldType.GetAliasOrName()} {field.FieldName} {{ get; set; }}{assignment}{Environment.NewLine}");
+            }
 
-        /// <summary>Gets or sets the update date UTC.</summary>
-        public DateTime UpdateDateUtc {{ get; set; }}";
+            return "        " + string.Join($"{Environment.NewLine}        ", propertyStatements);
         }
 
-        private string GenerateToMethods(IEnumerable<FieldModel> fields)
+        private string GenerateToDataMethod(IEnumerable<FieldModel> fields)
         {
             return $@"        /// <summary>Converts the {TableAlias}Model to {TableAlias}DataModel.</summary>
         /// <param name=""{TableVariableName}Model"">The {TableVariableName} model to convert.</param>
