@@ -23,8 +23,6 @@ namespace VanillaDb.NetCoreGenerators
 
         private FieldModel IdField { get { return Table.PrimaryKey; } }
 
-
-
         /// <summary>Gets the file extension.</summary>
         public string FileExtension => "cs";
 
@@ -88,26 +86,25 @@ namespace {Table.Namespace}.Models
 
         private string GenerateConstructors(IEnumerable<FieldModel> fields, IEnumerable<FieldModel> insertFields)
         {
-            return $@"        /// <summary>Initializes a new instance of the <see cref=""AccountModel""/> class.</summary>
-        public AccountModel()
+            var newAssignmentStatements = GetAssignmentStatements(insertFields, string.Empty, $"new{TableAlias}");
+            var dataAssignmentStatements = GetAssignmentStatements(fields, string.Empty, $"{TableVariableName}Data");
+            return $@"        /// <summary>Initializes a new instance of the <see cref=""{TableAlias}Model""/> class.</summary>
+        public {TableAlias}Model()
         {{
         }}
 
-        /// <summary>Initializes a new instance of the <see cref=""AccountModel""/> class from a NewAccountModel.</summary>
-        /// <param name=""newAccount"">The new account instance to initialize with.</param>
-        public AccountModel(NewAccountModel newAccount)
+        /// <summary>Initializes a new instance of the <see cref=""{TableAlias}Model""/> class from a New{TableAlias}Model.</summary>
+        /// <param name=""new{TableAlias}"">The new {TableVariableName} instance to initialize with.</param>
+        public {TableAlias}Model(New{TableAlias}Model new{TableAlias})
         {{
-
+            {string.Join($"{Environment.NewLine}            ", newAssignmentStatements)}
         }}
 
-        /// <summary>Initializes a new instance of the <see cref=""AccountModel""/> class from an AccountDataModel.</summary>
-        /// <param name=""accountData"">The account data to initialize with.</param>
-        public AccountModel(AccountDataModel accountData)
+        /// <summary>Initializes a new instance of the <see cref=""{TableAlias}Model""/> class from an {TableAlias}DataModel.</summary>
+        /// <param name=""{TableVariableName}Data"">The {TableVariableName} data to initialize with.</param>
+        public {TableAlias}Model({TableAlias}DataModel {TableVariableName}Data)
         {{
-            var result = new AccountModel();
-            result.Id = accountData.Id;
-            result.Name = accountData.Name;
-            result.UpdateDateUtc = accountData.UpdateDateUtc;
+            {string.Join($"{Environment.NewLine}            ", dataAssignmentStatements)}
         }}
 ";
         }
@@ -134,17 +131,27 @@ namespace {Table.Namespace}.Models
 
         private string GenerateToDataMethod(IEnumerable<FieldModel> fields)
         {
+            var assignmentStatements = GetAssignmentStatements(fields, "result.", $"{TableVariableName}Model");
             return $@"        /// <summary>Converts the {TableAlias}Model to {TableAlias}DataModel.</summary>
         /// <param name=""{TableVariableName}Model"">The {TableVariableName} model to convert.</param>
         /// <returns>{TableAlias}Data instance.</returns>
         public {TableAlias}DataModel ToData({TableAlias}Model {TableVariableName}Model)
         {{
             var result = new {TableAlias}DataModel();
-            result.Id = {TableVariableName}Model.Id;
-            result.Name = {TableVariableName}Model.Name;
-            result.UpdateDateUtc = {TableVariableName}Model.UpdateDateUtc;
+            {string.Join($"{Environment.NewLine}            ", assignmentStatements)}
             return result;
         }}";
+        }
+
+        private IEnumerable<string> GetAssignmentStatements(IEnumerable<FieldModel> fields, string toVariableName, string fromVariableName)
+        {
+            var assignmentStatements = new List<string>();
+            foreach (var field in fields)
+            {
+                assignmentStatements.Add($"{toVariableName}{field.FieldName} = {fromVariableName}.{field.FieldName};");
+            }
+
+            return assignmentStatements;
         }
 
         /// <summary>Generates the name for the generated file.</summary>
