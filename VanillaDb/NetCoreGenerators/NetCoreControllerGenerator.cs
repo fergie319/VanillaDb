@@ -45,14 +45,14 @@ namespace VanillaDb.NetCoreGenerators
                 GetByIdMethod() + Environment.NewLine +
                 CreateMethod() + Environment.NewLine +
                 UpdateMethod() + Environment.NewLine +
-                DeleteMethod() + Environment.NewLine +
+                DeleteMethod() +
                 EndClass();
         }
 
         private string BeginClass()
         {
             return $@"using {Table.Namespace}.DataProviders.{TableAlias};
-using {Table.Namespace}.Models.{TableAlias};
+using {Table.Namespace}.Models;
 using Microsoft.AspNetCore.Mvc;
 
 namespace {Table.Namespace}.Controllers
@@ -92,10 +92,10 @@ namespace {Table.Namespace}.Controllers
             return $@"        /// <summary>Gets all {TableVariableName}s in the system.</summary>
         /// <returns>List of {TableAlias}s</returns>
         [HttpGet]
-        public async Task<IEnumerable<{TableAlias}DataModel>> Get{TableAlias}s()
+        public async Task<IEnumerable<{TableAlias}Model>> Get{TableAlias}s()
         {{
             var {TableVariableName}s = await {TableAlias}DataProvider.GetAll();
-            return {TableVariableName}s;
+            return {TableVariableName}s.Select(d => new {TableAlias}Model(d));
         }}
 ";
         }
@@ -114,7 +114,7 @@ namespace {Table.Namespace}.Controllers
                 throw new HttpResponseException(404, $""No {TableVariableName} with {IdField.FieldName} {{{IdField.GetCodeParamName()}}} exists."");
             }}
 
-            return {TableVariableName};
+            return new {TableAlias}Model({TableVariableName});
         }}
 ";
         }
@@ -125,7 +125,7 @@ namespace {Table.Namespace}.Controllers
         /// <param name=""new{TableAlias}"">The {TableVariableName}s model.</param>
         /// <returns>new {TableVariableName}</returns>
         [HttpPost]
-        public async Task<{TableAlias}DataModel> Create{TableAlias}({TableAlias}DataModel new{TableAlias})
+        public async Task<{TableAlias}Model> Create{TableAlias}(New{TableAlias}Model new{TableAlias})
         {{
             if (new{TableAlias} == null)
             {{
@@ -143,8 +143,11 @@ namespace {Table.Namespace}.Controllers
                 throw new InvalidOperationException($""{TableAlias} Name {{new{TableAlias}.Name}} already exists."");
             }}
 
-            new{TableAlias}.{IdField.FieldName} = await {TableAlias}DataProvider.Insert(new{TableAlias});
-            return new{TableAlias};
+            // TODO: Initialize auto-populated fields here, e.g. create date
+
+            var toInsert = new {TableAlias}Model(new{TableAlias});
+            toInsert.{IdField.FieldName} = await {TableAlias}DataProvider.Insert(toInsert.ToData());
+            return new toInsert;
         }}
 ";
         }
@@ -157,11 +160,11 @@ namespace {Table.Namespace}.Controllers
         /// <returns>updated {TableVariableName}</returns>
         [Route(""{{{IdField.GetCodeParamName()}}}"")]
         [HttpPut]
-        public async Task<{TableAlias}DataModel> Update{TableAlias}(int {IdField.GetCodeParamName()}, {TableAlias}DataModel {TableVariableName}Data)
+        public async Task<{TableAlias}Model> Update{TableAlias}(int {IdField.GetCodeParamName()}, New{TableAlias}Model {TableVariableName}Model)
         {{
-            if ({TableVariableName}Data == null)
+            if ({TableVariableName}Model == null)
             {{
-                throw new ArgumentNullException(nameof({TableVariableName}Data));
+                throw new ArgumentNullException(nameof({TableVariableName}Model));
             }}
 
             if ({IdField.GetCodeParamName()} <= 0)
@@ -175,18 +178,7 @@ namespace {Table.Namespace}.Controllers
                 throw new HttpResponseException(404, $""No {TableVariableName} with ID {{{IdField.GetCodeParamName()}}} exists."");
             }}
 
-            // Validate that the updated {TableVariableName} name doesn't already exist
-            if (!string.Equals({TableVariableName}Data.Name, toUpdate.Name, StringComparison.InvariantCultureIgnoreCase))
-            {{
-                // Verify the {TableVariableName} name against all other {TableVariableName}s except the one we're updating
-                var {TableVariableName}s = await {TableAlias}DataProvider.GetAll();
-                if ({TableVariableName}s
-                    .Except({TableVariableName}s.Where(a => a.{IdField.FieldName} == {IdField.GetCodeParamName()}))
-                    .Any(a => string.Equals(a.Name, {TableVariableName}Data.Name, StringComparison.InvariantCultureIgnoreCase)))
-                {{
-                    throw new InvalidOperationException($""{TableAlias} Name {{{TableVariableName}Data.Name}} already exists."");
-                }}
-            }}
+            // TODO: Implement Validations here
 
             // Update fields that are allowed to be updated
             {GenUpdateFields()}
@@ -198,7 +190,7 @@ namespace {Table.Namespace}.Controllers
                 throw new InvalidOperationException($""{{result}} records were updated when it should have been one."");
             }}
 
-            return toUpdate;
+            return new {TableAlias}Model(toUpdate);
         }}
 ";
         }
@@ -216,8 +208,7 @@ namespace {Table.Namespace}.Controllers
 
         private string DeleteMethod()
         {
-            return $@"
-        /// <summary>Deletes the {TableVariableName} with the given {IdField.FieldName}.</summary>
+            return $@"        /// <summary>Deletes the {TableVariableName} with the given {IdField.FieldName}.</summary>
         /// <param name=""{TableVariableName}{IdField.FieldName}"">The {TableVariableName} {IdField.FieldName}.</param>
         [Route(""{{{IdField.GetCodeParamName()}}}"")]
         [HttpDelete]
