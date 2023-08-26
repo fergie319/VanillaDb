@@ -53,6 +53,7 @@ namespace VanillaDb.NetCoreGenerators
         {
             return $@"using {Table.Namespace}.DataProviders.{TableAlias};
 using {Table.Namespace}.Models;
+using {Table.Namespace}.Filters;
 using Microsoft.AspNetCore.Mvc;
 
 namespace {Table.Namespace}.Controllers
@@ -106,7 +107,7 @@ namespace {Table.Namespace}.Controllers
         /// <returns>{TableAlias} with the given {IdField.FieldName}.</returns>
         [Route(""{{{IdField.GetCodeParamName()}}}"")]
         [HttpGet]
-        public async Task<{TableAlias}DataModel> Get{TableAlias}(int {IdField.GetCodeParamName()})
+        public async Task<{TableAlias}Model> Get{TableAlias}(int {IdField.GetCodeParamName()})
         {{
             var {TableVariableName} = await {TableAlias}DataProvider.GetBy{IdField.FieldName}({IdField.GetCodeParamName()});
             if ({TableVariableName} == null)
@@ -147,7 +148,7 @@ namespace {Table.Namespace}.Controllers
 
             var toInsert = new {TableAlias}Model(new{TableAlias});
             toInsert.{IdField.FieldName} = await {TableAlias}DataProvider.Insert(toInsert.ToData());
-            return new toInsert;
+            return toInsert;
         }}
 ";
         }
@@ -156,7 +157,7 @@ namespace {Table.Namespace}.Controllers
         {
             return $@"        /// <summary>Updates the {TableVariableName}.</summary>
         /// <param name=""{IdField.GetCodeParamName()}""></param>
-        /// <param name=""{TableVariableName}Data""></param>
+        /// <param name=""{TableVariableName}Model""></param>
         /// <returns>updated {TableVariableName}</returns>
         [Route(""{{{IdField.GetCodeParamName()}}}"")]
         [HttpPut]
@@ -200,7 +201,7 @@ namespace {Table.Namespace}.Controllers
             var updateStatements = new List<string>();
             foreach (var field in Table.UpdateFields)
             {
-                updateStatements.Add($"toUpdate.{field.FieldName} = {TableVariableName}Data.{field.FieldName}");
+                updateStatements.Add($"toUpdate.{field.FieldName} = {TableVariableName}Model.{field.FieldName};");
             }
 
             return string.Join($"{Environment.NewLine}            ", updateStatements);
@@ -209,12 +210,12 @@ namespace {Table.Namespace}.Controllers
         private string DeleteMethod()
         {
             return $@"        /// <summary>Deletes the {TableVariableName} with the given {IdField.FieldName}.</summary>
-        /// <param name=""{TableVariableName}{IdField.FieldName}"">The {TableVariableName} {IdField.FieldName}.</param>
+        /// <param name=""{IdField.GetCodeParamName()}"">The {TableVariableName} {IdField.FieldName}.</param>
         [Route(""{{{IdField.GetCodeParamName()}}}"")]
         [HttpDelete]
-        public async Task Delete{TableAlias}(int {TableVariableName}{IdField.FieldName})
+        public async Task Delete{TableAlias}(int {IdField.GetCodeParamName()})
         {{
-            await {TableAlias}DataProvider.Delete({TableVariableName}{IdField.FieldName});
+            await {TableAlias}DataProvider.Delete({IdField.GetCodeParamName()});
         }}
 ";
         }

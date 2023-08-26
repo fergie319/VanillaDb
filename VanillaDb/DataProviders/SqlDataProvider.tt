@@ -29,7 +29,7 @@ namespace <#= Table.Namespace #>.DataProviders.<#= Table.TableAlias #>
     using Microsoft.Extensions.Logging.Abstractions;
 
     /// <summary>SQL implementation of data provider interface for <#= Record #> data.</summary>
-    /// <seealso cref="<#= Table.Namespace #>.<#= Table.TableAlias #>.I<#= Record #>DataProvider" />
+    /// <seealso cref="<#= Table.Namespace #>.DataProviders.<#= Table.TableAlias #>.I<#= Record #>DataProvider" />
     public partial class <#= GenerateName() #> : I<#= Record #>DataProvider
     {
         private ILogger Log { get; set; }

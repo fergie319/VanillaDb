@@ -86,8 +86,8 @@ namespace {Table.Namespace}.Models
 
         private string GenerateConstructors(IEnumerable<FieldModel> fields, IEnumerable<FieldModel> insertFields)
         {
-            var newAssignmentStatements = GetAssignmentStatements(insertFields, string.Empty, $"new{TableAlias}");
-            var dataAssignmentStatements = GetAssignmentStatements(fields, string.Empty, $"{TableVariableName}Data");
+            var newAssignmentStatements = GetAssignmentStatements(insertFields, string.Empty, $"new{TableAlias}.");
+            var dataAssignmentStatements = GetAssignmentStatements(fields, string.Empty, $"{TableVariableName}Data.");
             return $@"        /// <summary>Initializes a new instance of the <see cref=""{TableAlias}Model""/> class.</summary>
         public {TableAlias}Model()
         {{
@@ -131,11 +131,10 @@ namespace {Table.Namespace}.Models
 
         private string GenerateToDataMethod(IEnumerable<FieldModel> fields)
         {
-            var assignmentStatements = GetAssignmentStatements(fields, "result.", $"{TableVariableName}Model");
+            var assignmentStatements = GetAssignmentStatements(fields, "result.", string.Empty);
             return $@"        /// <summary>Converts the {TableAlias}Model to {TableAlias}DataModel.</summary>
-        /// <param name=""{TableVariableName}Model"">The {TableVariableName} model to convert.</param>
         /// <returns>{TableAlias}Data instance.</returns>
-        public {TableAlias}DataModel ToData({TableAlias}Model {TableVariableName}Model)
+        public {TableAlias}DataModel ToData()
         {{
             var result = new {TableAlias}DataModel();
             {string.Join($"{Environment.NewLine}            ", assignmentStatements)}
@@ -148,7 +147,7 @@ namespace {Table.Namespace}.Models
             var assignmentStatements = new List<string>();
             foreach (var field in fields)
             {
-                assignmentStatements.Add($"{toVariableName}{field.FieldName} = {fromVariableName}.{field.FieldName};");
+                assignmentStatements.Add($"{toVariableName}{field.FieldName} = {fromVariableName}{field.FieldName};");
             }
 
             return assignmentStatements;

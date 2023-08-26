@@ -145,37 +145,37 @@ namespace VanillaDb
 
             // Write out any static files
             File.WriteAllText($"{config.OutputCodePath}\\QueryOperator.cs",
-@"
-namespace " + config.CodeNamespace + @"
-{
+$@"
+namespace {config.CodeNamespace}.DataProviders
+{{
     /// <summary>Enumeration for the different query operators available to use.</summary>
     public enum QueryOperator
-    {
+    {{
         /// <summary>The equals operator</summary>
         Equals = 0,
         /// <summary>The greater-than operator</summary>
         GreaterThan = 1,
         /// <summary>The less-than operator</summary>
         LessThan = 2
-    }
-}
+    }}
+}}
 ");
 
             File.WriteAllText($"{config.OutputCodePath}\\TemporalTypes.cs",
-@"
-namespace " + config.CodeNamespace + @"
-{
+$@"
+namespace {config.CodeNamespace}.DataProviders
+{{
     /// <summary>Enumeration for the types of temporal queries supported by VanillaDb</summary>
     public enum TemporalTypes
-    {
+    {{
         /// <summary>The default behavior - for querying current record.</summary>
         Default = 0,
         /// <summary>As of - for querying a record(s) as of a specific date.</summary>
         AsOf = 1,
         /// <summary>All - for querying all current and historical data.</summary>
         All = 2
-    }
-}
+    }}
+}}
 ");
 
             return result;
