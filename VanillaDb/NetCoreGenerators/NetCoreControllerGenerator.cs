@@ -133,16 +133,7 @@ namespace {Table.Namespace}.Controllers
                 throw new ArgumentNullException(nameof(new{TableAlias}));
             }}
 
-            if (string.IsNullOrEmpty(new{TableAlias}.Name))
-            {{
-                throw new InvalidOperationException($""{TableAlias} Name is a required property of the {TableAlias}."");
-            }}
-
-            var {TableVariableName}s = await {TableAlias}DataProvider.GetAll();
-            if ({TableVariableName}s.Any(a => string.Equals(a.Name, new{TableAlias}.Name, StringComparison.InvariantCultureIgnoreCase)))
-            {{
-                throw new InvalidOperationException($""{TableAlias} Name {{new{TableAlias}.Name}} already exists."");
-            }}
+            // TODO: Perform validation here
 
             // TODO: Initialize auto-populated fields here, e.g. create date
 
