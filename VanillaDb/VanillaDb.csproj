@@ -101,6 +101,7 @@
   <ItemGroup>
     <Compile Include="CodeTemplateExtensions.cs" />
     <Compile Include="DataDictionaryParser.cs" />
+    <Compile Include="DataProviders\AddDataProviderExtensionGenerator.cs" />
     <Compile Include="DataProviders\DataModel.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>

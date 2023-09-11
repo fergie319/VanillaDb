@@ -131,17 +131,24 @@ namespace VanillaDb
             }
 
             // Process just the table file, or all files in the folder depending on what was configured
+            var tables = new List<TableModel>();
             if (sqlFileInfo.Exists)
             {
-                ProcessTableSql(sqlFileInfo, config);
+                var table = ProcessTableSql(sqlFileInfo, config);
+                tables.Add(table);
             }
             else if (sqlDirectory.Exists)
             {
                 foreach (var fileInfo in sqlDirectory.EnumerateFiles("*.sql", SearchOption.AllDirectories))
                 {
-                    ProcessTableSql(fileInfo, config);
+                    var table = ProcessTableSql(fileInfo, config);
+                    tables.Add(table);
                 }
             }
+
+            // Generate the AddDataProviders extension method for easier type registration
+            var dataProviderExtGen = new AddDataProviderExtensionGenerator(tables);
+            dataProviderExtGen.GenerateFile($"{config.OutputCodePath}");
 
             // Write out any static files
             File.WriteAllText($"{config.OutputCodePath}\\QueryOperator.cs",
@@ -181,7 +188,7 @@ namespace {config.CodeNamespace}.DataProviders
             return result;
         }
 
-        private static void ProcessTableSql(FileInfo tableFileInfo, VanillaConfig config)
+        private static TableModel ProcessTableSql(FileInfo tableFileInfo, VanillaConfig config)
         {
             // Open the file and start parsing
             var table = new TableModel()
@@ -622,8 +629,10 @@ namespace {config.CodeNamespace}.DataProviders
             var tsModelGenerator = new TsModelGenerator(table, indexes);
             tsModelGenerator.GenerateFile($"{config.OutputTsServicesPath}\\Models");
 
-            // Add table config to file for easy configuration
+            // Add table config to file for easy configuration and return the table
             WriteTableConfigToFile(tableFileInfo, table);
+            table.Indexes = indexes;
+            return table;
         }
 
         private static void WriteTableConfigToFile(FileInfo tableFileInfo, TableModel table)
