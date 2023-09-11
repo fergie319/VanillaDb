@@ -39,6 +39,9 @@ namespace VanillaDb.Models
         /// <summary>Gets or sets the fields.</summary>
         public IList<FieldModel> Fields { get; set; }
 
+        /// <summary>Gets or sets the indexes.</summary>
+        public IEnumerable<IndexModel> Indexes { get; set; }
+
         /// <summary>Gets or sets the data dictionary for the table.</summary>
         public IEnumerable<DictionaryDefinitionModel> DataDictionary { get; set; }
 

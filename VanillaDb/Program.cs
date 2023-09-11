@@ -1,16 +1,18 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using Serilog;
+using Serilog.Sinks.SystemConsole.Themes;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using Newtonsoft.Json;
-using Serilog;
-using Serilog.Sinks.SystemConsole.Themes;
 using VanillaDb.Configuration;
 using VanillaDb.DataProviders;
 using VanillaDb.DeleteProcs;
 using VanillaDb.GetProcs;
 using VanillaDb.InsertProcs;
 using VanillaDb.Models;
+using VanillaDb.NetCoreGenerators;
+using VanillaDb.TypeScriptGenerators;
 using VanillaDb.TypeTables;
 using VanillaDb.UpdateProcs;
 
@@ -73,8 +75,8 @@ namespace VanillaDb
                 {
                     throw new InvalidOperationException(
                         $"{ConfigFileName} is required in folder hierarchy, or all required arguments must be provided.\n" +
-                        "Required Arguments: <Table>.sql|<directory> <outSqlDir> <outCodeDir> <namespace> <company-name> (optional)--generate-config <config-path>.\n" +
-                        "Optional Arguments: --verbose");
+                        "Required Arguments: <Table>.sql|<directory> <outSqlDir> <outCodeDir> <outC#ServicesDir> <outTsDir> <namespace> <company-name>\n" +
+                        "Optional Arguments: --generate-config <config-path> --verbose");
                 }
                 else
                 {
@@ -84,34 +86,36 @@ namespace VanillaDb
                     config = JsonConvert.DeserializeObject<VanillaConfig>(configString);
                 }
             }
-            else if (args.Length == 5 || args.Length == 7)
+            else if (args.Length == 7 || args.Length == 9)
             {
                 config = new VanillaConfig()
                 {
                     TableSqlPath = args[0],
                     OutputSqlPath = args[1],
                     OutputCodePath = args[2],
-                    CodeNamespace = args[3],
-                    CompanyName = args[4]
+                    OutputControllersPath = args[3],
+                    OutputTsServicesPath = args[4],
+                    CodeNamespace = args[5],
+                    CompanyName = args[6]
                 };
 
-                // If 6 arguments, then check for --generate-config
-                if (args.Length == 7 && string.Equals(args[5], "--generate-config", StringComparison.InvariantCultureIgnoreCase))
+                // If 9 arguments, then check for --generate-config
+                if (args.Length == 9 && string.Equals(args[7], "--generate-config", StringComparison.InvariantCultureIgnoreCase))
                 {
                     // Set the working directory to the vanillaDb.config folder so relative paths work relative to that file
-                    var outputLocation = args[6];
+                    var outputLocation = args[8];
                     var outputContents = JsonConvert.SerializeObject(config, Formatting.Indented);
-                    var outputDirInfo = new DirectoryInfo(args[6]);
+                    var outputDirInfo = new DirectoryInfo(outputLocation);
                     Directory.SetCurrentDirectory(outputDirInfo.FullName);
                     File.WriteAllText(Path.Combine(outputLocation, ConfigFileName), outputContents);
                 }
             }
-            else if (args.Length != 5)
+            else
             {
-                // If 5 arguments, then assume all arguments were provided
                 throw new ArgumentException(
-                        $"{ConfigFileName} is required in folder hierarchy, or all required arguments must be provided." +
-                        "Required Arguments: <Table>.sql|<directory> <outSqlDir> <outCodeDir> <namespace> <company-name> (optional)--generate-config <config-path>.");
+                        $"{ConfigFileName} is required in folder hierarchy, or all required arguments must be provided.\n" +
+                        "Required Arguments: <Table>.sql|<directory> <outSqlDir> <outCodeDir> <outC#ServicesDir> <outJsDir> <namespace> <company-name>\n" +
+                        "Optional Arguments: --generate-config <config-path> --verbose");
             }
 
             // First param is the table file - expect *.sql - or directory containing *.sql table definition files
@@ -127,57 +131,64 @@ namespace VanillaDb
             }
 
             // Process just the table file, or all files in the folder depending on what was configured
+            var tables = new List<TableModel>();
             if (sqlFileInfo.Exists)
             {
-                ProcessTableSql(sqlFileInfo, config);
+                var table = ProcessTableSql(sqlFileInfo, config);
+                tables.Add(table);
             }
             else if (sqlDirectory.Exists)
             {
                 foreach (var fileInfo in sqlDirectory.EnumerateFiles("*.sql", SearchOption.AllDirectories))
                 {
-                    ProcessTableSql(fileInfo, config);
+                    var table = ProcessTableSql(fileInfo, config);
+                    tables.Add(table);
                 }
             }
 
+            // Generate the AddDataProviders extension method for easier type registration
+            var dataProviderExtGen = new AddDataProviderExtensionGenerator(tables);
+            dataProviderExtGen.GenerateFile($"{config.OutputCodePath}");
+
             // Write out any static files
             File.WriteAllText($"{config.OutputCodePath}\\QueryOperator.cs",
-@"
-namespace " + config.CodeNamespace + @"
-{
+$@"
+namespace {config.CodeNamespace}.DataProviders
+{{
     /// <summary>Enumeration for the different query operators available to use.</summary>
     public enum QueryOperator
-    {
+    {{
         /// <summary>The equals operator</summary>
         Equals = 0,
         /// <summary>The greater-than operator</summary>
         GreaterThan = 1,
         /// <summary>The less-than operator</summary>
         LessThan = 2
-    }
-}
+    }}
+}}
 ");
 
             File.WriteAllText($"{config.OutputCodePath}\\TemporalTypes.cs",
-@"
-namespace " + config.CodeNamespace + @"
-{
+$@"
+namespace {config.CodeNamespace}.DataProviders
+{{
     /// <summary>Enumeration for the types of temporal queries supported by VanillaDb</summary>
     public enum TemporalTypes
-    {
+    {{
         /// <summary>The default behavior - for querying current record.</summary>
         Default = 0,
         /// <summary>As of - for querying a record(s) as of a specific date.</summary>
         AsOf = 1,
         /// <summary>All - for querying all current and historical data.</summary>
         All = 2
-    }
-}
+    }}
+}}
 ");
 
             return result;
         }
 
-        private static void ProcessTableSql(FileInfo tableFileInfo, VanillaConfig config)
+        private static TableModel ProcessTableSql(FileInfo tableFileInfo, VanillaConfig config)
         {
             // Open the file and start parsing
             var table = new TableModel()
@@ -589,7 +600,7 @@ namespace " + config.CodeNamespace + @"
             var dataProviderInterfaceGen = new DataProviderInterface(table, indexes);
             dataProviderInterfaceGen.GenerateFile(dataProviderDir);
 
-            // Generate the SqlDataProvider classC:\git\RFA.Bank.Finance\Remittance.Database\Tables\pSubledger_Daily.sql
+            // Generate the SqlDataProvider class
             var sqlDataProviderGen = new SqlDataProvider(table, indexes);
             sqlDataProviderGen.GenerateFile(dataProviderDir);
 
@@ -600,8 +611,28 @@ namespace " + config.CodeNamespace + @"
                 File.WriteAllText(extendedPropertiesFile, extendedPropertiesScript);
             }
 
-            // Add table config to file for easy configuration
+            // Generate the CSharp Services output
+            Directory.CreateDirectory(config.OutputControllersPath);
+            Directory.CreateDirectory($"{config.OutputControllersPath}\\Controllers");
+            Directory.CreateDirectory($"{config.OutputControllersPath}\\Models");
+            var netControllerGenerator = new NetCoreControllerGenerator(table, indexes);
+            netControllerGenerator.GenerateFile($"{config.OutputControllersPath}\\Controllers");
+            var netModelGenerator = new NetCoreModelGenerator(table, indexes);
+            netModelGenerator.GenerateFile($"{config.OutputControllersPath}\\Models");
+
+            // Generate the TS Services output
+            Directory.CreateDirectory(config.OutputTsServicesPath);
+            Directory.CreateDirectory($"{config.OutputTsServicesPath}\\Services");
+            Directory.CreateDirectory($"{config.OutputTsServicesPath}\\Models");
+            var tsServiceGenerator = new TsServiceGenerator(table, indexes);
+            tsServiceGenerator.GenerateFile($"{config.OutputTsServicesPath}\\Services");
+            var tsModelGenerator = new TsModelGenerator(table, indexes);
+            tsModelGenerator.GenerateFile($"{config.OutputTsServicesPath}\\Models");
+
+            // Add table config to file for easy configuration and return the table
             WriteTableConfigToFile(tableFileInfo, table);
+            table.Indexes = indexes;
+            return table;
         }
 
         private static void WriteTableConfigToFile(FileInfo tableFileInfo, TableModel table)
