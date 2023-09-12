@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using VanillaDb.Models;
 
 namespace VanillaDb.TypeScriptGenerators
@@ -32,14 +33,54 @@ namespace VanillaDb.TypeScriptGenerators
         /// <returns>result string.</returns>
         public string TransformText()
         {
-            return string.Empty;
+            var result = $@"
+export default interface I{Table.TableAlias}Model
+{{
+{GenerateProperties()}}}
+";
+
+            return result;
+        }
+
+        private string GenerateProperties()
+        {
+            var propertyStatements = new List<string>();
+            foreach (var field in Table.Fields)
+            {
+                propertyStatements.Add($"/** Gets or sets the {field.FieldName}. */");
+                propertyStatements.Add($"{field.FieldName}: {GetFieldTsType(field.FieldType)}{Environment.NewLine}");
+            }
+
+            return "    " + string.Join($"{Environment.NewLine}    ", propertyStatements);
+        }
+
+        private string GetFieldTsType(FieldTypeModel fieldType)
+        {
+            switch (fieldType.GetAliasOrName())
+            {
+                case "int":
+                case "short":
+                case "byte":
+                case "long":
+                case "double":
+                case "decimal":
+                    return "number";
+                case "string":
+                    return "string";
+                case "bool":
+                    return "boolean";
+                case "DateTime":
+                    return "Date";
+                default:
+                    return fieldType.GetAliasOrName();
+            }
         }
 
         /// <summary>Generates the name for the generated file.</summary>
         /// <returns>Extensionless file name.</returns>
         public string GenerateName()
         {
-            return $"{Table.TableAlias}Model";
+            return $"I{Table.TableAlias}Model";
         }
     }
 }
