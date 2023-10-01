@@ -47,8 +47,9 @@ export default interface I{Table.TableAlias}Model
             var propertyStatements = new List<string>();
             foreach (var field in Table.Fields)
             {
+                var nullableChar = (field.IsNullable) ? "?" : string.Empty;
                 propertyStatements.Add($"/** Gets or sets the {field.FieldName}. */");
-                propertyStatements.Add($"{field.FieldName}: {GetFieldTsType(field.FieldType)}{Environment.NewLine}");
+                propertyStatements.Add($"{field.FieldName.ToCamelCase()}{nullableChar}: {GetFieldTsType(field.FieldType)}{Environment.NewLine}");
             }
 
             return "    " + string.Join($"{Environment.NewLine}    ", propertyStatements);
@@ -56,7 +57,7 @@ export default interface I{Table.TableAlias}Model
 
         private string GetFieldTsType(FieldTypeModel fieldType)
         {
-            switch (fieldType.GetAliasOrName())
+            switch (fieldType.GetAliasOrName().Replace("?", string.Empty))
             {
                 case "int":
                 case "short":
