@@ -90,7 +90,7 @@ export default class {TableAlias}sService {{
     }}
 
     Update{TableAlias} = async ({TableVariableName}: I{TableAlias}Model) => {{
-        let url = `/api/{TableAlias}s`;
+        let url = `/api/{TableAlias}s/${{{TableVariableName}.id}}`;
         const response = await axios.put<I{TableAlias}Model>(url, {TableVariableName});
         if (response.status == 200) {{
             {TableVariableName} = response.data;
@@ -102,7 +102,7 @@ export default class {TableAlias}sService {{
     }}
 
     Delete{TableAlias} = async (id: number) => {{
-        let url = `/api/{TableAlias}s`;
+        let url = `/api/{TableAlias}s/${{id}}`;
         const response = await axios.delete<I{TableAlias}Model>(url);
         if (response.status !== 200) {{
             throw new Error(`Server returned a ${{response.status}}.`);
