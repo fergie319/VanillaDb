@@ -39,13 +39,17 @@ namespace VanillaDb.NetCoreGenerators
         /// <returns>result string.</returns>
         public string TransformText()
         {
+            var getByIdMethod = (IdField != null) ? GetByIdMethod() + Environment.NewLine : string.Empty;
+            var insertMethod = (Table.Config.Insert) ? CreateMethod() + Environment.NewLine : string.Empty;
+            var updateMethod = (Table.Config.Update) ? UpdateMethod() + Environment.NewLine : string.Empty;
+            var deleteMethod = (Table.Config.Delete) ? DeleteMethod() : string.Empty;
             return
                 BeginClass() + Environment.NewLine +
                 GetAllMethod() + Environment.NewLine +
-                GetByIdMethod() + Environment.NewLine +
-                CreateMethod() + Environment.NewLine +
-                UpdateMethod() + Environment.NewLine +
-                DeleteMethod() +
+                getByIdMethod +
+                insertMethod +
+                updateMethod +
+                deleteMethod +
                 EndClass();
         }
 

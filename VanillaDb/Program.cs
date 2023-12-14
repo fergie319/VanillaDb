@@ -1,10 +1,10 @@
-﻿using Newtonsoft.Json;
-using Serilog;
-using Serilog.Sinks.SystemConsole.Themes;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Newtonsoft.Json;
+using Serilog;
+using Serilog.Sinks.SystemConsole.Themes;
 using VanillaDb.Configuration;
 using VanillaDb.DataProviders;
 using VanillaDb.DeleteProcs;
@@ -401,8 +401,8 @@ namespace {config.CodeNamespace}.DataProviders
                                 var splitIndexTokens = indexOnClause.Trim().Split(new[] { "(", ")" }, StringSplitOptions.RemoveEmptyEntries);
                                 var fieldClause = splitIndexTokens.Last();
 
-                                // Now split out the field names - removing whitespace characters
-                                var splitFields = fieldClause.Split(new[] { ",", " ", "[", "]", "\t" }, StringSplitOptions.RemoveEmptyEntries);
+                                // Now split out the field names - removing whitespace characters and common keywords
+                                var splitFields = fieldClause.Split(new[] { ",", " ", "[", "]", "\t", "ASC", "asc", "Asc", "DESC", "desc", "Desc" }, StringSplitOptions.RemoveEmptyEntries);
 
                                 // For each named field, find it add it to an index model
                                 var index = new IndexModel()
