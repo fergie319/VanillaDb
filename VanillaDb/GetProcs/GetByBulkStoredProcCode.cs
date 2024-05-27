@@ -53,9 +53,11 @@ namespace VanillaDb.GetProcs
         /// <returns>Newline separated stored procedure parameters</returns>
         public string GenerateProcParameters()
         {
-            // Create a list of the non-field parameters (like Query Operator and Temporal Operator)
+            // Create a list of the non-field parameters (like Temporal Operator)
+            // Note that QueryOperator is excluded for Bulk get-by methods because it wouldn't make sense
+            // (Imagine a join with a greater than comparison for multiple values)
             var procParams = Index.Parameters(TemporalType)
-                .Where(p => p.FieldType.IsSqlParameter)
+                .Where(p => p.FieldType.IsSqlParameter && p.FieldType.FieldType != typeof(QueryOperator))
                 .Select(p => $"    @{p.FieldName.ToCamelCase()} {p.FieldType.SqlType}")
                 .ToList();
             var fields = Index.Fields.Select(f => $"    @{f.FieldName.ToCamelCase()} {f.FieldType.SqlType}");
