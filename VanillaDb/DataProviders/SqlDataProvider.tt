@@ -140,9 +140,9 @@ namespace <#= Table.Namespace #>.DataProviders.<#= Table.TableAlias #>
             if (field.FieldType.FieldType == typeof(string))
             {
 #>
-            if (string.IsNullOrWhiteSpace(<#= field.FieldName.ToCamelCase() #>))
+            if (string.IsNullOrWhiteSpace(<#= field.GetCodeParamName() #>))
             {
-                throw new ArgumentNullException(nameof(<#= field.FieldName.ToCamelCase() #>));
+                throw new ArgumentNullException(nameof(<#= field.GetCodeParamName() #>));
             }
 
 <#
@@ -152,9 +152,9 @@ namespace <#= Table.Namespace #>.DataProviders.<#= Table.TableAlias #>
             if (field.IsIdentity && field.FieldType.FieldType == typeof(int))
             {
 #>
-            if (<#= field.FieldName.ToCamelCase() #> < 1)
+            if (<#= field.GetCodeParamName() #> < 1)
             {
-                throw new InvalidOperationException($"{<#= field.FieldName.ToCamelCase() #>} is not a valid <#= field.FieldName #>");
+                throw new InvalidOperationException($"{<#= field.GetCodeParamName() #>} is not a valid <#= field.FieldName #>");
             }
 
 <#
@@ -248,9 +248,9 @@ namespace <#= Table.Namespace #>.DataProviders.<#= Table.TableAlias #>
         foreach (FieldModel field in index.Fields)
         {
 #>
-            if (<#= field.FieldName.ToCamelCase() #>s == null || !<#= field.FieldName.ToCamelCase() #>s.Any())
+            if (<#= field.GetCodeParamName() #>s == null || !<#= field.GetCodeParamName() #>s.Any())
             {
-                throw new ArgumentNullException(nameof(<#= field.FieldName.ToCamelCase() #>s));
+                throw new ArgumentNullException(nameof(<#= field.GetCodeParamName() #>s));
             }
 
 <#
@@ -259,7 +259,7 @@ namespace <#= Table.Namespace #>.DataProviders.<#= Table.TableAlias #>
             // Create an in-memory datatable with all of the field values
             var idDataTable = new DataTable();
             <#= GenerateInMemoryDataColumns(index.Fields) #>
-            for (var i = 0; i < <#= index.Fields.ElementAt(0).FieldName.ToCamelCase() #>s.Count(); i++)
+            for (var i = 0; i < <#= index.Fields.ElementAt(0).GetCodeParamName() #>s.Count(); i++)
             {
                 <#= GenerateInMemoryRowCreation(index.Fields) #>
             }
@@ -362,9 +362,9 @@ namespace <#= Table.Namespace #>.DataProviders.<#= Table.TableAlias #>
             {
             #>
 
-            if (<#= RecordCamel #>Data.<#= PrimaryKey.FieldName #> > 0)
+            if (<#= RecordCamel #>Data.<#= PrimaryKey.GetCodeFieldName() #> > 0)
             {
-                throw new InvalidOperationException("Unable to insert <#= Record #> Data that already has a <#= PrimaryKey.FieldName #>.");
+                throw new InvalidOperationException("Unable to insert <#= Record #> Data that already has a <#= PrimaryKey.GetCodeFieldName() #>.");
             }
             <#
             }
@@ -389,7 +389,7 @@ namespace <#= Table.Namespace #>.DataProviders.<#= Table.TableAlias #>
                         if (Table.HasPrimaryKey)
                         {
 #>
-                        newId = (int)reader["<#= PrimaryKey.FieldName #>"];
+                        newId = (int)reader["<#= PrimaryKey.GetSqlFieldName() #>"];
 <#
                         }
 #>
@@ -425,11 +425,28 @@ namespace <#= Table.Namespace #>.DataProviders.<#= Table.TableAlias #>
             {
                 throw new InvalidOperationException("Connection String is null.  Insert operation cannot be performed.");
             }
+<#
+if (Table.HasPrimaryKey && PrimaryKey.IsStringField)
+{
+#>
 
-            if (<#= RecordCamel #>Data.<#=PrimaryKey.FieldName #> <= 0)
+            if (string.IsNullOrWhiteSpace(<#= RecordCamel #>Data.<#=PrimaryKey.GetCodeFieldName() #>))
             {
-                throw new InvalidOperationException("A valid <#=PrimaryKey.FieldName #> must be provided to update.");
+                throw new InvalidOperationException("A valid <#=PrimaryKey.GetCodeFieldName() #> must be provided to update.");
             }
+<#
+}
+else
+{
+#>
+
+            if (<#= RecordCamel #>Data.<#=PrimaryKey.GetCodeFieldName() #> <= 0)
+            {
+                throw new InvalidOperationException("A valid <#=PrimaryKey.GetCodeFieldName() #> must be provided to update.");
+            }
+<#
+}
+#>
 
             var affectedRows = 0;
             using (var connection = new SqlConnection(this.ConnectionString))
@@ -458,13 +475,13 @@ namespace <#= Table.Namespace #>.DataProviders.<#= Table.TableAlias #>
     if (Table.Config.Delete)
     {
 #>
-        /// <summary>Deletes record with the given <#= PrimaryKey.FieldName #> from the <#= Table.TableName #> table.</summary>
-        /// <param name="<#= PrimaryKey.GetCodeParamName() #>">The <#= PrimaryKey.FieldName #>.</param>
+        /// <summary>Deletes record with the given <#= PrimaryKey.GetCodeFieldName() #> from the <#= Table.TableName #> table.</summary>
+        /// <param name="<#= PrimaryKey.GetCodeParamName() #>">The <#= PrimaryKey.GetCodeFieldName() #>.</param>
         public async Task<int> Delete(int <#= PrimaryKey.GetCodeParamName() #>)
         {
             if (<#=PrimaryKey.GetCodeParamName() #> <= 0)
             {
-                throw new InvalidOperationException("A valid <#=PrimaryKey.FieldName #> must be provided to delete.");
+                throw new InvalidOperationException("A valid <#=PrimaryKey.GetCodeFieldName() #> must be provided to delete.");
             }
 
             var affectedRows = 0;
@@ -486,8 +503,8 @@ namespace <#= Table.Namespace #>.DataProviders.<#= Table.TableAlias #>
             return affectedRows;
         }
 
-        /// <summary>Deletes the records with the given <#= PrimaryKey.FieldName #>s from the <#= Table.TableName #> table.</summary>
-        /// <param name="<#= PrimaryKey.GetCodeParamName() #>s">The <#= PrimaryKey.FieldName #>s.</param>
+        /// <summary>Deletes the records with the given <#= PrimaryKey.GetCodeFieldName() #>s from the <#= Table.TableName #> table.</summary>
+        /// <param name="<#= PrimaryKey.GetCodeParamName() #>s">The <#= PrimaryKey.GetCodeFieldName() #>s.</param>
         public async Task<int> Delete(IEnumerable<int> <#= PrimaryKey.GetCodeParamName() #>s)
         {
             if (<#= PrimaryKey.GetCodeParamName() #>s == null)
@@ -497,12 +514,12 @@ namespace <#= Table.Namespace #>.DataProviders.<#= Table.TableAlias #>
 
             if (!<#= PrimaryKey.GetCodeParamName() #>s.Any())
             {
-                throw new ArgumentException("At least one <#= PrimaryKey.FieldName #> must be provided to delete.", nameof(<#= PrimaryKey.GetCodeParamName() #>s));
+                throw new ArgumentException("At least one <#= PrimaryKey.GetCodeFieldName() #> must be provided to delete.", nameof(<#= PrimaryKey.GetCodeParamName() #>s));
             }
 
             if (<#= PrimaryKey.GetCodeParamName() #>s.Any(i => i <= 0))
             {
-                throw new InvalidOperationException("All <#=PrimaryKey.FieldName #>s must be valid to delete.");
+                throw new InvalidOperationException("All <#=PrimaryKey.GetCodeFieldName() #>s must be valid to delete.");
             }
 
             // Create an in-memory datatable with the primary key values

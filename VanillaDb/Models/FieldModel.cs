@@ -5,8 +5,29 @@ namespace VanillaDb.Models
     /// <summary>Contains details about a field (name, type, whether it is indexed)</summary>
     public class FieldModel
     {
+        private string _fieldName = string.Empty;
+
         /// <summary>Gets or sets the name of the field.</summary>
-        public string FieldName { get; set; }
+        /// <remarks>Adds [] around field names that have special characters or that are SQL key words.</remarks>
+        public string FieldName
+        {
+            get
+            {
+                if (!string.IsNullOrEmpty(_fieldName) &&
+                    (_fieldName.Contains("-") ||
+                     _fieldName.Equals("Status", System.StringComparison.InvariantCultureIgnoreCase) ||
+                     _fieldName.Equals("Role", System.StringComparison.InvariantCultureIgnoreCase) ||
+                     _fieldName.Equals("Group", System.StringComparison.InvariantCultureIgnoreCase)))
+                {
+                    return "[" + _fieldName + "]";
+                }
+                else
+                {
+                    return _fieldName;
+                }
+            }
+            set => _fieldName = value;
+        }
 
         /// <summary>Gets or sets the field type details.</summary>
         public FieldTypeModel FieldType { get; set; }
@@ -33,19 +54,34 @@ namespace VanillaDb.Models
         /// and not a field in the table.</summary>
         public bool IsArtificialField { get; set; }
 
+        /// <summary>Gets the raw name of the SQL field (no brackets).</summary>
+        public string GetSqlFieldName()
+        {
+            return _fieldName;
+        }
+
+        /// <summary>Gets the name of the code field.</summary>
+        public string GetCodeFieldName()
+        {
+            return _fieldName.Replace("-", string.Empty);
+        }
+
         /// <summary>Gets this field's name as a stored procedure parameter.</summary>
         /// <returns>This field as a SQL Stored Procedure parameter name.</returns>
         public string GetParamName()
         {
-            return $"@{FieldName.ToCamelCase()}";
+            return $"@{_fieldName.Replace("-", string.Empty).ToCamelCase()}";
         }
 
         /// <summary>Gets this field's name as a method parameter in C#.</summary>
         /// <returns>this field as a method parameter in C#.</returns>
         public string GetCodeParamName()
         {
-            return $"{FieldName.ToCamelCase()}";
+            return $"{_fieldName.ToCamelCase()}";
         }
+
+        /// <summary>Gets a value indicating whether this is string field.</summary>
+        public bool IsStringField => FieldType.FieldType == typeof(string);
 
         /// <summary>
         /// Gets a value indicating whether this instance is range field

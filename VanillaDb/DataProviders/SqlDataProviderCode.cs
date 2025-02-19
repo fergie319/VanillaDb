@@ -73,8 +73,8 @@ namespace VanillaDb.DataProviders
                 .Select(f =>
                 {
                     return (f.IsNullable)
-                        ? $"\"@{f.FieldName.ToCamelCase()}\", {recordParam}.{f.FieldName} ?? (object)DBNull.Value"
-                        : $"\"@{f.FieldName.ToCamelCase()}\", {recordParam}.{f.FieldName}";
+                        ? $"\"{f.GetParamName()}\", {recordParam}.{f.GetCodeFieldName()} ?? (object)DBNull.Value"
+                        : $"\"{f.GetParamName()}\", {recordParam}.{f.GetCodeFieldName()}";
                 });
 
             var addParameters = parameters.Select(p => $"command.Parameters.AddWithValue({p});");
@@ -98,8 +98,8 @@ namespace VanillaDb.DataProviders
                 .Select(f =>
                 {
                     return (f.IsNullable)
-                        ? $"\"{f.GetParamName()}\", {recordParam}.{f.FieldName} ?? (object)DBNull.Value"
-                        : $"\"{f.GetParamName()}\", {recordParam}.{f.FieldName}";
+                        ? $"\"{f.GetParamName()}\", {recordParam}.{f.GetCodeFieldName()} ?? (object)DBNull.Value"
+                        : $"\"{f.GetParamName()}\", {recordParam}.{f.GetCodeFieldName()}";
                 });
 
             var addParameters = parameters.Select(p => $"command.Parameters.AddWithValue({p});");
@@ -115,8 +115,8 @@ namespace VanillaDb.DataProviders
             var readLines = Table.Fields.Select(f =>
             {
                 return (f.IsNullable)
-                    ? $"data.{f.FieldName} = (reader[\"{f.FieldName}\"] != DBNull.Value) ? ({f.FieldType.GetAliasOrName()})reader[\"{f.FieldName}\"] : null;"
-                    : $"data.{f.FieldName} = ({f.FieldType.GetAliasOrName()})reader[\"{f.FieldName}\"];";
+                    ? $"data.{f.GetCodeFieldName()} = (reader[\"{f.GetSqlFieldName()}\"] != DBNull.Value) ? ({f.FieldType.GetAliasOrName()})reader[\"{f.GetSqlFieldName()}\"] : null;"
+                    : $"data.{f.GetCodeFieldName()} = ({f.FieldType.GetAliasOrName()})reader[\"{f.GetSqlFieldName()}\"];";
             });
 
             return string.Join($"{Environment.NewLine}{indent}", readLines);

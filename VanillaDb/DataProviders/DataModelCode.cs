@@ -33,8 +33,8 @@ namespace VanillaDb.DataProviders
         {
             var indent = "        ";
             var properties = Table.Fields
-                .Select(f => $"/// <summary>Gets or sets the {f.FieldName}.</summary>{Environment.NewLine}{GetRemarks(f, indent)}" +
-                             $"{indent}public {f.FieldType.GetAliasOrName()} {f.FieldName} {{ get; set; }}");
+                .Select(f => $"/// <summary>Gets or sets the {f.GetCodeFieldName()}.</summary>{Environment.NewLine}{GetRemarks(f, indent)}" +
+                             $"{indent}public {f.FieldType.GetAliasOrName()} {f.GetCodeFieldName()} {{ get; set; }}");
             return string.Join($"{Environment.NewLine}{Environment.NewLine}{indent}", properties);
         }
 

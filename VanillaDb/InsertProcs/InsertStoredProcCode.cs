@@ -31,7 +31,7 @@ namespace VanillaDb.InsertProcs
         public string GenerateProcParameters()
         {
             var insertParams = Table.InsertFields
-                .Select(f => $"    @{f.FieldName.ToCamelCase()} {f.FieldType.SqlType}");
+                .Select(f => $"    {f.GetParamName()} {f.FieldType.SqlType}");
             return string.Join("," + Environment.NewLine, insertParams);
         }
 
@@ -55,7 +55,7 @@ namespace VanillaDb.InsertProcs
         /// <returns></returns>
         public string GenerateValuesFields()
         {
-            var insertParams = Table.InsertFields.Select(f => "@" + f.FieldName.ToCamelCase());
+            var insertParams = Table.InsertFields.Select(f => f.GetParamName());
             return string.Join(", ", insertParams);
         }
     }
